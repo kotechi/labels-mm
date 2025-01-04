@@ -13,6 +13,9 @@ return new class extends Migration
     {
         Schema::create('headers', function (Blueprint $table) {
             $table->id();
+            $table->string('tittle');
+            $table->string('image');
+            $table->string('description');            
             $table->timestamps();
         });
     }

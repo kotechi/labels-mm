@@ -9,6 +9,12 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body>
+
+    @foreach($headers as $header) 
+        {{ $header->tittle }}
+        {{ $header->description }}
+        {{$header->image}}
+    @endforeach
     
 <div class="py-12">
     <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
@@ -22,7 +28,7 @@
                 {{-- Gambar Produk --}}
                 <div class="relative h-48">
                     <img 
-                        src="{{ asset('storage/' . $product->gambar) }}" 
+                        src="{{ asset('storage/' . $product->image) }}" 
                         alt="{{ $product->nama }}"
                         class="w-full h-full object-cover"
                     >
