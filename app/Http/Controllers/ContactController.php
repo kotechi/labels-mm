@@ -27,7 +27,7 @@ class ContactController extends Controller
 
         Contact::create($request->all());
 
-        return redirect()->route('contacts.index')
+        return redirect()->route('content.index')
                          ->with('success', 'Contact created successfully.');
     }
 
@@ -50,7 +50,7 @@ class ContactController extends Controller
 
         $contact->update($request->all());
 
-        return redirect()->route('contacts.index')
+        return redirect()->route('content.index')
                          ->with('success', 'Contact updated successfully.');
     }
 
@@ -58,7 +58,7 @@ class ContactController extends Controller
     {
         $contact->delete();
 
-        return redirect()->route('contacts.index')
+        return redirect()->route('content.index')
                          ->with('success', 'Contact deleted successfully.');
     }
 }

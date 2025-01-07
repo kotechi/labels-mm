@@ -37,7 +37,7 @@ class HeaderController extends Controller
                     'image' => 'images/headers/' . $imageName
                 ]);
 
-                return redirect()->route('headers.header')->with('success', 'Header created successfully');
+                return redirect()->route('content.index')->with('success', 'Header created successfully');
             }
 
             throw new \Exception('Invalid image file');
@@ -81,7 +81,7 @@ class HeaderController extends Controller
                 $header->update($request->except('image'));
             }
 
-            return redirect()->route('headers.header')->with('success', 'Header updated successfully');
+            return redirect()->route('content.index')->with('success', 'Header updated successfully');
 
         } catch (\Exception $e) {
             return back()
@@ -98,7 +98,7 @@ class HeaderController extends Controller
             }
 
             $header->delete();
-            return redirect()->route('headers.header')->with('success', 'Header deleted successfully');
+            return redirect()->route('content.index')->with('success', 'Header deleted successfully');
         } catch (\Exception $e) {
             return back()->withErrors(['error' => 'Failed to delete header']);
         }
