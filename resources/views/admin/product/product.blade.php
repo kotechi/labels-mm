@@ -16,7 +16,7 @@
 	<link href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css" rel="stylesheet">
 	<!--Responsive Extension Datatables CSS-->
 	<link href="https://cdn.datatables.net/responsive/2.2.3/css/responsive.dataTables.min.css" rel="stylesheet">
-
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 	<style>
 		/*Overrides for Tailwind CSS */
 
@@ -129,36 +129,38 @@
 		<div id='recipients' class="p-8 mt-6 lg:mt-0 rounded shadow bg-white">
 
 
-			<table id="productTable" class="stripe hover" style="width:100%; padding-top: 1em;  padding-bottom: 1em;">
-				<thead class="bg-blue-500">
+			<table id="example" class="stripe hover" style="width:100%; padding-top: 1em;  padding-bottom: 1em;">
+				<thead>
 					<tr>
-						<th data-priority="1" class="text-white">Name</th>
-						<th data-priority="2" class="text-white">Price</th>
-						<th data-priority="3" class="text-white">Link</th>
-						<th data-priority="4" class="text-white">deskripsi</th>
-						<th data-priority="5" class="text-white">Image</th>
-						<th data-priority="6" class="text-white">Action</th>
+						<th data-priority="1">Name</th>
+						<th data-priority="2">Price</th>
+						<th data-priority="3">Link</th>
+						<th data-priority="4">deskripsi</th>
+						<th data-priority="5">Image</th>
+						<th data-priority="6">Action</th>
 					</tr>
 				</thead>
 				<tbody>
                     @foreach($products as $product)
 					<tr>
+                        
 						<td>{{$product->nama}}</td>
 						<td>{{$product->harga}}</td>
 						<td>{{$product->link}}</td>
 						<td>{{$product->deskripsi}}</td>
-						 <td><a href="#" onclick="openModal('{{ asset('storage/' . $product->image) }}')"><img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->nama }}" title="{{ $product->nama }}" width="100"></a></td>
+						 <td><img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->nama }}" width="100"></td>
 						<td>
                             <a href="{{ route('products.edit', $product->id) }}" class="btn btn-primary">Edit</a>
-                            <form action="{{ route('products.destroy', $product->id) }}" method="POST" style="display:inline;">
+                            <form action="{{ route('products.destroy', $product->id) }}" method="POST" class="inline-block delete-form">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="btn btn-danger">Delete</button>
+                                <button type="button" class="btn btn-danger delete-button">Delete</button>
                             </form>
                         </td>
 					</tr>
                     @endforeach
 				</tbody>
+
 			</table>
 
 
@@ -169,14 +171,6 @@
 	</div>
 	<!--/container-->
 
-	<!-- Modal -->
-	<div id="imageModal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center hidden">
-	    <div class="bg-white p-4 rounded-lg">
-	        <img id="modalImage" src="" alt="Image" class="max-w-full h-auto">
-	        <button onclick="closeModal()" class="mt-4 px-4 py-2 bg-red-500 text-white rounded-lg">Close</button>
-	    </div>
-	</div>
-
 	<!-- jQuery -->
 	<script type="text/javascript" src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
 
@@ -185,25 +179,31 @@
 	<script src="https://cdn.datatables.net/responsive/2.2.3/js/dataTables.responsive.min.js"></script>
 	<script>
 		$(document).ready(function() {
-			var table = $('#productTable').DataTable({
+
+			var table = $('#example').DataTable({
 					responsive: true
 				})
 				.columns.adjust()
 				.responsive.recalc();
-			
-			// Add margin-bottom to show entries and search elements
-			$('.dataTables_length').addClass('mb-4');
-			$('.dataTables_filter').addClass('mb-4');
+
+			// SweetAlert for delete confirmation
+			$('.delete-button').on('click', function() {
+				var form = $(this).closest('form');
+				Swal.fire({
+					title: 'Are you sure?',
+					text: "You won't be able to revert this!",
+					icon: 'warning',
+					showCancelButton: true,
+					confirmButtonColor: '#3085d6',
+					cancelButtonColor: '#d33',
+					confirmButtonText: 'Yes, delete it!'
+				}).then((result) => {
+					if (result.isConfirmed) {
+						form.submit();
+					}
+				});
+			});
 		});
-
-		function openModal(imageSrc) {
-		    document.getElementById('modalImage').src = imageSrc;
-		    document.getElementById('imageModal').classList.remove('hidden');
-		}
-
-		function closeModal() {
-		    document.getElementById('imageModal').classList.add('hidden');
-		}
 	</script>
 
 </body>

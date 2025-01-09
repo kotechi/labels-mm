@@ -4,11 +4,6 @@
 <div class="container mx-auto px-4 py-8">
     <h1 class="text-3xl font-bold text-gray-800 mb-8">Content Management</h1>
 
-    <!-- Chart Section -->
-    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
-        {!! $chart->html() !!}
-    </div>
-
     <!-- About Section -->
     <div class="bg-white rounded-lg shadow-md p-6 mb-8">
         <div class="flex justify-between items-center mb-6">
@@ -21,9 +16,9 @@
             <table id="aboutTable" class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-blue-500">
                     <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Title</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Description</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Image</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider border-r border-gray-200">Title</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider border-r border-gray-200">Description</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider border-r border-gray-200">Image</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Actions</th>
                     </tr>
                 </thead>
@@ -41,10 +36,10 @@
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <a href="{{ route('abouts.edit', $about->id) }}" class="px-3 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-md">Edit</a>
-                            <form action="{{ route('abouts.destroy', $about->id) }}" method="POST" class="inline-block">
+                            <form action="{{ route('abouts.destroy', $about->id) }}" method="POST" class="inline-block delete-form">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="px-3 py-2 bg-red-500 hover:bg-red-600 text-white rounded-md">Delete</button>
+                                <button type="button" class="px-3 py-2 bg-red-500 hover:bg-red-600 text-white rounded-md delete-button">Delete</button>
                             </form>
                         </td>
                     </tr>
@@ -66,8 +61,8 @@
             <table id="contactTable" class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-blue-500">
                     <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Title</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Link</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider border-r border-gray-200">Title</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider border-r border-gray-200">Link</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Actions</th>
                     </tr>
                 </thead>
@@ -78,10 +73,10 @@
                         <td class="px-6 py-4">{{ $contact->link }}</td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <a href="{{ route('contacts.edit', $contact->id) }}" class="px-3 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-md">Edit</a>
-                            <form action="{{ route('contacts.destroy', $contact->id) }}" method="POST" class="inline-block">
+                            <form action="{{ route('contacts.destroy', $contact->id) }}" method="POST" class="inline-block delete-form">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="px-3 py-2 bg-red-500 hover:bg-red-600 text-white rounded-md">Delete</button>
+                                <button type="button" class="px-3 py-2 bg-red-500 hover:bg-red-600 text-white rounded-md delete-button">Delete</button>
                             </form>
                         </td>
                     </tr>
@@ -103,9 +98,9 @@
             <table id="headerTable" class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-blue-500">
                     <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Title</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Description</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Image</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider border-r border-gray-200">Title</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider border-r border-gray-200">Description</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider border-r border-gray-200">Image</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Actions</th>
                     </tr>
                 </thead>
@@ -123,10 +118,10 @@
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <a href="{{ route('headers.edit', $header->id) }}" class="px-3 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-md">Edit</a>
-                            <form action="{{ route('headers.destroy', $header->id) }}" method="POST" class="inline-block">
+                            <form action="{{ route('headers.destroy', $header->id) }}" method="POST" class="inline-block delete-form">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="px-3 py-2 bg-red-500 hover:bg-red-600 text-white rounded-md">Delete</button>
+                                <button type="button" class="px-3 py-2 bg-red-500 hover:bg-red-600 text-white rounded-md delete-button">Delete</button>
                             </form>
                         </td>
                     </tr>
@@ -150,21 +145,30 @@
 <!-- Datatables -->
 <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/responsive/2.2.3/js/dataTables.responsive.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     $(document).ready(function() {
-        $('#aboutTable').DataTable({
-            responsive: true
-        }).columns.adjust().responsive.recalc();
-        $('#contactTable').DataTable({
-            responsive: true
-        }).columns.adjust().responsive.recalc();
-        $('#headerTable').DataTable({
-            responsive: true
-        }).columns.adjust().responsive.recalc();
-        
         // Add margin-bottom to show entries and search elements
         $('.dataTables_length').addClass('mb-4');
         $('.dataTables_filter').addClass('mb-4');
+
+        // SweetAlert for delete confirmation
+        $('.delete-button').on('click', function() {
+            var form = $(this).closest('form');
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
+        });
     });
 
     function openModal(imageSrc) {
@@ -176,6 +180,4 @@
         document.getElementById('imageModal').classList.add('hidden');
     }
 </script>
-{!! Charts::scripts() !!}
-{!! $chart->script() !!}
 @endsection

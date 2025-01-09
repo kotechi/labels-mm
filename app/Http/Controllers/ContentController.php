@@ -8,7 +8,6 @@ use App\Models\Header;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use ConsoleTVs\Charts\Facades\Charts;
 
 class ContentController extends Controller
 {
@@ -23,16 +22,10 @@ class ContentController extends Controller
         $abouts = About::all();
         $contacts = Contact::all();
         $headers = Header::all();
-
-        // Create a chart
-        $chart = Charts::create('line', 'highcharts')
-            ->title('Sample Chart')
-            ->labels(['January', 'February', 'March'])
-            ->values([10, 25, 13])
-            ->dimensions(0, 400); // Width x Height
-
-        return view('admin.web.index', compact('abouts', 'contacts', 'headers', 'chart'));
+        return view('admin.web.index', compact('abouts', 'contacts', 'headers'));
     }
+
+
 
     protected function getModel($type)
     {
