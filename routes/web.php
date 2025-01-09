@@ -3,12 +3,14 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
-use App\Http\Controllers\OrderController;
-use App\Http\Controllers\admin\ProductController;
 use App\Http\Controllers\HeaderController;
 use App\Http\Controllers\AboutController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\ContentController;
+
+use App\Http\Controllers\OrderController;
+use App\Http\Controllers\admin\ProductController;
+use App\Http\Controllers\admin\AdminController;
 
 Route::get('/', [HomeController::class, 'index']);
 Route::get('/dashboard', function () {
@@ -24,9 +26,7 @@ Route::get('/order/{product}', [OrderController::class, 'showOrderForm'])->name(
 Route::post('/order/create', [OrderController::class, 'createOrder'])->name('order.create');
 
 Route::middleware(['auth', 'admin'])->group(function () {
-    Route::get('/admin', function () {
-        return view('admin.index');
-    });
+    Route::get('/admin',[AdminController::class, 'index'])->name('admin.index');
     Route::get('/admin/product', [ProductController::class, 'index'])->name('products');
     Route::get('/admin/product/create', [ProductController::class, 'create'])->name('products.create');
     Route::post('/admin/product', [ProductController::class, 'store'])->name('products.store');

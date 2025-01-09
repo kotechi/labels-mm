@@ -25,7 +25,7 @@ class HomeController extends Controller
         return view('home', [
             'products' => $product,
             'headers' => $header,
-            'about' => $about,
+            'abouts' => $about,
             'contacts' => $contact,
         ]);
     }
