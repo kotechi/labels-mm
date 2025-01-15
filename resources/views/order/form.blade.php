@@ -1,4 +1,3 @@
-
 <div class="container mx-auto px-4 py-8">
     <div class="max-w-md mx-auto bg-white rounded-lg shadow-md p-6">
         <h2 class="text-2xl font-bold mb-4">Form Pemesanan</h2>
@@ -6,6 +5,12 @@
             <h3 class="font-semibold">{{ $product->nama }}</h3>
             <p class="text-gray-600">Harga: Rp {{ number_format($product->harga, 0, ',', '.') }}</p>
         </div>
+
+        @if ($errors->has('error'))
+            <div class="alert alert-danger">
+                {{ $errors->first('error') }}
+            </div>
+        @endif
 
         <form action="{{ route('order.create') }}" method="POST">
             @csrf
@@ -15,16 +20,6 @@
                 <label class="block text-gray-700 mb-2">Jumlah</label>
                 <input type="number" name="jumlah_product" min="1" value="1" 
                        class="w-full px-3 py-2 border rounded" required>
-            </div>
-
-            <div class="mb-4">
-                <label class="block text-gray-700 mb-2">Nama</label>
-                <input type="text" name="nama" class="w-full px-3 py-2 border rounded" required>
-            </div>
-
-            <div class="mb-4">
-                <label class="block text-gray-700 mb-2">Email</label>
-                <input type="email" name="email" class="w-full px-3 py-2 border rounded" required>
             </div>
 
             <div class="mb-4">

@@ -7,17 +7,18 @@ use App\Http\Controllers\HeaderController;
 use App\Http\Controllers\AboutController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\ContentController;
-
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\admin\ProductController;
 use App\Http\Controllers\admin\AdminController;
-
+use App\Http\Controllers\admin\UserController;
+use App\Http\Controllers\PesananController;
+    
 Route::get('/', [HomeController::class, 'index']);
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
-Route::middleware('auth')->group(function () {
+Route::middleware('auth ')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
@@ -56,6 +57,26 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::delete('/admin/contact/{contact}', [ContactController::class, 'destroy'])->name('contacts.destroy');
 
     Route::get('/admin/content', [ContentController::class, 'index'])->name('content.index');
+
+    Route::get('/admin/user/create', [AdminController::class, 'createUser'])->name('users.create');
+    Route::post('/admin/user', [AdminController::class, 'storeUser'])->name('users.store');
+    Route::get('/admin/user/{user}/edit', [AdminController::class, 'editUser'])->name('users.edit');
+    Route::patch('/admin/user/{user}', [AdminController::class, 'updateUser'])->name('users.update');
+    Route::delete('/admin/user/{user}', [AdminController::class, 'destroyUser'])->name('users.destroy');
+
+    Route::get('/admin/user', [UserController::class, 'index'])->name('users.index');
+    Route::get('/admin/user/create', [UserController::class, 'create'])->name('users.create');
+    Route::post('/admin/user', [UserController::class, 'store'])->name('users.store');
+    Route::get('/admin/user/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
+    Route::patch('/admin/user/{user}', [UserController::class, 'update'])->name('users.update');
+    Route::delete('/admin/user/{user}', [UserController::class, 'destroy'])->name('users.destroy');
+
+    Route::get('/admin/pesanan', [PesananController::class, 'index'])->name('pesanans.index');
+    Route::get('/admin/pesanan/create', [PesananController::class, 'create'])->name('pesanans.create');
+    Route::post('/admin/pesanan', [PesananController::class, 'store'])->name('pesanans.store');
+    Route::get('/admin/pesanan/{pesanan}/edit', [PesananController::class, 'edit'])->name('pesanans.edit');
+    Route::patch('/admin/pesanan/{pesanan}', [PesananController::class, 'update'])->name('pesanans.update');
+    Route::delete('/admin/pesanan/{pesanan}', [PesananController::class, 'destroy'])->name('pesanans.destroy');
 });
 
 require __DIR__ . '/auth.php';

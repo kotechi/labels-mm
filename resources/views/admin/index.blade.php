@@ -135,101 +135,205 @@
   
             <hr class="my-10">
   
-            <div class="grid grid-cols-2 gap-x-20">
+            <div>
+              <table id="pesananTable" class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-blue-500">
+                       <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider border-r border-gray-200">ID Pesanan</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider border-r border-gray-200">User</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider border-r border-gray-200">Product</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider border-r border-gray-200">Name Product</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider border-r border-gray-200">Nama</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider border-r border-gray-200">Status</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider border-r border-gray-200">Total Harga</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider border-r border-gray-200">Jumlah Product</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider border-r border-gray-200">Nomor Whatsapp</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    @foreach($pesanans as $pesanan)
+                    <tr>
+                        <td class="px-6 py-4 whitespace-nowrap">{{ $pesanan->id_pesanan }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">{{ $pesanan->user->name }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">{{ $pesanan->product->name }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">{{ $pesanan->name_product }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">{{ $pesanan->nama }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">{{ $pesanan->status }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">{{ $pesanan->total_harga }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">{{ $pesanan->jumlah_product }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">{{ $pesanan->nomor_whatsapp }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <a href="{{ route('pesanans.edit', $pesanan->id_pesanan) }}" class="px-3 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-md">Edit</a>
+                            <form action="{{ route('pesanans.destroy', $pesanan->id_pesanan) }}" method="POST" class="inline-block delete-form">
+                                @csrf
+                                @method('DELETE')
+                                <button type="button" class="px-3 py-2 bg-red-500 hover:bg-red-600 text-white rounded-md delete-button">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
               <div>
-                <h2 class="text-2xl font-bold mb-4">Stats</h2>
-  
-                <div class="grid grid-cols-2 gap-4">
-                  <div class="col-span-2">
-                    <div class="p-4 bg-green-100 rounded-xl">
-                      <div class="font-bold text-xl text-gray-800 leading-none">penghasilan, <br>perday</div>
-                      <div class="mt-5">
-                        <button type="button" class="inline-flex items-center justify-center py-2 px-3 rounded-xl bg-white text-gray-800 hover:text-green-500 text-sm font-semibold transition">
-                          <?php
-                          $totalpendapatan = 0 ;
-                          $totalmodal = 0 ;
-                          ?>
-                          @foreach ($penghasilan as $pendapatan )
-                            
-                            <?php
-                            $totalpendapatan = $totalpendapatan + $pendapatan->harga*$pendapatan->jumlah
-                            ?>
-                            
-                            {{-- {{ ($pendapatan->harga*$pendapatan->jumlah) + ($modals->harga*$modals->jumlah)}} --}}
-                          @endforeach
-
-                          @foreach ($modal as $modal)
-                          <?php
-                          $totalmodal = $totalmodal + $modal->harga*$modal->jumlah
-                          ?>
-                          @endforeach 
-                          {{$totalpendapatan - $totalmodal}}
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="p-4 bg-yellow-100 rounded-xl text-gray-800">
-                    <div class="font-bold text-2xl leading-none">20</div>
-                    <div class="mt-2">Tasks finished</div>
-                  </div>
-                  <div class="p-4 bg-yellow-100 rounded-xl text-gray-800">
-                    <div class="font-bold text-2xl leading-none">5,5</div>
-                    <div class="mt-2">Tracked hours</div>
-                  </div>
-                  <div class="col-span-2">
-                    <div class="p-4 bg-purple-100 rounded-xl text-gray-800">
-                      <div class="font-bold text-xl leading-none">Your daily plan</div>
-                      <div class="mt-2">5 of 8 completed</div>
-                    </div>
-                  </div>
+                <h2 class="text-2xl font-bold mb-4">Earnings</h2>
+                <div class="flex gap-4 mb-4">
+                  <select id="earningsPeriod" class="px-4 py-2 bg-gray-200 rounded">
+                    <option value="daily">Daily</option>
+                    <option value="monthly" selected>Monthly</option>
+                    <option value="yearly">Yearly</option>
+                  </select>
+                  <div id="totalEarnings" class="px-4 py-2 bg-gray-100 rounded">Total: {{$totalMonthlyEarnings}}</div>
                 </div>
-              </div>
-              <div>
-                <h2 class="text-2xl font-bold mb-4">Your tasks today</h2>
-  
-                <div class="space-y-4">
-                  <div class="p-4 bg-white border rounded-xl text-gray-800 space-y-2">
-                    <div class="flex justify-between">
-                      <div class="text-gray-400 text-xs">Number 10</div>
-                      <div class="text-gray-400 text-xs">4h</div>
-                    </div>
-                    <a href="javascript:void(0)" class="font-bold hover:text-yellow-800 hover:underline">Blog and social posts</a>
-                    <div class="text-sm text-gray-600">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" class="text-gray-800 inline align-middle mr-1" viewBox="0 0 16 16">
-                        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8 4a.905.905 0 0 0-.9.995l.35 3.507a.552.552 0 0 0 1.1 0l.35-3.507A.905.905 0 0 0 8 4zm.002 6a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/>
-                      </svg>Deadline is today
-                    </div>
-                  </div>
-                  <div class="p-4 bg-white border rounded-xl text-gray-800 space-y-2">
-                    <div class="flex justify-between">
-                      <div class="text-gray-400 text-xs">Grace Aroma</div>
-                      <div class="text-gray-400 text-xs">7d</div>
-                    </div>
-                    <a href="javascript:void(0)" class="font-bold hover:text-yellow-800 hover:underline">New campaign review</a>
-                    <div class="text-sm text-gray-600">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" class="text-gray-800 inline align-middle mr-1" viewBox="0 0 16 16">
-                        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8 4a.905.905 0 0 0-.9.995l.35 3.507a.552.552 0 0 0 1.1 0l.35-3.507A.905.905 0 0 0 8 4zm.002 6a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/>
-                      </svg>New feedback
-                    </div>
-                  </div>
-                  <div class="p-4 bg-white border rounded-xl text-gray-800 space-y-2">
-                    <div class="flex justify-between">
-                      <div class="text-gray-400 text-xs">Petz App</div>
-                      <div class="text-gray-400 text-xs">2h</div>
-                    </div>
-                    <a href="javascript:void(0)" class="font-bold hover:text-yellow-800 hover:underline">Cross-platform and browser QA</a>
-                  </div>
-  
+                <div id="navigationButtons" class="flex gap-4 mb-4">
+                  <button id="prevPeriod" class="px-4 py-2 bg-gray-200 rounded">Previous</button>
+                  <button id="nextPeriod" class="px-4 py-2 bg-gray-200 rounded">Next</button>
                 </div>
+                <canvas id="earningsChart"></canvas>
               </div>
             </div>
           </div>
         </div>
       </div>
     </main>
+    <script src="{{ asset('assets/js/jquery.min.js') }}"></script>
+    <script src="{{ asset('assets/js/chart.min.js') }}"></script>
+    <script>
+      $(document).ready(function() {
+        $('#pesananTable').DataTable();
+
+
+        $('.dataTables_length').addClass('mb-4');
+        $('.dataTables_filter').addClass('mb-4');
+      });
+
+      $('.delete-button').on('click', function() {
+            var form = $(this).closest('form');
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
+        });
+    </script>
     <script>
       document.addEventListener('DOMContentLoaded', function() {
-        // Add your JavaScript code here to generate the dashboard content automatically
+        const ctx = document.getElementById('earningsChart').getContext('2d');
+        let earningsChart = new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: @json($months),
+            datasets: [
+              {
+                label: 'Pendapatan',
+                data: @json($monthlyEarnings),
+                borderColor: 'rgba(75, 192, 192, 1)',
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderWidth: 1
+              },
+              {
+                label: 'Modal',
+                data: @json($monthlyModal),
+                borderColor: 'rgba(255, 99, 132, 1)',
+                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                borderWidth: 1
+              },
+              {
+                label: 'Total Penghasilan',
+                data: @json($monthlyTotalPenghasilan),
+                borderColor: 'rgba(54, 162, 235, 1)',
+                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                borderWidth: 1
+              }
+            ]
+          },
+          options: {
+            scales: {
+              y: {
+                beginAtZero: true
+              }
+            }
+          }
+        });
+
+        const totalEarningsElement = document.getElementById('totalEarnings');
+        const earningsPeriodElement = document.getElementById('earningsPeriod');
+        const prevPeriodButton = document.getElementById('prevPeriod');
+        const nextPeriodButton = document.getElementById('nextPeriod');
+
+        let currentMonth = new Date().getMonth() + 1;
+        let currentYear = new Date().getFullYear();
+
+        function fetchData(period, month, year) {
+          $.ajax({
+            url: '{{ route("admin.index") }}',
+            method: 'GET',
+            data: {
+              period: period,
+              month: month,
+              year: year
+            },
+            success: function(response) {
+              updateChart(response.labels, response.data, response.label, response.totalEarnings);
+            }
+          });
+        }
+
+        function updateChart(labels, data, label, totalEarnings) {
+          earningsChart.data.labels = labels;
+          earningsChart.data.datasets[0].data = data.pendapatan;
+          earningsChart.data.datasets[1].data = data.modal;
+          earningsChart.data.datasets[2].data = data.totalPenghasilan;
+          earningsChart.data.datasets[0].label = label;
+          earningsChart.update();
+
+          totalEarningsElement.textContent = `Total: ${totalEarnings}`;
+        }
+
+        earningsPeriodElement.addEventListener('change', function() {
+          const period = earningsPeriodElement.value;
+          fetchData(period, currentMonth, currentYear);
+        });
+
+        prevPeriodButton.addEventListener('click', function() {
+          const period = earningsPeriodElement.value;
+          if (period === 'daily') {
+            if (currentMonth === 1) {
+              currentMonth = 12;
+              currentYear--;
+            } else {
+              currentMonth--;
+            }
+          } else if (period === 'monthly') {
+            currentYear--;
+          }
+          fetchData(period, currentMonth, currentYear);
+        });
+
+        nextPeriodButton.addEventListener('click', function() {
+          const period = earningsPeriodElement.value;
+          if (period === 'daily') {
+            if (currentMonth === 12) {
+              currentMonth = 1;
+              currentYear++;
+            } else {
+              currentMonth++;
+            }
+          } else if (period === 'monthly') {
+            currentYear++;
+          }
+          fetchData(period, currentMonth, currentYear);
+        });
+
+        fetchData('monthly', currentMonth, currentYear);
       });
     </script>
   </body>

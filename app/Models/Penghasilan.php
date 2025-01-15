@@ -7,6 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 class Penghasilan extends Model
 {
     protected $fillable = [
-        'nama', 'harga', 'jumlah', 'created_at', 'updated_at'
+        'nama', 'harga', 'jumlah', 'total_harga', 'created_at', 'updated_at'
     ];
 }

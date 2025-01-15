@@ -5,17 +5,17 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta http-equiv="X-UA-Compatible" content="ie=edge">
-        <title>DataTables </title>
+        <title>labels|MM </title>
         <meta name="description" content="">
         <meta name="keywords" content="">
-        <link href="https://unpkg.com/tailwindcss@2.2.19/dist/tailwind.min.css" rel=" stylesheet">
-        <!--Replace with your tailwind.css once created-->
-    
-    
-        <!--Regular Datatables CSS-->
-        <link href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css" rel="stylesheet">
-        <!--Responsive Extension Datatables CSS-->
-        <link href="https://cdn.datatables.net/responsive/2.2.3/css/responsive.dataTables.min.css" rel="stylesheet">
+
+        @vite(['resources/css/app.css', 'resources/js/app.js'])
+        <link href="{{ asset('assets/css/jquery.dataTables.min.css') }}" rel="stylesheet">
+        <link href="{{ asset('assets/css/responsive.dataTables.min.css') }}" rel="stylesheet">
+        <script type="text/javascript" src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+        <!-- Datatables -->
+        <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+        <script src="https://cdn.datatables.net/responsive/2.2.3/js/dataTables.responsive.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <style>
             /*Overrides for Tailwind CSS */
@@ -115,7 +115,7 @@
 <body class="bg-gray-100 text-gray-900 tracking-wider leading-normal">
     <div class="min-h-screen flex flex-col">
         <!-- Header -->
-        <header class="bg-indigo-500 text-white p-4">
+        <header class="bg-in    digo-500 text-white p-4">
             <div class="container mx-auto">
                 <h1 class="text-2xl">Admin Panel</h1>
             </div>
@@ -133,8 +133,47 @@
             </div>
         </footer>
     </div>
-</body>
-@if (session('success'))
+    <script>
+        $(document).ready(function() {
+            // Initialize DataTables
+            $('#aboutTable').DataTable();
+            $('#contactTable').DataTable();
+            $('#headerTable').DataTable();
+            $('#userTable').DataTable();
+
+            // Add margin-bottom to show entries and search elements
+            $('.dataTables_length').addClass('mb-4');
+            $('.dataTables_filter').addClass('mb-4');
+
+            // SweetAlert for delete confirmation
+            $('.delete-button').on('click', function() {
+                var form = $(this).closest('form');
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You won't be able to revert this!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, delete it!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
+            });
+        });
+
+        function openModal(imageSrc) {
+            document.getElementById('modalImage').src = imageSrc;
+            document.getElementById('imageModal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('imageModal').classList.add('hidden');
+        }
+    </script>
+    @if (session('success'))
     <script>
         Swal.fire({
             icon: 'success',
@@ -143,4 +182,5 @@
         });
     </script>
 @endif
+</body>
 </html>

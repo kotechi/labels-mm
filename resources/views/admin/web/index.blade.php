@@ -148,6 +148,11 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     $(document).ready(function() {
+        // Initialize DataTables
+        $('#aboutTable').DataTable();
+        $('#contactTable').DataTable();
+        $('#headerTable').DataTable();
+
         // Add margin-bottom to show entries and search elements
         $('.dataTables_length').addClass('mb-4');
         $('.dataTables_filter').addClass('mb-4');

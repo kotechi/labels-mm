@@ -4,11 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class pesanan extends Model
+class Pesanan extends Model
 {
+    protected $primaryKey = 'id_pesanan'; // Set primary key to id_pesanan
+
     protected $fillable = [
-        'product_id', 'name_product', 'nama', 'status',
-        'total_harga', 'jumlah_product'
+        'id_pesanan', 'user_id', 'product_id', 'name_product', 'nama', 'status',
+        'total_harga', 'jumlah_product', 'nomor_whatsapp'
     ];
 
     protected $casts = [

@@ -18,6 +18,7 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->string('usertype')->default('user');
+            $table->integer('max_orders_per_day')->default(2);
             $table->rememberToken();
             $table->timestamps();
         });

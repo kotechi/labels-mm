@@ -57,13 +57,23 @@
                         <div class="text-lg font-bold text-gray-900">
                             Rp {{ number_format($product->harga, 0, ',', '.') }}
                         </div>
-                        <a href="{{ route('order.form', $product->id) }}" 
-                           class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                            </svg>
-                            Pesan Sekarang
-                        </a>
+                        @auth
+                            <a href="{{ route('order.form', $product->id) }}" 
+                               class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                                </svg>
+                                Pesan Sekarang
+                            </a>
+                        @else
+                            <button onclick="showLoginPopup()" 
+                                    class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                                </svg>
+                                Pesan Sekarang
+                            </button>
+                        @endauth
                     </div>
 
                     {{-- Fitur Tambahan --}}
@@ -81,6 +91,24 @@
         </div>
     </div>
 </div>
+
+{{-- Popup Login --}}
+<div id="loginPopup" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
+    <div class="bg-white p-6 rounded-lg shadow-lg">
+        <h2 class="text-xl font-semibold mb-4">Anda belum login</h2>
+        <p class="mb-4">Silakan login terlebih dahulu atau pesan melalui WhatsApp.</p>
+        <div class="flex justify-end">
+            <a href="{{ route('login') }}" class="px-4 py-2 bg-blue-600 text-white rounded-md mr-2">Login</a>
+            <a href="https://wa.me/+6282112327021" class="px-4 py-2 bg-green-600 text-white rounded-md">Pesan via WhatsApp</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    function showLoginPopup() {
+        document.getElementById('loginPopup').classList.remove('hidden');
+    }
+</script>
 
 </body>
 </html>
