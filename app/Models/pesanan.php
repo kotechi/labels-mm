@@ -3,19 +3,39 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Product;
 
 class Pesanan extends Model
 {
     protected $primaryKey = 'id_pesanan'; // Set primary key to id_pesanan
 
     protected $fillable = [
-        'id_pesanan', 'user_id', 'product_id', 'name_product', 'nama', 'status',
-        'total_harga', 'jumlah_product', 'nomor_whatsapp'
+        'product_id',
+        'nama_produk',
+        'nama_pemesan',
+        'status_pesanan',
+        'total_harga',
+        'jumlah_produk',
+        'no_telp_pemesan',
+        'payment_method',
+        'created_by',
+        'order_date',
+        'lebar_muka',
+        'lebar_pundak',
+        'lebar_punggung',
+        'panjang_lengan',
+        'panjang_punggung',
+        'panjang_baju',
+        'lingkar_badan',
+        'lingkar_pinggang',
+        'lingkar_panggul',
+        'lingkar_kerung_lengan',
+        'lingkar_pergelangan_lengan',
     ];
+    
 
     protected $casts = [
-        'status' => 'string',
-        'tanggal' => 'datetime'
+        'status_pesanan' => 'string',
     ];
 
     public function user()

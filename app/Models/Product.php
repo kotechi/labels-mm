@@ -6,13 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class Product extends Model
 {
-    protected $table = 'product';
+    protected $table = 'products'; // Ensure the table name is correct
+    protected $primaryKey = 'id_product'; // Set the primary key
     protected $fillable = [
-        'nama', 'harga', 'link', 'deskripsi', 'image'
+        'nama_produk', 'description', 'harga_jual', 'stock_product', 'image'
     ];
-
-    public function getWhatsAppLink()
-    {
-        return route('order.form', $this->id);
-    }
 }

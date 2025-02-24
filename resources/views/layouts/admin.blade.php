@@ -1,186 +1,265 @@
 <!DOCTYPE html>
-    <html lang="en" class="antialiased">
-    
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta http-equiv="X-UA-Compatible" content="ie=edge">
-        <title>labels|MM </title>
-        <meta name="description" content="">
-        <meta name="keywords" content="">
+<html lang="en" class="antialiased">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Admin | @yield('title')</title>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <script src="{{ asset('assets/js/chart.min.js') }}"></script>
+    <script src="{{ asset('assets/js/lucid.min.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('assets/js/jquery-3.4.1.min.js') }}"></script>
+    <script src="{{ asset('assets/js/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ asset('assets/js/dataTables.responsive.min.js') }}" ></script>
+    <link rel="preload" href="public/fonts/Poppins-Regular.woff2" as="font" type="font/woff2" crossorigin>
+    <link href="{{ asset('assets/css/jquery.dataTables.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets/css/responsive.dataTables.min.css') }}" rel="stylesheet">
+</head>
+<style>
+    @import 'fonts.css';
+    body {
+        font-family: 'Poppins', sans-serif;
+    }
+    .dataTables_wrapper .dataTables_filter {
+        margin-bottom: 16px;
+    }
 
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
-        <link href="{{ asset('assets/css/jquery.dataTables.min.css') }}" rel="stylesheet">
-        <link href="{{ asset('assets/css/responsive.dataTables.min.css') }}" rel="stylesheet">
-        <script type="text/javascript" src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-        <!-- Datatables -->
-        <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
-        <script src="https://cdn.datatables.net/responsive/2.2.3/js/dataTables.responsive.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-        <style>
-            /*Overrides for Tailwind CSS */
-    
-            /*Form fields*/
-            .dataTables_wrapper select,
-            .dataTables_wrapper .dataTables_filter input {
-                color: #4a5568;
-                /*text-gray-700*/
-                padding-left: 1rem;
-                /*pl-4*/
-                padding-right: 1rem;
-                /*pl-4*/
-                padding-top: .5rem;
-                /*pl-2*/
-                padding-bottom: .5rem;
-                /*pl-2*/
-                line-height: 1.25;
-                /*leading-tight*/
-                border-width: 2px;
-                /*border-2*/
-                border-radius: .25rem;
-                border-color: #edf2f7;
-                /*border-gray-200*/
-                background-color: #edf2f7;
-                /*bg-gray-200*/
-            }
-    
-            /*Row Hover*/
-            table.dataTable.hover tbody tr:hover,
-            table.dataTable.display tbody tr:hover {
-                background-color: #ebf4ff;
-                /*bg-indigo-100*/
-            }
-    
-            /*Pagination Buttons*/
-            .dataTables_wrapper .dataTables_paginate .paginate_button {
-                font-weight: 700;
-                /*font-bold*/
-                border-radius: .25rem;
-                /*rounded*/
-                border: 1px solid transparent;
-                /*border border-transparent*/
-            }
-    
-            /*Pagination Buttons - Current selected */
-            .dataTables_wrapper .dataTables_paginate .paginate_button.current {
-                color: #fff !important;
-                /*text-white*/
-                box-shadow: 0 1px 3px 0 rgba(0, 0, 0, .1), 0 1px 2px 0 rgba(0, 0, 0, .06);
-                /*shadow*/
-                font-weight: 700;
-                /*font-bold*/
-                border-radius: .25rem;
-                /*rounded*/
-                background: #667eea !important;
-                /*bg-indigo-500*/
-                border: 1px solid transparent;
-                /*border border-transparent*/
-            }
-    
-            /*Pagination Buttons - Hover */
-            .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
-                color: #fff !important;
-                /*text-white*/
-                box-shadow: 0 1px 3px 0 rgba(0, 0, 0, .1), 0 1px 2px 0 rgba(0, 0, 0, .06);
-                /*shadow*/
-                font-weight: 700;
-                /*font-bold*/
-                border-radius: .25rem;
-                /*rounded*/
-                background: #667eea !important;
-                /*bg-indigo-500*/
-                border: 1px solid transparent;
-                /*border border-transparent*/
-            }
-    
-            /*Add padding to bottom border */
-            table.dataTable.no-footer {
-                border-bottom: 1px solid #e2e8f0;
-                /*border-b-1 border-gray-300*/
-                margin-top: 0.75em;
-                margin-bottom: 0.75em;
-            }
-    
-            /*Change colour of responsive icon*/
-            table.dataTable.dtr-inline.collapsed>tbody>tr>td:first-child:before,
-            table.dataTable.dtr-inline.collapsed>tbody>tr>th:first-child:before {
-                background-color: #667eea !important;
-                /*bg-indigo-500*/
-            }
-        </style>
-    
-    
-    
-    </head>
-<body class="bg-gray-100 text-gray-900 tracking-wider leading-normal">
-    <div class="min-h-screen flex flex-col">
-        <!-- Header -->
-        <header class="bg-in    digo-500 text-white p-4">
-            <div class="container mx-auto">
-                <h1 class="text-2xl">Admin Panel</h1>
+    .border-purple {
+        border: 1px solid #9e3b78;
+    }
+
+    .dataTables_wrapper .dataTables_filter input {
+        border: 1px solid #9e3b78; 
+        border-radius: 4px;
+        padding: 6px 12px;
+        margin-left: 8px;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .dataTables_wrapper .dataTables_filter input:focus {
+        outline: none;
+        border-color: #8A0181;
+        box-shadow: 0 0 0 2px rgba(138, 1, 129, 0.1);
+    }
+
+    .dataTables_wrapper .dataTables_filter label {
+        font-weight: 500;
+        color: #374151;
+    }
+
+    .bg-green-100-important {
+        background-color: rgba(0, 255, 89, 0.151) !important;
+    }
+    .bg-red-100-important {
+        background-color: rgba(255, 0, 0, 0.103) !important;
+    }
+
+    .datatable tr.bg-green-100-important:hover,
+    .datatable tr.bg-red-100-important:hover {
+        opacity: 0.9;
+    }
+    .bg-thead {
+        background-color: #9A1573;
+    }
+
+    .bg-labels {
+        background-color: #9A1573;
+    }
+
+    .datatable td {
+        max-width: 150px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        text-align: center !important;
+    }
+
+    .datatable thead th {
+        position: relative;
+        text-align: center;
+        padding-right: 20px;
+    }
+
+    .datatable td:hover {
+        white-space: normal;
+        overflow: visible;
+        position: relative;
+        z-index: 1;
+    }
+
+    .dataTables_wrapper,
+    .dataTables_wrapper,
+    .dataTables_wrapper,
+    .dataTables_wrapper {
+        text-align: center !important;
+        float: none !important;
+        margin: 10px 0;
+    }
+
+    table.dataTable thead .sorting,
+    table.dataTable thead .sorting_asc,
+    table.dataTable thead .sorting_desc {
+        background-image: url('{{ asset('storage/images/icon/sort_both.png') }}');
+        background-repeat: no-repeat;
+        background-position: center right;
+    }
+
+    table.dataTable thead .sorting_asc {
+        background-image: url('{{ asset('storage/images/icon/sort_asc.png') }}');
+    }
+
+    table.dataTable thead .sorting_desc {
+        background-image: url('{{ asset('storage/images/icon/sort_desc.png') }}');
+    }
+
+    .dataTables_wrapper .dataTables_paginate .paginate_button.current,
+    .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+        background: #8A0181 !important;
+        color: white !important;
+        border: 1px solid #8A0181;
+        border-radius: 4px;
+    }
+
+    /* New pagination button styling */
+    .dataTables_wrapper .dataTables_paginate .paginate_button {
+        color: #9A1573 !important;
+        border: 1px solid transparent;
+        border-radius: 4px;
+        padding: 6px 12px;
+        margin: 0 4px;
+        cursor: pointer;
+    }
+
+    .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+        background: rgba(154, 21, 115, 0.1) !important;
+        border-color: rgba(154, 21, 115, 0.2);
+        color: #9A1573 !important;
+    }
+
+    .dataTables_wrapper .dataTables_paginate .paginate_button.disabled,
+    .dataTables_wrapper .dataTables_paginate .paginate_button.disabled:hover {
+        color: #999 !important;
+        background: transparent !important;
+        border-color: transparent;
+    }
+</style>
+<body class="min-h-screen font-sans bg-gray-100">
+    <div class="flex min-h-screen">
+        <!-- Sidebar -->
+        <aside class="fixed top-0 left-0 h-screen w-48 lg:w-64 z-50 p-6 bg-white shadow-lg flex flex-col">
+            <div class="flex items-center gap-2 mb-6 ">
+                <img src="{{ asset('storage/images/icon/LAblesMM.png') }}" alt="Logo" class="w-auto h-auto">
+                <span class="text-lg font-bold text-gray-700"></span>
             </div>
-        </header>
+
+            <!-- Navigation -->
+            <nav class="flex-1">
+                <ul>
+                    <li class="mb-4 flex items-center">
+                        <i data-lucide="layout-dashboard" class="w-5 h-5 mr-2"></i>
+                        <a href="{{ route('admin.index') }}" class="text-gray-700 hover:text-gray-900 font-bold">Dashboard</a>
+                    </li>
+                    <li class="mb-4 flex items-center">
+                        <i data-lucide="credit-card" class="w-5 h-5 mr-2"></i>
+                        <a href="{{ route('admin.pengeluaran.index') }}" class="text-gray-700 hover:text-gray-900 font-bold">Pengeluaran</a>
+                    </li>
+                    <li class="mb-4 flex items-center">
+                        <i data-lucide="wallet" class="w-5 h-5 mr-2"></i>
+                        <a href="{{ route('pemasukan.index') }}" class="text-gray-700 hover:text-gray-900 font-bold">Pemasukan</a>
+                    </li>
+                    <li class="mb-4 flex items-center">
+                        <i data-lucide="image" class="w-5 h-5 mr-2"></i>
+                        <a href="{{ route('products') }}" class="text-gray-700 hover:text-gray-900 font-bold">Galeri</a>
+                    </li>
+                    <li class="mb-4 flex items-center">
+                        <i data-lucide="user" class="w-5 h-5 mr-2"></i>
+                        <a href="{{ route('users.index') }}" class="text-gray-700 hover:text-gray-900 font-bold">User</a>
+                    </li>
+                    <li class="mb-4 flex items-center">
+                        <i data-lucide="user" class="w-5 h-5 mr-2"></i>
+                        <a href="{{ route('admin.profile.index') }}" class="text-gray-700 hover:text-gray-900 font-bold">Profile</a>
+                    </li>
+                </ul>
+            </nav>
+
+            <!-- Logout -->
+            <div class="mt-auto">
+                <form action="{{ route('logout') }}" method="POST" class="flex items-center space-x-3">
+                    @csrf
+                    <div class="w-10 h-10 flex items-center justify-center bg-black rounded-lg">
+                        <i data-lucide="log-out" class="h-6 text-white"></i>
+                    </div>
+                    <button type="submit" class="text-gray-700 hover:text-red-800 font-bold">Logout</button>
+                </form>
+            </div>
+        </aside>
 
         <!-- Main Content -->
-        <main class="flex-grow container mx-auto p-4">
-            @yield('content')
-        </main>
+        <main class="flex-1 pl-48 h-full lg:pl-64">
 
-        <!-- Footer -->
-        <footer class="bg-gray-800 text-white p-4">
-            <div class="container mx-auto text-center">
-                &copy; {{ date('Y') }} Your Company. All rights reserved.
+            <!-- Content Area -->
+            <div class="px-5 pb-5 h-full">
+                @yield('content')
             </div>
-        </footer>
+        </main>
     </div>
+
     <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
         $(document).ready(function() {
-            // Initialize DataTables
-            $('#aboutTable').DataTable();
-            $('#contactTable').DataTable();
-            $('#headerTable').DataTable();
-            $('#userTable').DataTable();
+    // Inisialisasi DataTable dengan konfigurasi tambahan
+    $('table.datatable').DataTable({
+        responsive: true,
+        ordering: true,
+        language: {
+            search: "" // Menghilangkan label "Search:"
+        },
+        "createdRow": function(row, data, dataIndex, cells) {
+            // Ambil kategori dari data attribute
+            const kategori = $(row).data('kategori');
+            if (kategori === 'pemasukan') {
+                $(row).addClass('bg-green-100-important');
+            } else if (kategori === 'pengeluaran') {
+                $(row).addClass('bg-red-100-important');
+            }
+        },
+        "initComplete": function() {
+            $('.dataTables_filter input').attr('placeholder', 'Search here...');
+        }
+    });
+});
 
-            // Add margin-bottom to show entries and search elements
-            $('.dataTables_length').addClass('mb-4');
-            $('.dataTables_filter').addClass('mb-4');
-
-            // SweetAlert for delete confirmation
-            $('.delete-button').on('click', function() {
-                var form = $(this).closest('form');
-                Swal.fire({
-                    title: 'Are you sure?',
-                    text: "You won't be able to revert this!",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#d33',
-                    confirmButtonText: 'Yes, delete it!'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        form.submit();
-                    }
-                });
+        // SweetAlert for delete confirmation
+        $('.delete-button').on('click', function() {
+            var form = $(this).closest('form');
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
             });
         });
-
-        function openModal(imageSrc) {
-            document.getElementById('modalImage').src = imageSrc;
-            document.getElementById('imageModal').classList.remove('hidden');
-        }
-
-        function closeModal() {
-            document.getElementById('imageModal').classList.add('hidden');
-        }
     </script>
-    @if (session('success'))
-    <script>
-        Swal.fire({
-            icon: 'success',
-            title: 'Success!',
-            text: "{{ session('success') }}"
-        });
-    </script>
+
+@if (session('success'))
+<script>
+    Swal.fire({
+        icon: 'success',
+        title: 'Success!',
+        text: "{{ session('success') }}"
+    });
+</script>
 @endif
+
+    @stack('scripts')
 </body>
 </html>

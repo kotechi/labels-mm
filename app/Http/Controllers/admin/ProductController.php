@@ -23,11 +23,10 @@ class ProductController extends Controller
 
     public function store(Request $request) {
         $request->validate([
-            'nama' => 'required',
-            'harga' => 'required',
-            'link' => 'required',
-            'deskripsi' => 'required',
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'nama_produk' => 'required',
+            'harga_jual' => 'required',
+            'description' => 'nullable',
+            'stock_product' => 'required|integer',
         ]);
     
         try {
@@ -61,10 +60,10 @@ class ProductController extends Controller
     
     public function update(Request $request, Product $product) {
         $request->validate([
-            'nama' => 'required',
-            'harga' => 'required',
-            'link' => 'required',
-            'deskripsi' => 'required',
+            'nama_produk' => 'required',
+            'harga_jual' => 'required',
+            'description' => 'nullable',
+            'stock_product' => 'required|integer',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
     

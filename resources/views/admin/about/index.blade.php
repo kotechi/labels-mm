@@ -14,7 +14,7 @@
 		<!--Card-->
 		<div id='recipients' class="p-8 mt-6 lg:mt-0 rounded shadow bg-white">
 			<table id="aboutTable" class="stripe hover" style="width:100%; padding-top: 1em; padding-bottom: 1em;">
-				<thead class="bg-blue-500">
+				<thead class="bg-thead">
 					<tr>
 						<th data-priority="1" class="text-white">Tittle</th>
 						<th data-priority="2" class="text-white">Deskripsi</th>

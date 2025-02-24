@@ -22,54 +22,55 @@ class UserController extends Controller
 
     public function store(Request $request)
     {
+        // Validate the entire users array
         $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
+            'nama_lengkap' => 'required|string|max:255',
+            'username' => 'required|string|max:255|unique:users,username',
             'password' => 'required|string|min:8|confirmed',
             'usertype' => 'required|string',
-            'max_orders_per_day' => 'required|integer|min:1'
+            'no_telp' => 'required|string|max:15',
         ]);
-
-        User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => bcrypt($request->password),
-            'usertype' => $request->usertype,
-            'max_orders_per_day' => $request->max_orders_per_day
-        ]);
-
-        return redirect()->route('users.index')->with('success', 'User created successfully.');
+    
+            User::create($request->all());
+    
+        return redirect()->route('users.index')
+            ->with('success', 'User(s) created successfully.');
     }
 
-    public function edit(User $user)
+    public function edit($id_users)
     {
+        $user = User::where('id_users', $id_users)->firstOrFail();
         return view('admin.user.edit', compact('user'));
     }
 
-    public function update(Request $request, User $user)
+    public function update(Request $request, $id_users)
     {
+        $user = User::where('id_users', $id_users)->firstOrFail();
+
         $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
+            'nama_lengkap' => 'required|string|max:255',
+            'username' => 'required|string|max:255|unique:users,username,' . $id_users . ',id_users',
             'password' => 'nullable|string|min:8|confirmed',
-            'usertype' => 'required|string|in:admin,user',
-            'max_orders_per_day' => 'required|integer|min:1'
+            'usertype' => 'required|string|in:admin,karyawan', // Updated validation rule
+            'no_telp' => 'required|string|max:15',
         ]);
 
         $user->update([
-            'name' => $request->name,
-            'email' => $request->email,
+            'nama_lengkap' => $request->nama_lengkap,
+            'username' => $request->username,
             'password' => $request->password ? bcrypt($request->password) : $user->password,
             'usertype' => $request->usertype,
-            'max_orders_per_day' => $request->max_orders_per_day
+            'no_telp' => $request->no_telp,
         ]);
 
         return redirect()->route('users.index')->with('success', 'User updated successfully.');
     }
 
-    public function destroy(User $user)
+    public function destroy($id_users)
     {
+        $user = User::where('id_users', $id_users)->firstOrFail();
         $user->delete();
+
         return redirect()->route('users.index')->with('success', 'User deleted successfully.');
     }
 }

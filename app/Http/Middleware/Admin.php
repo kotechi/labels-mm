@@ -16,11 +16,10 @@ class Admin
      */
     public function handle(Request $request, Closure $next): Response
     {
-
         if (Auth::user()->usertype == 'admin') {
             return $next($request);
         }
 
-        abort(401);
+        return redirect()->back()->with('error', 'You do not have access to this page.');
     }
 }

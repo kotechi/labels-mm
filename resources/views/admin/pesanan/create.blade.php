@@ -1,41 +1,209 @@
 @extends('layouts.admin')
 
 @section('content')
-<div class="container mx-auto px-4 py-8">
-    <h1 class="text-3xl font-bold text-gray-800 mb-8">Create New Users</h1>
-    <form action="{{ route('pesanans.store') }}" method="POST">
-        @csrf
-        <div class="mb-4">
-            <label for="name_{{ $i }}" class="block text-sm font-medium text-gray-700">Name</label>
-            <input type="text" name="users[{{ $i }}][name]" id="name_{{ $i }}" class="mt-1 block w-full" required>
-        </div>
-        <div class="mb-4">
-            <label for="email_{{ $i }}" class="block text-sm font-medium text-gray-700">Email</label>
-            <input type="email" name="users[{{ $i }}][email]" id="email_{{ $i }}" class="mt-1 block w-full" required>
-        </div>
-        <div class="mb-4">
-            <label for="password_{{ $i }}" class="block text-sm font-medium text-gray-700">Password</label>
-            <input type="password" name="users[{{ $i }}][password]" id="password_{{ $i }}" class="mt-1 block w-full" required>
-        </div>
-        <div class="mb-4">
-            <label for="password_confirmation_{{ $i }}" class="block text-sm font-medium text-gray-700">Confirm Password</label>
-            <input type="password" name="users[{{ $i }}][password_confirmation]" id="password_confirmation_{{ $i }}" class="mt-1 block w-full" required>
-        </div>
-        <div class="mb-4">
-            <label for="usertype_{{ $i }}" class="block text-sm font-medium text-gray-700">User Type</label>
-            <select name="users[{{ $i }}][usertype]" id="usertype_{{ $i }}" class="mt-1 block w-full" required>
-                <option value="admin">Admin</option>
-                <option value="user">User</option>
-            </select>
-        </div>
-        <div class="mb-4">
-            <label for="max_orders_per_day_{{ $i }}" class="block text-sm font-medium text-gray-700">Max Orders Per Day</label>
-            <input type="number" name="users[{{ $i }}][max_orders_per_day]" id="max_orders_per_day_{{ $i }}" class="mt-1 block w-full" required>
-        </div>
-        @endfor
-        <div class="flex justify-end">
-            <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg">Create</button>
-        </div>
-    </form>
+<div class="p-5 rounded-lg shadow bg-white">
+    <div class="flex justify-between items-center">
+        <u class="font-extrabold text-3xl">Admin | Pesanan</u>
+    </div>
 </div>
+<div class="bg-white shadow-md border mt-6">
+    <div class="bg-labels shadow-lg rounded-sm">
+        <div class="p-4 w-auto">
+            <h3 class="text-lg text-white font-semibold">Tambah Data Pesanan</h3>
+        </div>
+    </div>
+    <div class="p-6 mt-2">
+        <form action="{{ route('pesanans.store') }}" method="POST">
+            @csrf
+            <div class="grid grid-cols-2 gap-6">
+                <!-- Row 1 -->
+                <div class="space-y-2">
+                    <label for="nama_pemesan" class="block text-gray-700">Nama</label>
+                    <input type="text" name="nama_pemesan" id="nama_pemesan" 
+                        class="w-full p-2 border rounded-md" 
+                        placeholder="masukan nama" required>
+                </div>
+                <div class="space-y-2">
+                    <label for="product_id" class="block text-gray-700">Model</label>
+                    <select name="product_id" id="product_id" 
+                        class="w-full p-2 border rounded-md" required>
+                        <option value="">masukan pesanan</option>
+                        @foreach($products as $product)
+                            <option value="{{ $product->id_product }}" 
+                                data-price="{{ $product->harga_jual }}"
+                                data-name="{{ $product->nama_produk }}">
+                                {{ $product->nama_produk }}
+                            </option>
+                        @endforeach
+                    </select>
+                    <input type="hidden" name="nama_produk" id="nama_produk">
+                </div>
+
+                <div class="space-y-2">
+                    <label for="payment_method" class="block text-gray-700">Metode Pembayaran</label>
+                    <select name="payment_method" id="payment_method" class="w-full p-2 border rounded-md" required>
+                        <option value="">Pilih metode pembayaran</option>
+                        <option value="cash">Cash</option>
+                        <option value="midtrans">Online Payment (Midtrans)</option>
+                    </select>
+                </div>
+                
+                <!-- Row 2 -->
+                <div class="space-y-2">
+                    <label for="total_harga" class="block text-gray-700">Total harga</label>
+                    <input type="text" id="total_harga_display" 
+                        class="w-full p-2 border rounded-md" 
+                        readonly>
+                    <input type="hidden" name="total_harga" id="total_harga">
+                </div>
+                <div class="space-y-2">
+                    <label for="no_telp_pemesan" class="block text-gray-700">Nomor telepon</label>
+                    <input type="text" name="no_telp_pemesan" id="no_telp_pemesan" 
+                        class="w-full p-2 border rounded-md" 
+                        placeholder="masukan nomor telepon" required>
+                </div>
+
+                <!-- Row 3 -->
+                <div class="space-y-2">
+                    <label for="jumlah_produk" class="block text-gray-700">Jumlah produk</label>
+                    <div class="flex items-center space-x-2">
+                        <button type="button" class="px-3 py-1 border rounded" onclick="decrementQuantity()">-</button>
+                        <input type="number" name="jumlah_produk" id="jumlah_produk" 
+                            class="w-20 p-2 border rounded-md text-center" 
+                            value="1" min="1" required>
+                        <button type="button" class="px-3 py-1 border rounded" onclick="incrementQuantity()">+</button>
+                    </div>
+                </div>
+                <div class="space-y-2">
+                    <label for="lingkar_pinggang" class="block text-gray-700">Lingkar pinggang</label>
+                    <input type="number" step="0.01" name="lingkar_pinggang" id="lingkar_pinggang" 
+                        class="w-full p-2 border rounded-md" 
+                        placeholder="None" required>
+                </div>
+
+                <!-- Row 4 -->
+                <div class="space-y-2">
+                    <label for="lingkar_panggul" class="block text-gray-700">Lingkar pinggul</label>
+                    <input type="number" step="0.01" name="lingkar_panggul" id="lingkar_panggul" 
+                        class="w-full p-2 border rounded-md" 
+                        placeholder="None" required>
+                </div>
+                <div class="space-y-2">
+                    <label for="lebar_pundak" class="block text-gray-700">Lebar pundak</label>
+                    <input type="number" step="0.01" name="lebar_pundak" id="lebar_pundak" 
+                        class="w-full p-2 border rounded-md" 
+                        placeholder="None" required>
+                </div>
+
+                <!-- Additional measurement fields in pairs -->
+                <div class="space-y-2">
+                    <label for="panjang_lengan" class="block text-gray-700">Panjang lengan</label>
+                    <input type="number" step="0.01" name="panjang_lengan" id="panjang_lengan" 
+                        class="w-full p-2 border rounded-md" 
+                        placeholder="None" required>
+                </div>
+                <div class="space-y-2">
+                    <label for="lingkar_kerung_lengan" class="block text-gray-700">Lingkar kerung lengan</label>
+                    <input type="number" step="0.01" name="lingkar_kerung_lengan" id="lingkar_kerung_lengan" 
+                        class="w-full p-2 border rounded-md" 
+                        placeholder="None" required>
+                </div>
+
+                <div class="space-y-2">
+                    <label for="lingkar_pergelangan_lengan" class="block text-gray-700">Lingkar pergelangan lengan</label>
+                    <input type="number" step="0.01" name="lingkar_pergelangan_lengan" id="lingkar_pergelangan_lengan" 
+                        class="w-full p-2 border rounded-md" 
+                        placeholder="None" required>
+                </div>
+                <div class="space-y-2">
+                    <label for="panjang_punggung" class="block text-gray-700">Panjang punggung</label>
+                    <input type="number" step="0.01" name="panjang_punggung" id="panjang_punggung" 
+                        class="w-full p-2 border rounded-md" 
+                        placeholder="None" required>
+                </div>
+
+                <div class="space-y-2">
+                    <label for="lebar_punggung" class="block text-gray-700">Lebar punggung</label>
+                    <input type="number" step="0.01" name="lebar_punggung" id="lebar_punggung" 
+                        class="w-full p-2 border rounded-md" 
+                        placeholder="None" required>
+                </div>
+                <div class="space-y-2">
+                    <label for="lebar_muka" class="block text-gray-700">Lebar muka</label>
+                    <input type="number" step="0.01" name="lebar_muka" id="lebar_muka" 
+                        class="w-full p-2 border rounded-md" 
+                        placeholder="None" required>
+                </div>
+                <div class="space-y-2">
+                    <label for="panjang_baju" class="block text-gray-700">Panjang Baju</label>
+                    <input type="number" step="0.01" name="panjang_baju" id="panjang_baju" 
+                        class="w-full p-2 border rounded-md" 
+                        placeholder="None" required>
+                </div>
+                <div class="space-y-2">
+                    <label for="lingkar_badan" class="block text-gray-700">Lingkar Badan</label>
+                    <input type="number" step="0.01" name="lingkar_badan" id="lingkar_badan" 
+                        class="w-full p-2 border rounded-md" 
+                        placeholder="None" required>
+                </div>
+
+                <input type="hidden" name="status_pesanan" value="proses">
+            </div>
+
+            <div class="mt-6 flex justify-end space-x-2">
+                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                    Simpan
+                </button>
+            </div>
+            
+        </form>
+    </div>
+</div>
+
+<script>
+    document.getElementById('product_id').addEventListener('change', function() {
+    const selectedOption = this.options[this.selectedIndex];
+    document.getElementById('nama_produk').value = selectedOption.dataset.name;
+    updateTotal();
+});
+    // Definisikan fungsi secara global
+    function incrementQuantity() {
+        const quantityInput = document.getElementById('jumlah_produk');
+        quantityInput.value = parseInt(quantityInput.value) + 1;
+        updateTotal();
+    }
+
+    function decrementQuantity() {
+        const quantityInput = document.getElementById('jumlah_produk');
+        const currentValue = parseInt(quantityInput.value);
+        if (currentValue > 1) {
+            quantityInput.value = currentValue - 1;
+            updateTotal();
+        }
+    }
+
+    function updateTotal() {
+        const productSelect = document.getElementById('product_id');
+        const quantityInput = document.getElementById('jumlah_produk');
+        const totalPriceInput = document.getElementById('total_harga');
+        const totalPriceDisplay = document.getElementById('total_harga_display');
+        const selectedOption = productSelect.options[productSelect.selectedIndex];
+        const price = parseFloat(selectedOption.dataset.price) || 0;
+        const quantity = parseInt(quantityInput.value) || 0;
+        const total = price * quantity;
+        totalPriceInput.value = total;
+        totalPriceDisplay.value = 'Rp ' + total.toLocaleString('id-ID');
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const productSelect = document.getElementById('product_id');
+        const quantityInput = document.getElementById('jumlah_produk');
+        
+        productSelect.addEventListener('change', updateTotal);
+        quantityInput.addEventListener('input', updateTotal);
+        
+        // Initial calculation
+        updateTotal();
+    });
+</script>
 @endsection

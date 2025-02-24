@@ -1,211 +1,88 @@
-<!DOCTYPE html>
-<html lang="en" class="antialiased">
+{{-- resources/views/admin/products/index.blade.php --}}
+@extends('layouts.admin')
 
-<head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<meta http-equiv="X-UA-Compatible" content="ie=edge">
-	<title>DataTables </title>
-	<meta name="description" content="">
-	<meta name="keywords" content="">
-	<link href="https://unpkg.com/tailwindcss@2.2.19/dist/tailwind.min.css" rel=" stylesheet">
-	<!--Replace with your tailwind.css onc	e created-->
+@section('title', 'Model')
 
+@section('content')
+<div class="p-5 rounded-lg shadow bg-white">
+    <div class="flex justify-between items-center">
+        <u class="font-extrabold text-3xl" >Admin | Model</u>
+    </div>
+</div>
 
-	<!--Regular Datatables CSS-->	
-	<link href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css" rel="stylesheet">
-	<!--Responsive Extension Datatables CSS-->
-	<link href="https://cdn.datatables.net/responsive/2.2.3/css/responsive.dataTables.min.css" rel="stylesheet">
-	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-	<style>
-		/*Overrides for Tailwind CSS */
+<div class="mt-6 p-6 rounded-lg shadow bg-white">
+    <div class="flex justify-between items-center">
+        <h2 class="text-2xl font-semibold text-gray-700"> Daftar Model</h2>
+        <a href="{{ route('products.create') }}" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-600">
+            <span class="mr-2">+</span> Tambah Model Baru
+        </a>
+    </div>
+    <div class="overflow-x-auto">
+        <table class="datatable min-w-full divide-y divide-gray-200">
+            <thead class="bg-thead">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Name</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Price</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Stock</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Description</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Image</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+                @foreach($products as $product)
+                <tr>
+                    <td class="px-6 py-4 whitespace-nowrap">{{ $product->nama_produk }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">Rp {{ number_format($product->harga_jual, 0, ',', '.') }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">{{ $product->stock_product }}</td>
+                    <td class="px-6 py-4 whitespace-normal max-w-xs truncate">{{ $product->description }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <img src="{{ asset('storage/' . $product->image) }}" 
+                             alt="{{ $product->nama_produk }}" 
+                             class="h-16 w-16 object-cover rounded-lg">
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <a href="{{ route('products.edit', $product->id_product) }}" 
+                           class="px-3 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-md">Edit</a>
+                        <form action="{{ route('products.destroy', $product->id_product) }}" 
+                              method="POST" class="inline-block delete-form">
+                            @csrf
+                            @method('DELETE')
+                            <button type="button" 
+                                    class="px-3 py-2 bg-red-500 hover:bg-red-600 text-white rounded-md delete-button">
+                                Delete
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
+</div>
+@endsection
 
-		/*Form fields*/
-		.dataTables_wrapper select,
-		.dataTables_wrapper .dataTables_filter input {
-			color: #4a5568;
-			/*text-gray-700*/
-			padding-left: 1rem;
-			/*pl-4*/
-			padding-right: 1rem;
-			/*pl-4*/
-			padding-top: .5rem;
-			/*pl-2*/
-			padding-bottom: .5rem;
-			/*pl-2*/
-			line-height: 1.25;
-			/*leading-tight*/
-			border-width: 2px;
-			/*border-2*/
-			border-radius: .25rem;
-			border-color: #edf2f7;
-			/*border-gray-200*/
-			background-color: #edf2f7;
-			/*bg-gray-200*/
-		}
+@push('scripts')
+<script>
+    $(document).ready(function() {
 
-		/*Row Hover*/
-		table.dataTable.hover tbody tr:hover,
-		table.dataTable.display tbody tr:hover {
-			background-color: #ebf4ff;
-			/*bg-indigo-100*/
-		}
-
-		/*Pagination Buttons*/
-		.dataTables_wrapper .dataTables_paginate .paginate_button {
-			font-weight: 700;
-			/*font-bold*/
-			border-radius: .25rem;
-			/*rounded*/
-			border: 1px solid transparent;
-			/*border border-transparent*/
-		}
-
-		/*Pagination Buttons - Current selected */
-		.dataTables_wrapper .dataTables_paginate .paginate_button.current {
-			color: #fff !important;
-			/*text-white*/
-			box-shadow: 0 1px 3px 0 rgba(0, 0, 0, .1), 0 1px 2px 0 rgba(0, 0, 0, .06);
-			/*shadow*/
-			font-weight: 700;
-			/*font-bold*/
-			border-radius: .25rem;
-			/*rounded*/
-			background: #667eea !important;
-			/*bg-indigo-500*/
-			border: 1px solid transparent;
-			/*border border-transparent*/
-		}
-
-		/*Pagination Buttons - Hover */
-		.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
-			color: #fff !important;
-			/*text-white*/
-			box-shadow: 0 1px 3px 0 rgba(0, 0, 0, .1), 0 1px 2px 0 rgba(0, 0, 0, .06);
-			/*shadow*/
-			font-weight: 700;
-			/*font-bold*/
-			border-radius: .25rem;
-			/*rounded*/
-			background: #667eea !important;
-			/*bg-indigo-500*/
-			border: 1px solid transparent;
-			/*border border-transparent*/
-		}
-
-		/*Add padding to bottom border */
-		table.dataTable.no-footer {
-			border-bottom: 1px solid #e2e8f0;
-			/*border-b-1 border-gray-300*/
-			margin-top: 0.75em;
-			margin-bottom: 0.75em;
-		}
-
-		/*Change colour of responsive icon*/
-		table.dataTable.dtr-inline.collapsed>tbody>tr>td:first-child:before,
-		table.dataTable.dtr-inline.collapsed>tbody>tr>th:first-child:before {
-			background-color: #667eea !important;
-			/*bg-indigo-500*/
-		}
-	</style>
-
-
-
-</head>
-
-<body class="bg-gray-100 text-gray-900 tracking-wider leading-normal">
-
-
-	<!--Container-->
-	<div class="container w-full md:w-4/5 xl:w-3/5  mx-auto px-2">
-
-		<!--Title-->
-		<h1 class="flex items-center font-sans font-bold break-normal text-indigo-500 px-2 py-8 text-xl md:text-2xl">
-			Responsive <a class="underline mx-2" href="https://datatables.net/">DataTables.net</a> Table
-		</h1>
-
-
-		<!--Card-->
-		<div id='recipients' class="p-8 mt-6 lg:mt-0 rounded shadow bg-white">
-
-
-			<table id="example" class="stripe hover" style="width:100%; padding-top: 1em;  padding-bottom: 1em;">
-				<thead>
-					<tr>
-						<th data-priority="1">Name</th>
-						<th data-priority="2">Price</th>
-						<th data-priority="3">Link</th>
-						<th data-priority="4">deskripsi</th>
-						<th data-priority="5">Image</th>
-						<th data-priority="6">Action</th>
-					</tr>
-				</thead>
-				<tbody>
-                    @foreach($products as $product)
-					<tr>
-                        
-						<td>{{$product->nama}}</td>
-						<td>{{$product->harga}}</td>
-						<td>{{$product->link}}</td>
-						<td>{{$product->deskripsi}}</td>
-						 <td><img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->nama }}" width="100"></td>
-						<td>
-                            <a href="{{ route('products.edit', $product->id) }}" class="btn btn-primary">Edit</a>
-                            <form action="{{ route('products.destroy', $product->id) }}" method="POST" class="inline-block delete-form">
-                                @csrf
-                                @method('DELETE')
-                                <button type="button" class="btn btn-danger delete-button">Delete</button>
-                            </form>
-                        </td>
-					</tr>
-                    @endforeach
-				</tbody>
-
-			</table>
-
-
-		</div>
-		<!--/Card-->
-
-
-	</div>
-	<!--/container-->
-
-	<!-- jQuery -->
-	<script type="text/javascript" src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-
-	<!--Datatables -->
-	<script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
-	<script src="https://cdn.datatables.net/responsive/2.2.3/js/dataTables.responsive.min.js"></script>
-	<script>
-		$(document).ready(function() {
-
-			var table = $('#example').DataTable({
-					responsive: true
-				})
-				.columns.adjust()
-				.responsive.recalc();
-
-			// SweetAlert for delete confirmation
-			$('.delete-button').on('click', function() {
-				var form = $(this).closest('form');
-				Swal.fire({
-					title: 'Are you sure?',
-					text: "You won't be able to revert this!",
-					icon: 'warning',
-					showCancelButton: true,
-					confirmButtonColor: '#3085d6',
-					cancelButtonColor: '#d33',
-					confirmButtonText: 'Yes, delete it!'
-				}).then((result) => {
-					if (result.isConfirmed) {
-						form.submit();
-					}
-				});
-			});
-		});
-	</script>
-
-</body>
-
-</html>
+        // SweetAlert for delete confirmation
+        $('.delete-button').on('click', function() {
+            var form = $(this).closest('form');
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
+        });
+    });
+</script>
+@endpush

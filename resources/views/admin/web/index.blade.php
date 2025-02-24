@@ -14,7 +14,7 @@
         </div>
         <div class="overflow-x-auto">
             <table id="aboutTable" class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-blue-500">
+                <thead class="bg-thead">
                     <tr>
                         <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider border-r border-gray-200">Title</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider border-r border-gray-200">Description</th>
@@ -59,7 +59,7 @@
         </div>
         <div class="overflow-x-auto">
             <table id="contactTable" class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-blue-500">
+                <thead class="bg-thead">
                     <tr>
                         <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider border-r border-gray-200">Title</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider border-r border-gray-200">Link</th>
@@ -96,7 +96,7 @@
         </div>
         <div class="overflow-x-auto">
             <table id="headerTable" class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-blue-500">
+                <thead class="bg-thead">
                     <tr>
                         <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider border-r border-gray-200">Title</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider border-r border-gray-200">Description</th>

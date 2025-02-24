@@ -18,15 +18,6 @@ class HomeController extends Controller
 {
     public function index()
     {
-        $product = Product::all();
-        $header = Header::all();
-        $about = About::all();
-        $contact = Contact::all();
-        return view('home', [
-            'products' => $product,
-            'headers' => $header,
-            'abouts' => $about,
-            'contacts' => $contact,
-        ]);
+        return redirect(route('home'));
     }
 }

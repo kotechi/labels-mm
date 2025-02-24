@@ -11,12 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('modals', function (Blueprint $table) {
-            $table->id();
-            $table->string("nama");
-            $table->string("harga");
-            $table->integer("jumlah");
-            $table->timestamps();
+        Schema::create('gaji_karyawan', function (Blueprint $table) {
+            $table->id('id_gaji');
+            $table->string('nama_karyawan');
+            $table->decimal('nominal', 15, 2);
+            $table->date('created_at');
         });
     }
 
@@ -25,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('modals');
+        Schema::dropIfExists('gaji_karyawan');
     }
 };

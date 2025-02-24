@@ -13,14 +13,29 @@ return new class extends Migration
     {
         Schema::create('pesanans', function (Blueprint $table) {
             $table->id('id_pesanan');
+            $table->string('nama_pemesan');
             $table->integer('product_id');
-            $table->integer('user_id');
-            $table->string('nomor_whatsapp');
-            $table->string('name_product');
-            $table->string('nama');
-            $table->string('status')->default('proses');
+            $table->string('no_telp_pemesan');
+            $table->string('nama_produk');
+            $table->integer('jumlah_produk');
             $table->string('total_harga');
-            $table->integer('jumlah_product');
+            $table->string('payment_method');
+            $table->integer('created_by');
+            $table->string('status_pesanan')->default('proses');
+            $table->timestamp('order_date')->default(DB::raw('CURRENT_TIMESTAMP'));
+
+            $table->decimal('lebar_muka', 8, 2)->nullable();
+            $table->decimal('lebar_pundak', 8, 2)->nullable();
+            $table->decimal('lebar_punggung', 8, 2)->nullable();
+            $table->decimal('panjang_lengan', 8, 2)->nullable();
+            $table->decimal('panjang_punggung', 8, 2)->nullable();
+            $table->decimal('panjang_baju', 8, 2)->nullable();
+            $table->decimal('lingkar_badan', 8, 2)->nullable();
+            $table->decimal('lingkar_pinggang', 8, 2)->nullable();
+            $table->decimal('lingkar_panggul', 8, 2)->nullable();
+            $table->decimal('lingkar_kerung_lengan', 8, 2)->nullable();
+            $table->decimal('lingkar_pergelangan_lengan', 8, 2)->nullable();
+            
             $table->timestamps();
         });
     }

@@ -17,12 +17,13 @@ class User extends Authenticatable
      *
      * @var list<string>
      */
+    
     protected $fillable = [
-        'name',
-        'email',
+        'nama_lengkap',
+        'username',
         'password',
         'usertype',
-        'max_orders_per_day' // Add this line
+        'no_telp',
     ];
 
     /**
@@ -43,17 +44,14 @@ class User extends Authenticatable
     protected function casts(): array
     {
         return [
-            'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
     }
 
     /**
-     * The attributes that should have default values.
+     * The primary key associated with the table.
      *
-     * @var array<string, mixed>
+     * @var string
      */
-    protected $attributes = [
-        'max_orders_per_day' => 2, // Set default value
-    ];
+    protected $primaryKey = 'id_users'; // Specify the primary key column
 }

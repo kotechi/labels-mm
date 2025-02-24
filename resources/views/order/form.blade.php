@@ -27,7 +27,7 @@
                 <input type="text" name="nomor_whatsapp" class="w-full px-3 py-2 border rounded" required>
             </div>
 
-            <button type="submit" class="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">
+            <button type="submit" class="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-600">
                 Lanjutkan ke WhatsApp
             </button>
         </form>

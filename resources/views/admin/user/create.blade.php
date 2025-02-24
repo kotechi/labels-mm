@@ -1,42 +1,86 @@
 @extends('layouts.admin')
 
+@section('title','User')
 @section('content')
-<div class="container mx-auto px-4 py-8">
-    <h1 class="text-3xl font-bold text-gray-800 mb-8">Create New Users</h1>
-    <form action="{{ route('users.store') }}" method="POST">
-        @csrf
-        @for ($i = 0; $i < request()->get('count', 1); $i++)
-        <div class="mb-4">
-            <label for="name_{{ $i }}" class="block text-sm font-medium text-gray-700">Name</label>
-            <input type="text" name="users[{{ $i }}][name]" id="name_{{ $i }}" class="mt-1 block w-full" required>
+<div class="p-5 rounded-lg shadow bg-white">
+    <div class="flex justify-between items-center">
+        <u class="font-extrabold text-3xl">Admin | User</u>
+    </div>
+</div>
+<div class="bg-white shadow-md border mt-6">
+    <div class="bg-labels shadow-lg rounded-sm">
+        <div class="p-4 w-auto">
+            <h3 class="text-lg text-white font-semibold">Tambah Data User</h3>
         </div>
-        <div class="mb-4">
-            <label for="email_{{ $i }}" class="block text-sm font-medium text-gray-700">Email</label>
-            <input type="email" name="users[{{ $i }}][email]" id="email_{{ $i }}" class="mt-1 block w-full" required>
-        </div>
-        <div class="mb-4">
-            <label for="password_{{ $i }}" class="block text-sm font-medium text-gray-700">Password</label>
-            <input type="password" name="users[{{ $i }}][password]" id="password_{{ $i }}" class="mt-1 block w-full" required>
-        </div>
-        <div class="mb-4">
-            <label for="password_confirmation_{{ $i }}" class="block text-sm font-medium text-gray-700">Confirm Password</label>
-            <input type="password" name="users[{{ $i }}][password_confirmation]" id="password_confirmation_{{ $i }}" class="mt-1 block w-full" required>
-        </div>
-        <div class="mb-4">
-            <label for="usertype_{{ $i }}" class="block text-sm font-medium text-gray-700">User Type</label>
-            <select name="users[{{ $i }}][usertype]" id="usertype_{{ $i }}" class="mt-1 block w-full" required>
-                <option value="admin">Admin</option>
-                <option value="user">User</option>
-            </select>
-        </div>
-        <div class="mb-4">
-            <label for="max_orders_per_day_{{ $i }}" class="block text-sm font-medium text-gray-700">Max Orders Per Day</label>
-            <input type="number" name="users[{{ $i }}][max_orders_per_day]" id="max_orders_per_day_{{ $i }}" class="mt-1 block w-full" required>
-        </div>
-        @endfor
-        <div class="flex justify-end">
-            <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg">Create</button>
-        </div>
-    </form>
+    </div>
+    <div class="p-6 mt-2">
+        <form action="{{ route('users.store') }}" method="POST">
+            @csrf
+            <div class="mb-4">
+                <label for="nama_lengkap" class="block text-lg font-medium text-gray-700">Nama Lengkap</label>
+                <input type="text" name="nama_lengkap" id="nama_lengkap" 
+                    placeholder="masukan nama lengkap" 
+                    class="p-3 block w-full border rounded-md @error('nama_lengkap') border-red-500 @enderror" 
+                    required>
+                @error('nama_lengkap')
+                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <div class="mb-4">
+                <label for="username" class="block text-lg font-medium text-gray-700">Username</label>
+                <input type="text" name="username" id="username" 
+                    class="p-3 block w-full border rounded-md @error('username') border-red-500 @enderror" 
+                    required>
+                @error('username')
+                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <div class="mb-4">
+                <label for="password" class="block text-lg font-medium text-gray-700">Password</label>
+                <input type="password" name="password" id="password" 
+                    class="p-3 block w-full border rounded-md @error('password') border-red-500 @enderror" 
+                    required>
+                @error('password')
+                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <div class="mb-4">
+                <label for="password_confirmation" class="block text-lg font-medium text-gray-700">Confirm Password</label>
+                <input type="password" name="password_confirmation" id="password_confirmation" 
+                    class="p-3 block w-full border rounded-md" 
+                    required>
+            </div>
+
+            <div class="mb-4">
+                <label for="usertype" class="block text-lg font-medium text-gray-700">User Type</label>
+                <select name="usertype" id="usertype" 
+                    class="p-3 block w-full border rounded-md @error('usertype') border-red-500 @enderror" 
+                    required>
+                    <option value="admin">Admin</option>
+                    <option value="karyawan">Karyawan</option>
+                </select>
+                @error('usertype')
+                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <div class="mb-4">
+                <label for="no_telp" class="block text-lg font-medium text-gray-700">Phone Number</label>
+                <input type="text" name="no_telp" id="no_telp" 
+                    class="p-3 block w-full border rounded-md @error('no_telp') border-red-500 @enderror" 
+                    required>
+                @error('no_telp')
+                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <div class="flex justify-end">
+                <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg">Create</button>
+            </div>
+        </form>
+    </div>
 </div>
 @endsection
