@@ -18,7 +18,7 @@
         <div class="flex w-full max-w-4xl bg-white rounded-lg shadow-lg">
             <!-- Logo Section -->
             <div class="w-1/2 flex items-center justify-center bg-white shadow-lg mt-1 p-16">
-                <img src="{{ asset('storage/images/icon/LAblesMM.png') }}" alt="Logo" class="max-w-full rounded-xl border-2 border-pink-200 shadow-[0_6px_15px_rgba(0,0,0,0.6)]">
+                <img src="{{ asset('storage/images/icon/LAblesMM.png') }}" alt="Logo" class="p-3 max-w-full rounded-xl border-2 border-pink-200 shadow-[0_6px_15px_rgba(0,0,0,0.6)]">
             </div>
 
             <!-- Form Section -->

@@ -125,11 +125,6 @@ class PesananController extends Controller
         ]);
     }
 
-    public function show(string $id)
-    {
-
-    }
-
     public function edit($id)
     {
         $pesanan = Pesanan::findOrFail($id);
@@ -205,13 +200,6 @@ class PesananController extends Controller
     
         return redirect()->route('pesanans.index')
             ->with('success', 'Pesanan updated successfully');
-    }
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
     }
 
     public function markAsPaid($id)

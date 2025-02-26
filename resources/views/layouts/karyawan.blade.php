@@ -156,19 +156,19 @@
             <nav class="flex-1">
                 <ul>
                     <li class="mb-4 flex items-center">
-                        <i class="w-7 h-7 mr-2"><x-svg-icon icon="dashboard-sidebar" /></i>
+                        <i class="w-5 h-5 mr-2" data-lucide="layout-dashboard"></i>
                         <a href="{{ route('karyawan.index') }}" class="text-gray-700 hover:text-gray-900 font-bold">Dashboard</a>
                     </li>
                     <li class="mb-4 flex items-center">
-                        <i class="w-7 h-7 mr-2"><x-svg-icon icon="order-sidebar" /></i>
+                        <i class="w-5 h-5 mr-2" data-lucide="clipboard-list"></i>
                         <a href="{{ route('karyawan.pesanans.index') }}" class="text-gray-700 hover:text-gray-900 font-bold">Pesanan</a>
                     </li>
                     <li class="mb-4 flex items-center">
-                        <i data-lucide="image" class="w-7 h-7 mr-2"></i>
+                        <i data-lucide="image" class="w-5 h-5 mr-2"></i>
                         <a href="{{ route('karyawan.gallery.index') }}" class="text-gray-700 hover:text-gray-900 font-bold">Model</a>
                     </li>
                     <li class="mb-4 flex items-center">
-                        <i data-lucide="image" class="w-7 h-7 mr-2"></i>
+                        <i data-lucide="user-pen" class="w-5 h-5 mr-2"></i>
                         <a href="{{ route('karyawan.profile.index') }}" class="text-gray-700 hover:text-gray-900 font-bold">Profile</a>
                     </li>
                 </ul>

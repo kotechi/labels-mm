@@ -9,7 +9,6 @@ class MidtransService
 {
     public function __construct()
     {
-        Config::$merchantId = config('midtrans.merchant_id');
         Config::$serverKey = config('midtrans.server_key');
         Config::$clientKey = config('midtrans.client_key');
         Config::$isProduction = config('midtrans.is_production');

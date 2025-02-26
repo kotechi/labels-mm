@@ -153,7 +153,7 @@
             </div>
 
             <!-- Navigation -->
-            <nav class="flex-1">
+            <nav class="flex-1 gap-5">
                 <ul>
                     <li class="mb-4 flex items-center">
                         <i data-lucide="layout-dashboard" class="w-5 h-5 mr-2"></i>
@@ -172,11 +172,11 @@
                         <a href="{{ route('products') }}" class="text-gray-700 hover:text-gray-900 font-bold">Galeri</a>
                     </li>
                     <li class="mb-4 flex items-center">
-                        <i data-lucide="user" class="w-5 h-5 mr-2"></i>
+                        <i data-lucide="users" class="w-5 h-5 mr-2"></i>
                         <a href="{{ route('users.index') }}" class="text-gray-700 hover:text-gray-900 font-bold">User</a>
                     </li>
                     <li class="mb-4 flex items-center">
-                        <i data-lucide="user" class="w-5 h-5 mr-2"></i>
+                        <i data-lucide="user-pen" class="w-5 h-5 mr-2"></i>
                         <a href="{{ route('admin.profile.index') }}" class="text-gray-700 hover:text-gray-900 font-bold">Profile</a>
                     </li>
                 </ul>
@@ -210,26 +210,26 @@
 
         $(document).ready(function() {
     // Inisialisasi DataTable dengan konfigurasi tambahan
-    $('table.datatable').DataTable({
-        responsive: true,
-        ordering: true,
-        language: {
-            search: "" // Menghilangkan label "Search:"
-        },
-        "createdRow": function(row, data, dataIndex, cells) {
-            // Ambil kategori dari data attribute
-            const kategori = $(row).data('kategori');
-            if (kategori === 'pemasukan') {
-                $(row).addClass('bg-green-100-important');
-            } else if (kategori === 'pengeluaran') {
-                $(row).addClass('bg-red-100-important');
-            }
-        },
-        "initComplete": function() {
-            $('.dataTables_filter input').attr('placeholder', 'Search here...');
-        }
-    });
-});
+            $('table.datatable').DataTable({
+                responsive: true,
+                ordering: true,
+                language: {
+                    search: "" // Menghilangkan label "Search:"
+                },
+                "createdRow": function(row, data, dataIndex, cells) {
+                    // Ambil kategori dari data attribute
+                    const kategori = $(row).data('kategori');
+                    if (kategori === 'pemasukan') {
+                        $(row).addClass('bg-green-100-important');
+                    } else if (kategori === 'pengeluaran') {
+                        $(row).addClass('bg-red-100-important');
+                    }
+                },
+                "initComplete": function() {
+                    $('.dataTables_filter input').attr('placeholder', 'Search here...');
+                }
+            });
+        });
 
         // SweetAlert for delete confirmation
         $('.delete-button').on('click', function() {
@@ -248,18 +248,19 @@
                 }
             });
         });
-    </script>
 
-@if (session('success'))
+</script>
+
+@if(session('success'))
 <script>
-    Swal.fire({
-        icon: 'success',
-        title: 'Success!',
-        text: "{{ session('success') }}"
-    });
+        Swal.fire({
+            icon: 'success',
+            title: 'Success!',
+            text: "{{ session('success') }}"
+        });
+    
 </script>
 @endif
-
     @stack('scripts')
 </body>
 </html>

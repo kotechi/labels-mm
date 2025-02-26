@@ -23,7 +23,10 @@ use App\Http\Controllers\KaryawanGalleryController;
 use App\Http\Controllers\ReportController;
 
 
+
 Route::middleware('auth')->group(function () {
+    Route::post('payments/midtrans-callback', [PesananController::class, 'handleCallback'])->name('midtrans.callback');
+
     Route::get('/report/pdf', [ReportController::class, 'generatePDF'])->name('report.pdf');
     Route::get('/',[RouteController::class, 'index'])->name('home');
 
