@@ -2,12 +2,13 @@
 <html lang="en" class="antialiased">
 <head>
     <meta charset="UTF-8">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="icon" type="image/x-icon" href="{{ asset('storage/images/icon/favicon.ico') }}">
     <title>Admin | @yield('title')</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <script src="{{ asset('assets/js/chart.min.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="{{ asset('assets/js/lucid.min.js') }}"></script>
     <script type="text/javascript" src="{{ asset('assets/js/jquery-3.4.1.min.js') }}"></script>
     <script src="{{ asset('assets/js/jquery.dataTables.min.js') }}"></script>
@@ -15,6 +16,7 @@
     <link rel="preload" href="public/fonts/Poppins-Regular.woff2" as="font" type="font/woff2" crossorigin>
     <link href="{{ asset('assets/css/jquery.dataTables.min.css') }}" rel="stylesheet">
     <link href="{{ asset('assets/css/responsive.dataTables.min.css') }}" rel="stylesheet">
+    
 </head>
 <style>
     @import 'fonts.css';

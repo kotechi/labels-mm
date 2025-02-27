@@ -184,32 +184,55 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const ctx = document.getElementById('earningsChart').getContext('2d');
-    let currentDate = new Date();
     let period = 'monthly';
-    
-    // Initialize Chart
+
+    // Data langsung dari Laravel (tanpa AJAX)
+    const dataSets = {
+        daily: {
+            labels: @json($dailyLabels),
+            pemasukan: @json($dailyEarnings),
+            pengeluaran: @json($dailyModal),
+            keuntungan: @json($dailyTotalPemasukan),
+            total: {{ $totalDailyEarnings ?? 0 }}
+        },
+        monthly: {
+            labels: @json($months),
+            pemasukan: @json($monthlyEarnings),
+            pengeluaran: @json($monthlyModal),
+            keuntungan: @json($monthlyTotalPemasukan),
+            total: {{ $totalMonthlyEarnings ?? 0 }}
+        },
+        yearly: {
+            labels: @json($years),
+            pemasukan: @json($yearlyEarnings),
+            pengeluaran: @json($yearlyModal),
+            keuntungan: @json($yearlyTotalPemasukan),
+            total: {{ $totalYearlyEarnings ?? 0 }}
+        }
+    };
+
     let earningsChart = new Chart(ctx, {
         type: 'line',
         data: {
-            labels: @json($months),
+            labels: dataSets[period].labels,
             datasets: [
                 {
                     label: 'Pemasukan',
-                    data: @json($monthlyEarnings),
+                    data: dataSets[period].pemasukan,
                     borderColor: 'rgba(75, 192, 192, 1)',
                     backgroundColor: 'rgba(75, 192, 192, 0.2)',
                     borderWidth: 1
                 },
                 {
                     label: 'Pengeluaran',
-                    data: @json($monthlyModal),
+                    data: dataSets[period].pengeluaran,
                     borderColor: '#6A1E55',
                     backgroundColor: 'rgba(106, 30, 85, 0.2)',
                     borderWidth: 1
                 },
                 {
                     label: 'Total Keuntungan',
-                    data: @json($monthlyTotalPemasukan),
+                    data: dataSets[period].keuntungan,
                     borderColor: '#7C084E',
                     backgroundColor: 'rgba(124, 8, 78, 0.2)',
                     borderWidth: 1
@@ -242,80 +265,28 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    
+    // Fungsi untuk mengupdate Chart
+    function updateChart(period) {
+        earningsChart.data.labels = dataSets[period].labels;
+        earningsChart.data.datasets[0].data = dataSets[period].pemasukan;
+        earningsChart.data.datasets[1].data = dataSets[period].pengeluaran;
+        earningsChart.data.datasets[2].data = dataSets[period].keuntungan;
+        earningsChart.update();
 
-    function formatPeriodDisplay(date, period) {
-        const months = ['January', 'February', 'March', 'April', 'May', 'June', 
-                       'July', 'August', 'September', 'October', 'November', 'December'];
-        
-        if (period === 'daily') {
-            return `${months[date.getMonth()]} ${date.getFullYear()}`;
-        } else if (period === 'monthly') {
-            return date.getFullYear().toString();
-        } else {
-            return `${date.getFullYear() - 4} - ${date.getFullYear()}`;
-        }
+        document.getElementById('totalEarnings').textContent = 
+            `Total: Rp ${new Intl.NumberFormat('id-ID').format(dataSets[period].total)}`;
     }
 
-    function updatePeriodDisplay() {
-        const displayElement = document.getElementById('periodDisplay');
-        displayElement.textContent = formatPeriodDisplay(currentDate, period);
-    }
-
-    function fetchData() {
-        $.ajax({
-            url: '{{ route("admin.index") }}',
-            method: 'GET',
-            data: {
-                period: period,
-                year: currentDate.getFullYear(),
-                month: currentDate.getMonth() + 1
-            },
-            success: function(response) {
-                earningsChart.data.labels = response.labels;
-                earningsChart.data.datasets[0].data = response.data.pendapatan;
-                earningsChart.data.datasets[1].data = response.data.modal;
-                earningsChart.data.datasets[2].data = response.data.totalPemasukan;
-                earningsChart.update();
-                
-                document.getElementById('totalEarnings').textContent = 
-                    `Total: Rp ${new Intl.NumberFormat('id-ID').format(response.totalEarnings)}`;
-                
-                updatePeriodDisplay();
-            }
-        });
-    }
-
-    // Event Listeners
+    // Event Listener untuk Select Dropdown
     document.getElementById('earningsPeriod').addEventListener('change', function() {
         period = this.value;
-        fetchData();
+        updateChart(period);
     });
 
-    document.getElementById('prevPeriod').addEventListener('click', function() {
-        if (period === 'daily') {
-            currentDate.setMonth(currentDate.getMonth() - 1);
-        } else if (period === 'monthly') {
-            currentDate.setFullYear(currentDate.getFullYear() - 1);
-        } else {
-            currentDate.setFullYear(currentDate.getFullYear() - 5);
-        }
-        fetchData();
-    });
-
-    document.getElementById('nextPeriod').addEventListener('click', function() {
-        if (period === 'daily') {
-            currentDate.setMonth(currentDate.getMonth() + 1);
-        } else if (period === 'monthly') {
-            currentDate.setFullYear(currentDate.getFullYear() + 1);
-        } else {
-            currentDate.setFullYear(currentDate.getFullYear() + 5);
-        }
-        fetchData();
-    });
-
-    // Initialize period display
-    updatePeriodDisplay();
+    // Set total earnings pertama kali
+    document.getElementById('totalEarnings').textContent = 
+        `Total: Rp ${new Intl.NumberFormat('id-ID').format(dataSets[period].total)}`;
 });
+
 </script>
 @endpush

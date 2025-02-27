@@ -24,7 +24,7 @@
             <!-- Selesai -->
             <div class="relative p-4 shadow-lg border border-black rounded-lg ">
                 <div class="flex items-center justify-between text-center">
-                    <span class="font-semibold text-gray-800 text-xl">{{$paidCount}}</span>
+                    <span class="font-semibold text-gray-800 text-xl">{{$paidCount+$completedCount}}</span>
                     <i data-lucide="wallet" class="h-6 w-6 text-gray-600"></i>
                 </div>
                 <span class="block mt-2 text-xl">Sudah bayar</span>
