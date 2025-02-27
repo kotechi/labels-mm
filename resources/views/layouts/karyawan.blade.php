@@ -5,6 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta http-equiv="X-UA-Compatible" content="ie=edge">
         <title>Karyawan | @yield('title')</title>
+        <link rel="icon" type="image/x-icon" href="{{ asset('storage/images/icon/favicon.ico') }}">
         @vite(['resources/css/app.css', 'resources/js/app.js'])
         <script src="{{ asset('assets/js/chart.min.js') }}"></script>
         <script src="{{ asset('assets/js/lucid.min.js') }}"></script>
@@ -146,30 +147,30 @@
 <body class="min-h-screen font-sans bg-gray-100">
     <div class="flex min-h-screen">
         <!-- Sidebar -->
-        <aside class="fixed top-0 left-0 h-screen w-48 lg:w-64 p-6 bg-white shadow-lg flex z-50 flex-col">
+        <aside class="fixed top-0 left-0 h-screen w-48 lg:w-[220px] p-6 bg-white shadow-lg flex z-50 flex-col">
             <div class="flex items-center gap-2 mb-6">
-                <img src="{{ asset('storage/images/icon/LAblesMM.png') }}" alt="Logo" class="w-auto h-auto">
+                <img src="{{ asset('storage/images/icon/LAblesMM.png') }}" alt="Logo" class="w-[230] h-auto">
                 <span class="text-lg font-bold text-gray-700"></span>
             </div>
 
             <!-- Navigation -->
-            <nav class="flex-1">
+            <nav class="flex-1 items-center">
                 <ul>
-                    <li class="mb-4 flex items-center">
-                        <i class="w-5 h-5 mr-2" data-lucide="layout-dashboard"></i>
-                        <a href="{{ route('karyawan.index') }}" class="text-gray-700 hover:text-gray-900 font-bold">Dashboard</a>
+                    <li class="mb-7 flex items-center">
+                        <i class="w-7 h-7 mr-2" data-lucide="layout-dashboard"></i>
+                        <a href="{{ route('karyawan.index') }}" class="text-gray-900 hover:text-gray-700 text-lg font-semibold">Dashboard</a>
                     </li>
-                    <li class="mb-4 flex items-center">
-                        <i class="w-5 h-5 mr-2" data-lucide="clipboard-list"></i>
-                        <a href="{{ route('karyawan.pesanans.index') }}" class="text-gray-700 hover:text-gray-900 font-bold">Pesanan</a>
+                    <li class="mb-7 flex items-center">
+                        <i class="w-7 h-7 mr-2" data-lucide="clipboard-list"></i>
+                        <a href="{{ route('karyawan.pesanans.index') }}" class="text-gray-900 hover:text-gray-700 text-lg font-semibold">Pesanan</a>
                     </li>
-                    <li class="mb-4 flex items-center">
-                        <i data-lucide="image" class="w-5 h-5 mr-2"></i>
-                        <a href="{{ route('karyawan.gallery.index') }}" class="text-gray-700 hover:text-gray-900 font-bold">Model</a>
+                    <li class="mb-7 flex items-center">
+                        <i data-lucide="image" class="w-7 h-7 mr-2"></i>
+                        <a href="{{ route('karyawan.gallery.index') }}" class="text-gray-900 hover:text-gray-700 text-lg font-semibold">Model</a>
                     </li>
-                    <li class="mb-4 flex items-center">
-                        <i data-lucide="user-pen" class="w-5 h-5 mr-2"></i>
-                        <a href="{{ route('karyawan.profile.index') }}" class="text-gray-700 hover:text-gray-900 font-bold">Profile</a>
+                    <li class="mb-7 flex items-center">
+                        <i data-lucide="user-pen" class="w-7 h-7 mr-2"></i>
+                        <a href="{{ route('karyawan.profile.index') }}" class="text-gray-900 hover:text-gray-700 text-lg font-semibold">Profile</a>
                     </li>
                 </ul>
             </nav>
@@ -187,7 +188,7 @@
         </aside>
 
         <!-- Main Content -->
-        <main class="flex-1  h-full pl-48 lg:pl-64">
+        <main class="flex-1  h-full pl-48 lg:pl-[220px]">
 
             <!-- Content Area -->
             <div class="px-5 pb-5 h-full">
@@ -242,13 +243,15 @@
         });
     </script>
 
-@if (session('success'))
+@if(session('success'))
 <script>
-    Swal.fire({
-        icon: 'success',
-        title: 'Success!',
-        text: "{{ session('success') }}"
-    });
+    window.onload = function() {
+        Swal.fire({
+            icon: 'success',
+            title: 'Success!',
+            text: "{{ session('success') }}"
+        });
+    }
 </script>
 @endif
 

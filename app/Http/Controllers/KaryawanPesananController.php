@@ -40,18 +40,17 @@ class KaryawanPesananController extends Controller
         $request->merge(['created_by' => auth()->user()->id_users]);
         $pesanan = Pesanan::create($request->all());
 
-        // Create transaction record
-        tbl_transaksi::create([
-            'id_referens' => $pesanan->id_pesanan,
-            'pelaku_transaksi' => $pesanan->created_by,
-            'keterangan' => "Order created for Order #{$pesanan->id_pesanan} - {$pesanan->nama_produk} (Qty: {$pesanan->jumlah_produk})",
-            'nominal' => $pesanan->total_harga,
-            'kategori' => 'pemasukan',
-            'tanggal' => now(),
-        ]);
+        // Add to pemasukan and transaksi if status is paid or completed
+        if (in_array($pesanan->status_pesanan, ['paid', 'completed'])) {
+            tbl_transaksi::create([
+                'id_referens' => $pesanan->id_pesanan,
+                'pelaku_transaksi' => $pesanan->created_by,
+                'keterangan' => "Order created for Order #{$pesanan->id_pesanan} - {$pesanan->nama_produk} (Qty: {$pesanan->jumlah_produk})",
+                'nominal' => $pesanan->total_harga,
+                'kategori' => 'pemasukan',
+                'tanggal' => now(),
+            ]);
 
-        // Add to pemasukan if status is paid
-        if ($pesanan->status_pesanan === 'paid') {
             Pemasukan::create([
                 'id_referensi' => $pesanan->id_pesanan,
                 'keterangan' => "Payment received for Order #{$pesanan->id_pesanan} - {$pesanan->nama_produk} (Qty: {$pesanan->jumlah_produk})",
@@ -61,7 +60,22 @@ class KaryawanPesananController extends Controller
             ]);
         }
 
-        return redirect()->route('karyawan.pesanans.index')->with('success', 'Pesanan created successfully.');
+        if ($request->payment_method === 'midtrans') {
+            $snapToken = $this->midtransService->createTransaction($pesanan);
+            
+            if ($snapToken) {
+                return view('karyawan.pesanan.payment', compact('snapToken', 'pesanan'));
+            }
+            
+            return redirect()->back()->with('error', 'Gagal membuat transaksi pembayaran');
+        }
+        // For cash payments, fetch the product and show receipt
+        $product = Product::findOrFail($request->product_id);
+        
+        // If this is a cash payment, return receipt view
+        if ($request->payment_method === 'cash') {
+            return view('karyawan.pesanan.cash', compact('pesanan', 'product'));
+        }
     }
 
     public function edit($id)
@@ -134,6 +148,37 @@ class KaryawanPesananController extends Controller
             }
         }
         $pesanan->update($input);
+
+        // Remove pemasukan if status is changed to 'proses'
+        if ($pesanan->status_pesanan === 'proses') {
+            Pemasukan::where('id_referensi', $pesanan->id_pesanan)->delete();
+        } else {
+            // Add to pemasukan and transaksi if status is paid or completed
+            if (in_array($pesanan->status_pesanan, ['paid', 'completed'])) {
+                tbl_transaksi::create([
+                    'id_referens' => $pesanan->id_pesanan,
+                    'pelaku_transaksi' => $pesanan->created_by,
+                    'keterangan' => "Order updated for Order #{$pesanan->id_pesanan} - {$pesanan->nama_produk} (Qty: {$pesanan->jumlah_produk})",
+                    'nominal' => $pesanan->total_harga,
+                    'kategori' => 'pemasukan',
+                    'tanggal' => now(),
+                ]);
+
+                $pemasukan = Pemasukan::where('id_referensi', $pesanan->id_pesanan)->first();
+                if ($pemasukan) {
+                    $pemasukan->nominal = $pesanan->total_harga;
+                    $pemasukan->save();
+                } else {
+                    Pemasukan::create([
+                        'id_referensi' => $pesanan->id_pesanan,
+                        'keterangan' => "Payment received for Order #{$pesanan->id_pesanan} - {$pesanan->nama_produk} (Qty: {$pesanan->jumlah_produk})",
+                        'nominal' => $pesanan->total_harga,
+                        'created_by' => $pesanan->created_by,
+                        'created_at' => now(),
+                    ]);
+                }
+            }
+        }
     
         return redirect()->route('karyawan.pesanans.index')
             ->with('success', 'Pesanan updated successfully');
@@ -173,7 +218,7 @@ class KaryawanPesananController extends Controller
             $pesanan->update(['status_pesanan' => 'paid']);
 
             tbl_transaksi::create([
-                'id_referensi' => $pesanan->id_pesanan,
+                'id_referens' => $pesanan->id_pesanan,
                 'pelaku_transaksi' => $pesanan->created_by,
                 'keterangan' => "Payment received for Order #{$pesanan->id_pesanan} - {$pesanan->nama_produk} (Qty: {$pesanan->jumlah_produk})",
                 'nominal' => $pesanan->total_harga,

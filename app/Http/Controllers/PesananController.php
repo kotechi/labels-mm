@@ -94,6 +94,7 @@ class PesananController extends Controller
             'lingkar_panggul' => 'nullable|numeric',
             'lingkar_kerung_lengan' => 'nullable|numeric',
             'lingkar_pergelangan_lengan' => 'nullable|numeric',
+            'jumlah_pembayaran' => 'nullable|numeric',
         ]);
 
         $request->merge([
@@ -102,15 +103,45 @@ class PesananController extends Controller
 
         $pesanan = Pesanan::create($request->all());
 
+        // Add to pemasukan and transaksi if status is paid or completed
+        if (in_array($pesanan->status_pesanan, ['paid', 'completed'])) {
+            tbl_transaksi::create([
+                'id_referens' => $pesanan->id_pesanan,
+                'pelaku_transaksi' => $pesanan->created_by,
+                'keterangan' => "Order created for Order #{$pesanan->id_pesanan} - {$pesanan->nama_produk} (Qty: {$pesanan->jumlah_produk})",
+                'nominal' => $pesanan->total_harga,
+                'kategori' => 'pemasukan',
+                'tanggal' => now(),
+            ]);
+
+            Pemasukan::create([
+                'id_referensi' => $pesanan->id_pesanan,
+                'keterangan' => "Payment received for Order #{$pesanan->id_pesanan} - {$pesanan->nama_produk} (Qty: {$pesanan->jumlah_produk})",
+                'nominal' => $pesanan->total_harga,
+                'created_by' => $pesanan->created_by,
+                'created_at' => now(),
+            ]);
+        }
+
         if ($request->payment_method === 'midtrans') {
             $snapToken = $this->midtransService->createTransaction($pesanan);
             
             if ($snapToken) {
-                return view('admin.pesanan.payment', compact('snapToken', 'pesanan'));
+                return view('admin.pesanan.payment', compact('snapToken', 'pesanan'))->with('succes', 'Berhasil membuat pesanan');
             }
             
             return redirect()->back()->with('error', 'Gagal membuat transaksi pembayaran');
         }
+        
+        // For cash payments, fetch the product and show receipt
+        $product = Product::findOrFail($request->product_id);
+        
+        // If this is a cash payment, return receipt view
+        if ($request->payment_method === 'cash') {
+            return view('admin.pesanan.cash', compact('pesanan', 'product'))->with('success', 'berhasil membuat pesanan');
+        }
+
+        return redirect()->route('pemasukan.index')->with('success', 'Pesanan created successfully');
     }
 
     // PesananController.php
@@ -197,8 +228,39 @@ class PesananController extends Controller
         }
         
         $pesanan->update($input);
+
+        // Remove pemasukan if status is changed to 'proses'
+        if ($pesanan->status_pesanan === 'proses') {
+            Pemasukan::where('id_referensi', $pesanan->id_pesanan)->delete();
+        } else {
+            // Add to pemasukan and transaksi if status is paid or completed
+            if (in_array($pesanan->status_pesanan, ['paid', 'completed'])) {
+                tbl_transaksi::create([
+                    'id_referens' => $pesanan->id_pesanan,
+                    'pelaku_transaksi' => $pesanan->created_by,
+                    'keterangan' => "Order updated for Order #{$pesanan->id_pesanan} - {$pesanan->nama_produk} (Qty: {$pesanan->jumlah_produk})",
+                    'nominal' => $pesanan->total_harga,
+                    'kategori' => 'pemasukan',
+                    'tanggal' => now(),
+                ]);
+
+                $pemasukan = Pemasukan::where('id_referensi', $pesanan->id_pesanan)->first();
+                if ($pemasukan) {
+                    $pemasukan->nominal = $pesanan->total_harga;
+                    $pemasukan->save();
+                } else {
+                    Pemasukan::create([
+                        'id_referensi' => $pesanan->id_pesanan,
+                        'keterangan' => "Payment received for Order #{$pesanan->id_pesanan} - {$pesanan->nama_produk} (Qty: {$pesanan->jumlah_produk})",
+                        'nominal' => $pesanan->total_harga,
+                        'created_by' => $pesanan->created_by,
+                        'created_at' => now(),
+                    ]);
+                }
+            }
+        }
     
-        return redirect()->route('pesanans.index')
+        return redirect()->route('pemasukan.index')
             ->with('success', 'Pesanan updated successfully');
     }
 
@@ -247,14 +309,14 @@ class PesananController extends Controller
 
             DB::commit();
 
-            return redirect()->route('pesanans.index')
+            return redirect()->route('pemasukan.index')
                 ->with('success', 'Order marked as paid and transaction recorded successfully.');
 
         } catch (\Exception $e) {
             DB::rollBack();
 
             
-            return redirect()->route('pesanans.index')
+            return redirect()->route('pemasukan.index')
                 ->with('error', 'Failed to process payment: ' . $e->getMessage());
         }
     }
@@ -267,7 +329,7 @@ class PesananController extends Controller
             
             // Only allow completing if status is 'paid'
             if ($pesanan->status_pesanan !== 'paid') {
-                return redirect()->route('pesanans.index')
+                return redirect()->route('pemasukan.index')
                     ->with('error', 'Invalid status transition. Order must be paid first.');
             }
 
@@ -276,12 +338,12 @@ class PesananController extends Controller
 
             DB::commit();
 
-            return redirect()->route('pesanans.index')
+            return redirect()->route('pemasukan.index')
                 ->with('success', 'Order marked as completed successfully.');
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->route('pesanans.index')
+            return redirect()->route('pemasukan.index')
                 ->with('error', 'Failed to complete order: ' . $e->getMessage());
         }
     }
@@ -301,13 +363,13 @@ class PesananController extends Controller
 
             DB::commit();
 
-            return redirect()->route('pesanans.index')
+            return redirect()->route('pemasukan.index')
                 ->with('success', 'Pesanan and associated pemasukan deleted successfully.');
 
         } catch (\Exception $e) {
             DB::rollBack();
 
-            return redirect()->route('pesanans.index')
+            return redirect()->route('pemasukan.index')
                 ->with('error', 'Failed to delete pesanan: ' . $e->getMessage());
         }
     }

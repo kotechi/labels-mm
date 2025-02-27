@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="icon" type="image/x-icon" href="{{ asset('storage/images/icon/favicon.ico') }}">
     <title>Admin | @yield('title')</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script src="{{ asset('assets/js/chart.min.js') }}"></script>
@@ -146,38 +147,38 @@
 <body class="min-h-screen font-sans bg-gray-100">
     <div class="flex min-h-screen">
         <!-- Sidebar -->
-        <aside class="fixed top-0 left-0 h-screen w-48 lg:w-64 z-50 p-6 bg-white shadow-lg flex flex-col">
-            <div class="flex items-center gap-2 mb-6 ">
-                <img src="{{ asset('storage/images/icon/LAblesMM.png') }}" alt="Logo" class="w-auto h-auto">
+        <aside class="fixed top-0 left-0 h-screen w-48 lg:w-[220px] p-6 bg-white shadow-lg flex z-50 flex-col">
+            <div class="flex items-center gap-2 mb-6">
+                <img src="{{ asset('storage/images/icon/LAblesMM.png') }}" alt="Logo" class="w-[230] h-auto">
                 <span class="text-lg font-bold text-gray-700"></span>
             </div>
 
             <!-- Navigation -->
-            <nav class="flex-1 gap-5">
+            <nav class="flex-1 items-center">
                 <ul>
-                    <li class="mb-4 flex items-center">
-                        <i data-lucide="layout-dashboard" class="w-5 h-5 mr-2"></i>
-                        <a href="{{ route('admin.index') }}" class="text-gray-700 hover:text-gray-900 font-bold">Dashboard</a>
+                    <li class="mb-6 flex items-center">
+                        <i class="w-7 h-7 mr-2" data-lucide="layout-dashboard"></i>
+                        <a href="{{ route('admin.index') }}" class="text-gray-900 hover:text-gray-700 text-lg font-semibold">Dashboard</a>
                     </li>
-                    <li class="mb-4 flex items-center">
-                        <i data-lucide="credit-card" class="w-5 h-5 mr-2"></i>
-                        <a href="{{ route('admin.pengeluaran.index') }}" class="text-gray-700 hover:text-gray-900 font-bold">Pengeluaran</a>
+                    <li class="mb-6 flex items-center">
+                        <i class="w-7 h-7 mr-2" data-lucide="credit-card"></i>
+                        <a href="{{ route('admin.pengeluaran.index') }}" class="text-gray-900 hover:text-gray-700 text-lg font-semibold">Pengeluaran</a>
                     </li>
-                    <li class="mb-4 flex items-center">
-                        <i data-lucide="wallet" class="w-5 h-5 mr-2"></i>
-                        <a href="{{ route('pemasukan.index') }}" class="text-gray-700 hover:text-gray-900 font-bold">Pemasukan</a>
+                    <li class="mb-6 flex items-center">
+                        <i class="w-7 h-7 mr-2" data-lucide="wallet"></i>
+                        <a href="{{ route('pemasukan.index') }}" class="text-gray-900 hover:text-gray-700 text-lg font-semibold">Pemasukan</a>
                     </li>
-                    <li class="mb-4 flex items-center">
-                        <i data-lucide="image" class="w-5 h-5 mr-2"></i>
-                        <a href="{{ route('products') }}" class="text-gray-700 hover:text-gray-900 font-bold">Galeri</a>
+                    <li class="mb-6 flex items-center">
+                        <i class="w-7 h-7 mr-2" data-lucide="image"></i>
+                        <a href="{{ route('products') }}" class="text-gray-900 hover:text-gray-700 text-lg font-semibold">Model</a>
                     </li>
-                    <li class="mb-4 flex items-center">
-                        <i data-lucide="users" class="w-5 h-5 mr-2"></i>
-                        <a href="{{ route('users.index') }}" class="text-gray-700 hover:text-gray-900 font-bold">User</a>
+                    <li class="mb-6 flex items-center">
+                        <i class="w-7 h-7 mr-2" data-lucide="users"></i>
+                        <a href="{{ route('users.index') }}" class="text-gray-900 hover:text-gray-700 text-lg font-semibold">User</a>
                     </li>
-                    <li class="mb-4 flex items-center">
-                        <i data-lucide="user-pen" class="w-5 h-5 mr-2"></i>
-                        <a href="{{ route('admin.profile.index') }}" class="text-gray-700 hover:text-gray-900 font-bold">Profile</a>
+                    <li class="mb-6 flex items-center">
+                        <i class="w-7 h-7 mr-2" data-lucide="user-pen"></i>
+                        <a href="{{ route('admin.profile.index') }}" class="text-gray-900 hover:text-gray-700 text-lg font-semibold">Profile</a>
                     </li>
                 </ul>
             </nav>
@@ -195,7 +196,7 @@
         </aside>
 
         <!-- Main Content -->
-        <main class="flex-1 pl-48 h-full lg:pl-64">
+        <main class="flex-1  h-full pl-48 lg:pl-[220px]">
 
             <!-- Content Area -->
             <div class="px-5 pb-5 h-full">
@@ -209,26 +210,25 @@
         lucide.createIcons();
 
         $(document).ready(function() {
-    // Inisialisasi DataTable dengan konfigurasi tambahan
-            $('table.datatable').DataTable({
-                responsive: true,
-                ordering: true,
-                language: {
-                    search: "" // Menghilangkan label "Search:"
-                },
-                "createdRow": function(row, data, dataIndex, cells) {
-                    // Ambil kategori dari data attribute
-                    const kategori = $(row).data('kategori');
-                    if (kategori === 'pemasukan') {
-                        $(row).addClass('bg-green-100-important');
-                    } else if (kategori === 'pengeluaran') {
-                        $(row).addClass('bg-red-100-important');
-                    }
-                },
-                "initComplete": function() {
-                    $('.dataTables_filter input').attr('placeholder', 'Search here...');
+        $('table.datatable').DataTable({
+            responsive: true,
+            ordering: true,
+            language: {
+                search: "" // Menghilangkan label "Search:"
+            },
+            "createdRow": function(row, data, dataIndex, cells) {
+                // Ambil kategori dari data attribute
+                const kategori = $(row).data('kategori');
+                if (kategori === 'pemasukan') {
+                    $(row).addClass('bg-green-100-important');
+                } else if (kategori === 'pengeluaran') {
+                    $(row).addClass('bg-red-100-important');
                 }
-            });
+            },
+            "initComplete": function() {
+                $('.dataTables_filter input').attr('placeholder', 'Search here...');
+            }
+        });
         });
 
         // SweetAlert for delete confirmation
@@ -248,19 +248,33 @@
                 }
             });
         });
+    </script>
 
-</script>
+    @if(session('success'))
+    <script>
+        window.onload = function() {
+            Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: "{{ session('success') }}"
+            });
+        }
+    </script>
+    @endif
 
-@if(session('success'))
-<script>
-        Swal.fire({
-            icon: 'success',
-            title: 'Success!',
-            text: "{{ session('success') }}"
-        });
-    
-</script>
-@endif
+    @if(session('error'))
+    <script>
+        window.onload = function() {
+            Swal.fire({
+                icon: 'error',
+                title: 'error!',
+                text: "{{ session('error') }}"
+            });
+        }
+    </script>
+    @endif
+
+
     @stack('scripts')
 </body>
 </html>

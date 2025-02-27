@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('total_harga');
             $table->string('payment_method');
             $table->integer('created_by');
-            $table->string('status_pesanan')->default('proses');
+            $table->string('status_pesanan');
             $table->timestamp('order_date')->default(DB::raw('CURRENT_TIMESTAMP'));
 
             $table->decimal('lebar_muka', 8, 2)->nullable();

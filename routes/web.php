@@ -114,14 +114,6 @@ Route::middleware(['auth', 'admin'])->group(function () {
     
 });
 
-    Route::get('/forgot-password/phone', [PhonePasswordResetController::class, 'showForgotForm'])
-        ->name('password.request.phone');
-    Route::post('/forgot-password/phone', [PhonePasswordResetController::class, 'sendResetLink'])
-        ->name('password.phone.send');
-    Route::get('/reset-password/phone/verify', [PhonePasswordResetController::class, 'showVerifyForm'])
-        ->name('password.reset.phone.verify');
-    Route::post('/reset-password/phone/verify', [PhonePasswordResetController::class, 'verifyOTP'])
-        ->name('password.reset.phone.update');
 
 Route::middleware(['auth'])->group(function () {
 

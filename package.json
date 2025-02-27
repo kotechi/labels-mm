@@ -19,6 +19,6 @@
     "dependencies": {
         "chart.js": "^4.4.7",
         "puppeteer": "^24.2.1",
-        "sweetalert2": "^11.15.10"
+        "sweetalert2": "^11.17.2"
     }
 }

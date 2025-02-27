@@ -42,7 +42,7 @@ class ProductController extends Controller
                     'image' => 'images/products/' . $imageName
                 ]);
     
-                return redirect()->route('products')->with('success', 'Product created successfully');
+                return redirect()->route('products')->with('success', 'Model created successfully');
             }
             
             throw new \Exception('Invalid image file');
@@ -91,7 +91,7 @@ class ProductController extends Controller
                 $product->update($request->except('image'));
             }
     
-            return redirect()->route('products')->with('success', 'Product updated successfully');
+            return redirect()->route('products')->with('success', 'Model updated successfully');
             
         } catch (\Exception $e) {
             return back()
@@ -107,7 +107,7 @@ class ProductController extends Controller
             }
             
             $product->delete();
-            return redirect()->route('products')->with('success', 'Product deleted successfully');
+            return redirect()->route('products')->with('success', 'Model deleted successfully');
         } catch (\Exception $e) {
             return back()->withErrors(['error' => 'Failed to delete product']);
         }

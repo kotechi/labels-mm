@@ -148,8 +148,9 @@
 @endsection
 @push('scripts')
 <script>
-    $(document).ready(function() {
+document.addEventListener('DOMContentLoaded', function() {
 
+        
         $('table.datatable tbody tr').on('click', function(e) {
             // Don't trigger if clicking on buttons, links, or forms
             if (!$(e.target).closest('button, a, form').length) {
@@ -167,24 +168,6 @@
         // Add margin-bottom to show entries and search elements
         $('.dataTables_length').addClass('mb-4');
         $('.dataTables_filter').addClass('mb-4');
-
-        // SweetAlert for delete confirmation
-        $('.delete-button').on('click', function() {
-            var form = $(this).closest('form');
-            Swal.fire({
-                title: 'Are you sure?',
-                text: "You won't be able to revert this!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, delete it!'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    form.submit();
-                }
-            });
-        });
 
         $('table.datatable tbody tr').css('cursor', 'pointer');
 

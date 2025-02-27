@@ -1,5 +1,7 @@
 @extends('layouts.admin')
 
+@section('title', 'Pesanan')
+
 @section('content')
 <div class="p-5 rounded-lg shadow bg-white">
     <div class="flex justify-between items-center">
@@ -44,7 +46,17 @@
                     <select name="payment_method" id="payment_method" class="w-full p-2 border rounded-md" required>
                         <option value="">Pilih metode pembayaran</option>
                         <option value="cash">Cash</option>
-                        <option value="midtrans">Online Payment (Midtrans)</option>
+                        <option value="midtrans" disabled>Online Payment (Midtrans)</option>
+                    </select>
+                </div>
+
+                <div class="space-y-2">
+                    <label for="status_pesanan" class="block text-gray-700">Status Pesanan</label>
+                    <select name="status_pesanan" id="status_pesanan" 
+                        class="w-full p-2 border rounded-md" required>
+                        <option value="proses">Proses</option>
+                        <option value="paid">Paid</option>
+                        <option value="completed">Completed</option>
                     </select>
                 </div>
                 
@@ -74,80 +86,101 @@
                         <button type="button" class="px-3 py-1 border rounded" onclick="incrementQuantity()">+</button>
                     </div>
                 </div>
+                
+                <!-- Size Selection -->
                 <div class="space-y-2">
-                    <label for="lingkar_pinggang" class="block text-gray-700">Lingkar pinggang</label>
-                    <input type="number" step="0.01" name="lingkar_pinggang" id="lingkar_pinggang" 
-                        class="w-full p-2 border rounded-md" 
-                        placeholder="None" required>
+                    <label for="size_option" class="block text-gray-700">Pilihan Ukuran</label>
+                    <select name="size_option" id="size_option" class="w-full p-2 border rounded-md">
+                        <option value="custom">Ukuran Kustom</option>
+                        <option value="S">Small (S)</option>
+                        <option value="M">Medium (M)</option>
+                        <option value="L">Large (L)</option>
+                        <option value="XL">Extra Large (XL)</option>
+                        <option value="2XL">2XL</option>
+                        <option value="3XL">3XL</option>
+                        <option value="4XL">4XL</option>
+                    </select>
                 </div>
 
-                <!-- Row 4 -->
-                <div class="space-y-2">
-                    <label for="lingkar_panggul" class="block text-gray-700">Lingkar pinggul</label>
-                    <input type="number" step="0.01" name="lingkar_panggul" id="lingkar_panggul" 
-                        class="w-full p-2 border rounded-md" 
-                        placeholder="None" required>
-                </div>
-                <div class="space-y-2">
-                    <label for="lebar_pundak" class="block text-gray-700">Lebar pundak</label>
-                    <input type="number" step="0.01" name="lebar_pundak" id="lebar_pundak" 
-                        class="w-full p-2 border rounded-md" 
-                        placeholder="None" required>
+                <!-- Measurement Fields section -->
+                <div class="col-span-2">
+                    <div class="border-t pt-4 mb-2">
+                        <h3 class="font-semibold text-lg">Ukuran</h3>
+                    </div>
                 </div>
 
-                <!-- Additional measurement fields in pairs -->
+                <!-- Measurement fields in pairs -->
                 <div class="space-y-2">
-                    <label for="panjang_lengan" class="block text-gray-700">Panjang lengan</label>
-                    <input type="number" step="0.01" name="panjang_lengan" id="panjang_lengan" 
-                        class="w-full p-2 border rounded-md" 
-                        placeholder="None" required>
-                </div>
-                <div class="space-y-2">
-                    <label for="lingkar_kerung_lengan" class="block text-gray-700">Lingkar kerung lengan</label>
-                    <input type="number" step="0.01" name="lingkar_kerung_lengan" id="lingkar_kerung_lengan" 
-                        class="w-full p-2 border rounded-md" 
-                        placeholder="None" required>
-                </div>
-
-                <div class="space-y-2">
-                    <label for="lingkar_pergelangan_lengan" class="block text-gray-700">Lingkar pergelangan lengan</label>
-                    <input type="number" step="0.01" name="lingkar_pergelangan_lengan" id="lingkar_pergelangan_lengan" 
-                        class="w-full p-2 border rounded-md" 
-                        placeholder="None" required>
-                </div>
-                <div class="space-y-2">
-                    <label for="panjang_punggung" class="block text-gray-700">Panjang punggung</label>
-                    <input type="number" step="0.01" name="panjang_punggung" id="panjang_punggung" 
-                        class="w-full p-2 border rounded-md" 
-                        placeholder="None" required>
-                </div>
-
-                <div class="space-y-2">
-                    <label for="lebar_punggung" class="block text-gray-700">Lebar punggung</label>
-                    <input type="number" step="0.01" name="lebar_punggung" id="lebar_punggung" 
-                        class="w-full p-2 border rounded-md" 
-                        placeholder="None" required>
-                </div>
-                <div class="space-y-2">
-                    <label for="lebar_muka" class="block text-gray-700">Lebar muka</label>
-                    <input type="number" step="0.01" name="lebar_muka" id="lebar_muka" 
-                        class="w-full p-2 border rounded-md" 
-                        placeholder="None" required>
-                </div>
-                <div class="space-y-2">
-                    <label for="panjang_baju" class="block text-gray-700">Panjang Baju</label>
-                    <input type="number" step="0.01" name="panjang_baju" id="panjang_baju" 
-                        class="w-full p-2 border rounded-md" 
-                        placeholder="None" required>
-                </div>
-                <div class="space-y-2">
-                    <label for="lingkar_badan" class="block text-gray-700">Lingkar Badan</label>
+                    <label for="lingkar_badan" class="block text-gray-700">Lingkar Badan (cm)</label>
                     <input type="number" step="0.01" name="lingkar_badan" id="lingkar_badan" 
                         class="w-full p-2 border rounded-md" 
-                        placeholder="None" required>
+                        placeholder="Contoh: 96" required>
+                </div>
+                <div class="space-y-2">
+                    <label for="lingkar_pinggang" class="block text-gray-700">Lingkar pinggang (cm)</label>
+                    <input type="number" step="0.01" name="lingkar_pinggang" id="lingkar_pinggang" 
+                        class="w-full p-2 border rounded-md" 
+                        placeholder="Contoh: 80" required>
                 </div>
 
-                <input type="hidden" name="status_pesanan" value="proses">
+                <div class="space-y-2">
+                    <label for="lingkar_panggul" class="block text-gray-700">Lingkar pinggul (cm)</label>
+                    <input type="number" step="0.01" name="lingkar_panggul" id="lingkar_panggul" 
+                        class="w-full p-2 border rounded-md" 
+                        placeholder="Contoh: 100" required>
+                </div>
+                <div class="space-y-2">
+                    <label for="lebar_pundak" class="block text-gray-700">Lebar pundak (cm)</label>
+                    <input type="number" step="0.01" name="lebar_pundak" id="lebar_pundak" 
+                        class="w-full p-2 border rounded-md" 
+                        placeholder="Contoh: 42" required>
+                </div>
+
+                <div class="space-y-2">
+                    <label for="panjang_lengan" class="block text-gray-700">Panjang lengan (cm)</label>
+                    <input type="number" step="0.01" name="panjang_lengan" id="panjang_lengan" 
+                        class="w-full p-2 border rounded-md" 
+                        placeholder="Contoh: 60" required>
+                </div>
+                <div class="space-y-2">
+                    <label for="lingkar_kerung_lengan" class="block text-gray-700">Lingkar kerung lengan (cm)</label>
+                    <input type="number" step="0.01" name="lingkar_kerung_lengan" id="lingkar_kerung_lengan" 
+                        class="w-full p-2 border rounded-md" 
+                        placeholder="Contoh: 45" required>
+                </div>
+
+                <div class="space-y-2">
+                    <label for="lingkar_pergelangan_lengan" class="block text-gray-700">Lingkar pergelangan lengan (cm)</label>
+                    <input type="number" step="0.01" name="lingkar_pergelangan_lengan" id="lingkar_pergelangan_lengan" 
+                        class="w-full p-2 border rounded-md" 
+                        placeholder="Contoh: 20" required>
+                </div>
+                <div class="space-y-2">
+                    <label for="panjang_punggung" class="block text-gray-700">Panjang punggung (cm)</label>
+                    <input type="number" step="0.01" name="panjang_punggung" id="panjang_punggung" 
+                        class="w-full p-2 border rounded-md" 
+                        placeholder="Contoh: 40" required>
+                </div>
+
+                <div class="space-y-2">
+                    <label for="lebar_punggung" class="block text-gray-700">Lebar punggung (cm)</label>
+                    <input type="number" step="0.01" name="lebar_punggung" id="lebar_punggung" 
+                        class="w-full p-2 border rounded-md" 
+                        placeholder="Contoh: 43" required>
+                </div>
+                <div class="space-y-2">
+                    <label for="lebar_muka" class="block text-gray-700">Lebar muka (cm)</label>
+                    <input type="number" step="0.01" name="lebar_muka" id="lebar_muka" 
+                        class="w-full p-2 border rounded-md" 
+                        placeholder="Contoh: 33" required>
+                </div>
+                <div class="space-y-2">
+                    <label for="panjang_baju" class="block text-gray-700">Panjang Baju (cm)</label>
+                    <input type="number" step="0.01" name="panjang_baju" id="panjang_baju" 
+                        class="w-full p-2 border rounded-md" 
+                        placeholder="Contoh: 70" required>
+                </div>
+                
             </div>
 
             <div class="mt-6 flex justify-end space-x-2">
@@ -161,12 +194,137 @@
 </div>
 
 <script>
+    // Standard size measurements (in cm)
+    const standardSizes = {
+        'S': {
+            lingkar_badan: 90,
+            lingkar_pinggang: 76,
+            lingkar_panggul: 96,
+            lebar_pundak: 40,
+            panjang_lengan: 58,
+            lingkar_kerung_lengan: 42,
+            lingkar_pergelangan_lengan: 18,
+            panjang_punggung: 38,
+            lebar_punggung: 40,
+            lebar_muka: 31,
+            panjang_baju: 68
+        },
+        'M': {
+            lingkar_badan: 96,
+            lingkar_pinggang: 80,
+            lingkar_panggul: 100,
+            lebar_pundak: 42,
+            panjang_lengan: 60,
+            lingkar_kerung_lengan: 45,
+            lingkar_pergelangan_lengan: 20,
+            panjang_punggung: 40,
+            lebar_punggung: 43,
+            lebar_muka: 33,
+            panjang_baju: 70
+        },
+        'L': {
+            lingkar_badan: 102,
+            lingkar_pinggang: 86,
+            lingkar_panggul: 106,
+            lebar_pundak: 44,
+            panjang_lengan: 61,
+            lingkar_kerung_lengan: 48,
+            lingkar_pergelangan_lengan: 22,
+            panjang_punggung: 42,
+            lebar_punggung: 46,
+            lebar_muka: 35,
+            panjang_baju: 72
+        },
+        'XL': {
+            lingkar_badan: 108,
+            lingkar_pinggang: 92,
+            lingkar_panggul: 112,
+            lebar_pundak: 46,
+            panjang_lengan: 62,
+            lingkar_kerung_lengan: 51,
+            lingkar_pergelangan_lengan: 24,
+            panjang_punggung: 44,
+            lebar_punggung: 49,
+            lebar_muka: 37,
+            panjang_baju: 74
+        },
+        '2XL': {
+            lingkar_badan: 116,
+            lingkar_pinggang: 100,
+            lingkar_panggul: 120,
+            lebar_pundak: 48,
+            panjang_lengan: 63,
+            lingkar_kerung_lengan: 54,
+            lingkar_pergelangan_lengan: 26,
+            panjang_punggung: 46,
+            lebar_punggung: 52,
+            lebar_muka: 39,
+            panjang_baju: 76
+        },
+        '3XL': {
+            lingkar_badan: 124,
+            lingkar_pinggang: 108,
+            lingkar_panggul: 128,
+            lebar_pundak: 50,
+            panjang_lengan: 64,
+            lingkar_kerung_lengan: 57,
+            lingkar_pergelangan_lengan: 28,
+            panjang_punggung: 48,
+            lebar_punggung: 55,
+            lebar_muka: 41,
+            panjang_baju: 78
+        },
+        '4XL': {
+            lingkar_badan: 132,
+            lingkar_pinggang: 116,
+            lingkar_panggul: 136,
+            lebar_pundak: 52,
+            panjang_lengan: 65,
+            lingkar_kerung_lengan: 60,
+            lingkar_pergelangan_lengan: 30,
+            panjang_punggung: 50,
+            lebar_punggung: 58,
+            lebar_muka: 43,
+            panjang_baju: 80
+        }
+    };
+
     document.getElementById('product_id').addEventListener('change', function() {
-    const selectedOption = this.options[this.selectedIndex];
-    document.getElementById('nama_produk').value = selectedOption.dataset.name;
-    updateTotal();
-});
-    // Definisikan fungsi secara global
+        const selectedOption = this.options[this.selectedIndex];
+        document.getElementById('nama_produk').value = selectedOption.dataset.name;
+        updateTotal();
+    });
+
+    // Size selection handler
+    document.getElementById('size_option').addEventListener('change', function() {
+        const selectedSize = this.value;
+        
+        if (selectedSize !== 'custom') {
+            // Fill in the form with standard measurements
+            const measurements = standardSizes[selectedSize];
+            
+            for (const [field, value] of Object.entries(measurements)) {
+                const input = document.getElementById(field);
+                if (input) {
+                    input.value = value;
+                }
+            }
+        } else {
+            // Clear all measurement fields for custom input
+            const measurementFields = [
+                'lingkar_badan', 'lingkar_pinggang', 'lingkar_panggul', 
+                'lebar_pundak', 'panjang_lengan', 'lingkar_kerung_lengan',
+                'lingkar_pergelangan_lengan', 'panjang_punggung', 'lebar_punggung',
+                'lebar_muka', 'panjang_baju'
+            ];
+            
+            measurementFields.forEach(field => {
+                document.getElementById(field).value = '';
+            });
+        }
+    });
+
+    // Existing functions
     function incrementQuantity() {
         const quantityInput = document.getElementById('jumlah_produk');
         quantityInput.value = parseInt(quantityInput.value) + 1;

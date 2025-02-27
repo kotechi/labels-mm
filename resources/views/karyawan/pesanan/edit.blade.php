@@ -47,7 +47,7 @@
                     <select name="payment_method" id="payment_method" 
                         class="w-full p-2 border rounded-md" required>
                         <option value="cash" {{ $pesanan->payment_method == 'cash' ? 'selected' : '' }}>Cash</option>
-                        <option value="transfer" {{ $pesanan->payment_method == 'transfer' ? 'selected' : '' }}>Transfer</option>
+                        <option value="midtrans" disabled {{ $pesanan->payment_method == 'midtrans' ? 'selected' : '' }}>Online Payment (Midtrans)</option>
                     </select>
                 </div>
 

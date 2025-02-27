@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Profile')
+@section('title', 'profile')
 
 @section('content')
 <div class="p-5 rounded-lg shadow bg-white">
