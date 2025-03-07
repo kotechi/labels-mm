@@ -89,6 +89,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::post('/admin/pesanan/{pesanan}/markAsCompleted', [PesananController::class, 'markAsCompleted'])->name('pesanans.markAsCompleted');
     Route::delete('/admin/pesanan/{pesanan}/deleteWithPemasukan', [PesananController::class, 'destroyWithPemasukan'])->name('pesanans.destroyWithPemasukan');
 
+    Route::get('/admin/daily-data', [AdminController::class, 'getDailyData'])->name('admin.dailyData');
 
     Route::get('/admin/transaksi/{transaksi}/edit', [AdminTransaksiController::class, 'edit'])->name('transaksi.edit');
     Route::patch('/admin/transaksi/{transaksi}', [AdminTransaksiController::class, 'update'])->name('transaksi.update');

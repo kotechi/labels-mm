@@ -8,7 +8,7 @@
     <link rel="icon" type="image/x-icon" href="{{ asset('storage/images/icon/favicon.ico') }}">
     <title>Admin | @yield('title')</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="{{ asset('assets/js/chart.min.js') }}"></script>
     <script src="{{ asset('assets/js/lucid.min.js') }}"></script>
     <script type="text/javascript" src="{{ asset('assets/js/jquery-3.4.1.min.js') }}"></script>
     <script src="{{ asset('assets/js/jquery.dataTables.min.js') }}"></script>

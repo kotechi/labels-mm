@@ -20,46 +20,98 @@ class AdminController extends Controller
 
         $currentMonth = date('m');
         $currentYear = date('Y');
-
-        // ======== DATA BULANAN =========
-        $monthlyEarnings = [];
-        $monthlyModal = [];
-        $monthlyTotalPemasukan = [];
-        $months = [];
-
-        foreach (range(1, 12) as $month) {
-            $pendapatan = Pemasukan::whereMonth('created_at', $month)->whereYear('created_at', $currentYear)->sum('nominal');
-            $modal = Pengeluaran::whereMonth('created_at', $month)->whereYear('created_at', $currentYear)->sum('nominal_pengeluaran');
+        
+        // Get 6 years of data (current + 5 previous years)
+        $startYear = $currentYear - 5;
+        
+        // ======== DATA BULANAN UNTUK SEMUA TAHUN =========
+        $allMonthlyData = [];
+        
+        // Loop through each year we want to track
+        for ($year = $startYear; $year <= $currentYear; $year++) {
+            $monthlyEarnings = [];
+            $monthlyModal = [];
+            $monthlyTotalPemasukan = [];
+            $months = [];
             
-            $monthlyEarnings[] = $pendapatan;
-            $monthlyModal[] = $modal;
-            $monthlyTotalPemasukan[] = $pendapatan - $modal;
-            $months[] = date('F', mktime(0, 0, 0, $month, 10));
-        }
-
-        // ======== DATA HARIAN =========
-        $dailyEarnings = [];
-        $dailyModal = [];
-        $dailyTotalPemasukan = [];
-        $dailyLabels = [];
-
-        foreach (range(1, 31) as $day) {
-            $pendapatan = Pemasukan::whereDay('created_at', $day)->whereMonth('created_at', $currentMonth)->whereYear('created_at', $currentYear)->sum('nominal');
-            $modal = Pengeluaran::whereDay('created_at', $day)->whereMonth('created_at', $currentMonth)->whereYear('created_at', $currentYear)->sum('nominal_pengeluaran');
+            foreach (range(1, 12) as $month) {
+                $pendapatan = Pemasukan::whereMonth('created_at', $month)
+                    ->whereYear('created_at', $year)
+                    ->sum('nominal');
+                    
+                $modal = Pengeluaran::whereMonth('created_at', $month)
+                    ->whereYear('created_at', $year)
+                    ->sum('nominal_pengeluaran');
+                
+                $monthlyEarnings[] = $pendapatan;
+                $monthlyModal[] = $modal;
+                $monthlyTotalPemasukan[] = $pendapatan - $modal;
+                $months[] = date('F', mktime(0, 0, 0, $month, 10));
+            }
             
-            $dailyEarnings[] = $pendapatan;
-            $dailyModal[] = $modal;
-            $dailyTotalPemasukan[] = $pendapatan - $modal;
-            $dailyLabels[] = $day;
+            $totalMonthlyEarnings = array_sum($monthlyTotalPemasukan);
+            
+            $allMonthlyData[$year] = [
+                'months' => $months,
+                'pemasukan' => $monthlyEarnings,
+                'pengeluaran' => $monthlyModal,
+                'keuntungan' => $monthlyTotalPemasukan,
+                'total' => $totalMonthlyEarnings
+            ];
         }
-
+        
+        // ======== DATA HARIAN UNTUK SEMUA BULAN DAN TAHUN =========
+        $allDailyData = [];
+        
+        // Loop through each year we want to track
+        for ($year = $startYear; $year <= $currentYear; $year++) {
+            $allDailyData[$year] = [];
+            
+            // Loop through each month
+            for ($month = 1; $month <= 12; $month++) {
+                $daysInMonth = cal_days_in_month(CAL_GREGORIAN, $month, $year);
+                
+                $dailyEarnings = [];
+                $dailyModal = [];
+                $dailyTotalPemasukan = [];
+                $dailyLabels = [];
+                
+                foreach (range(1, $daysInMonth) as $day) {
+                    $pendapatan = Pemasukan::whereDay('created_at', $day)
+                        ->whereMonth('created_at', $month)
+                        ->whereYear('created_at', $year)
+                        ->sum('nominal');
+                        
+                    $modal = Pengeluaran::whereDay('created_at', $day)
+                        ->whereMonth('created_at', $month)
+                        ->whereYear('created_at', $year)
+                        ->sum('nominal_pengeluaran');
+                    
+                    $dailyEarnings[] = $pendapatan;
+                    $dailyModal[] = $modal;
+                    $dailyTotalPemasukan[] = $pendapatan - $modal;
+                    $dailyLabels[] = $day;
+                }
+                
+                $totalDailyEarnings = array_sum($dailyTotalPemasukan);
+                
+                $allDailyData[$year][$month] = [
+                    'days' => $dailyLabels,
+                    'pemasukan' => $dailyEarnings,
+                    'pengeluaran' => $dailyModal,
+                    'keuntungan' => $dailyTotalPemasukan,
+                    'total' => $totalDailyEarnings
+                ];
+            }
+        }
+        
         // ======== DATA TAHUNAN =========
         $yearlyEarnings = [];
         $yearlyModal = [];
         $yearlyTotalPemasukan = [];
         $years = [];
-
-        foreach (range(date('Y') - 5, date('Y')) as $year) {
+        
+        foreach (range($startYear, $currentYear) as $year) {
             $pendapatan = Pemasukan::whereYear('created_at', $year)->sum('nominal');
             $modal = Pengeluaran::whereYear('created_at', $year)->sum('nominal_pengeluaran');
             
@@ -68,22 +120,30 @@ class AdminController extends Controller
             $yearlyTotalPemasukan[] = $pendapatan - $modal;
             $years[] = $year;
         }
-
-        // ======== TOTAL =========
-        $totalMonthlyEarnings = array_sum($monthlyTotalPemasukan);
-        $totalDailyEarnings = array_sum($dailyTotalPemasukan);
-        $totalYearlyEarnings = array_sum($yearlyTotalPemasukan);
-
-        $totalPengeluaran = Pengeluaran::whereMonth('created_at', $currentMonth)->whereYear('created_at', $currentYear)->sum('nominal_pengeluaran');
-        $totalPemasukan = Pemasukan::whereMonth('created_at', $currentMonth)->whereYear('created_at', $currentYear)->sum('nominal');
+        
+        $yearlyData = [
+            'years' => $years,
+            'pemasukan' => $yearlyEarnings,
+            'pengeluaran' => $yearlyModal,
+            'keuntungan' => $yearlyTotalPemasukan,
+            'total' => array_sum($yearlyTotalPemasukan)
+        ];
+        
+        // ======== DATA UTAMA UNTUK TAMPILAN AWAL =========
+        $totalPengeluaran = Pengeluaran::whereMonth('created_at', $currentMonth)
+            ->whereYear('created_at', $currentYear)
+            ->sum('nominal_pengeluaran');
+            
+        $totalPemasukan = Pemasukan::whereMonth('created_at', $currentMonth)
+            ->whereYear('created_at', $currentYear)
+            ->sum('nominal');
+            
         $totalPenghasilan = $totalPemasukan - $totalPengeluaran;
-
+        
         return view('admin.index', compact(
             'transaksis', 'pesanans', 'pengeluaran', 'pemasukan',
-            'monthlyEarnings', 'monthlyModal', 'monthlyTotalPemasukan', 'months',
-            'dailyEarnings', 'dailyModal', 'dailyTotalPemasukan', 'dailyLabels',
-            'yearlyEarnings', 'yearlyModal', 'yearlyTotalPemasukan', 'years',
-            'totalMonthlyEarnings', 'totalDailyEarnings', 'totalYearlyEarnings',
+            'allMonthlyData', 'allDailyData', 'yearlyData',
+            'currentMonth', 'currentYear', 'startYear',
             'totalPengeluaran', 'totalPemasukan', 'totalPenghasilan'
         ));
     }

@@ -183,56 +183,51 @@
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const ctx = document.getElementById('earningsChart').getContext('2d');
-    let period = 'monthly';
+    // Check if the chart canvas exists
+    const canvas = document.getElementById('earningsChart');
+    if (!canvas) {
+        console.error('Canvas element not found!');
+        return;
+    }
 
-    // Data langsung dari Laravel (tanpa AJAX)
-    const dataSets = {
-        daily: {
-            labels: @json($dailyLabels),
-            pemasukan: @json($dailyEarnings),
-            pengeluaran: @json($dailyModal),
-            keuntungan: @json($dailyTotalPemasukan),
-            total: {{ $totalDailyEarnings ?? 0 }}
-        },
-        monthly: {
-            labels: @json($months),
-            pemasukan: @json($monthlyEarnings),
-            pengeluaran: @json($monthlyModal),
-            keuntungan: @json($monthlyTotalPemasukan),
-            total: {{ $totalMonthlyEarnings ?? 0 }}
-        },
-        yearly: {
-            labels: @json($years),
-            pemasukan: @json($yearlyEarnings),
-            pengeluaran: @json($yearlyModal),
-            keuntungan: @json($yearlyTotalPemasukan),
-            total: {{ $totalYearlyEarnings ?? 0 }}
-        }
-    };
+    const ctx = canvas.getContext('2d');
+    let period = 'monthly'; // Default period
+    let currentMonth = new Date().getMonth() + 1; // Current month (1-12)
+    let currentYear = new Date().getFullYear(); // Current year
+    let yearRangeStart = currentYear - 5; // Start of 5-year period for yearly view
 
+    // Initialize data from PHP variables
+    const allYearlyData = @json($yearlyData);
+    const allMonthlyData = @json($allMonthlyData);
+    const allDailyData = @json($allDailyData);
+    
+    // Month names for display
+    const monthNames = ["January", "February", "March", "April", "May", "June", 
+                        "July", "August", "September", "October", "November", "December"];
+
+    // Create and configure the chart
     let earningsChart = new Chart(ctx, {
         type: 'line',
         data: {
-            labels: dataSets[period].labels,
+            labels: [],
             datasets: [
                 {
                     label: 'Pemasukan',
-                    data: dataSets[period].pemasukan,
+                    data: [],
                     borderColor: 'rgba(75, 192, 192, 1)',
                     backgroundColor: 'rgba(75, 192, 192, 0.2)',
                     borderWidth: 1
                 },
                 {
                     label: 'Pengeluaran',
-                    data: dataSets[period].pengeluaran,
+                    data: [],
                     borderColor: '#6A1E55',
                     backgroundColor: 'rgba(106, 30, 85, 0.2)',
                     borderWidth: 1
                 },
                 {
                     label: 'Total Keuntungan',
-                    data: dataSets[period].keuntungan,
+                    data: [],
                     borderColor: '#7C084E',
                     backgroundColor: 'rgba(124, 8, 78, 0.2)',
                     borderWidth: 1
@@ -257,7 +252,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     callbacks: {
                         label: function(context) {
                             return context.dataset.label + ': Rp ' + 
-                                   new Intl.NumberFormat('id-ID').format(context.raw);
+                                  new Intl.NumberFormat('id-ID').format(context.raw);
                         }
                     }
                 }
@@ -265,28 +260,175 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Fungsi untuk mengupdate Chart
-    function updateChart(period) {
-        earningsChart.data.labels = dataSets[period].labels;
-        earningsChart.data.datasets[0].data = dataSets[period].pemasukan;
-        earningsChart.data.datasets[1].data = dataSets[period].pengeluaran;
-        earningsChart.data.datasets[2].data = dataSets[period].keuntungan;
-        earningsChart.update();
+    // Function to get current data based on period, month, and year
+    function getCurrentData() {
+        let data = {
+            labels: [],
+            pemasukan: [],
+            pengeluaran: [],
+            keuntungan: [],
+            total: 0
+        };
 
-        document.getElementById('totalEarnings').textContent = 
-            `Total: Rp ${new Intl.NumberFormat('id-ID').format(dataSets[period].total)}`;
+        if (period === 'daily') {
+            // Generate empty data for all days if needed
+            const daysInMonth = new Date(currentYear, currentMonth, 0).getDate();
+            data.labels = Array.from({length: daysInMonth}, (_, i) => i + 1);
+            data.pemasukan = Array(daysInMonth).fill(0);
+            data.pengeluaran = Array(daysInMonth).fill(0);
+            data.keuntungan = Array(daysInMonth).fill(0);
+            
+            // Check if data exists for the specified month and year and override with actual data
+            if (allDailyData[currentYear] && allDailyData[currentYear][currentMonth]) {
+                const actualData = allDailyData[currentYear][currentMonth];
+                // Map actual data values to their correct day position
+                actualData.days.forEach((day, index) => {
+                    const dayIdx = parseInt(day) - 1;
+                    if (dayIdx >= 0 && dayIdx < daysInMonth) {
+                        data.pemasukan[dayIdx] = actualData.pemasukan[index] || 0;
+                        data.pengeluaran[dayIdx] = actualData.pengeluaran[index] || 0;
+                        data.keuntungan[dayIdx] = actualData.keuntungan[index] || 0;
+                    }
+                });
+                data.total = actualData.total || 0;
+            }
+        } else if (period === 'monthly') {
+            // Generate empty data for all months
+            data.labels = monthNames;
+            data.pemasukan = Array(12).fill(0);
+            data.pengeluaran = Array(12).fill(0);
+            data.keuntungan = Array(12).fill(0);
+            
+            // Check if data exists for the specified year and override with actual data
+            if (allMonthlyData[currentYear]) {
+                const actualData = allMonthlyData[currentYear];
+                // Map actual data values to their correct month position
+                actualData.months.forEach((month, index) => {
+                    const monthIdx = monthNames.indexOf(month);
+                    if (monthIdx >= 0) {
+                        data.pemasukan[monthIdx] = actualData.pemasukan[index] || 0;
+                        data.pengeluaran[monthIdx] = actualData.pengeluaran[index] || 0;
+                        data.keuntungan[monthIdx] = actualData.keuntungan[index] || 0;
+                    }
+                });
+                data.total = actualData.total || 0;
+            }
+        } else if (period === 'yearly') {
+            // Generate empty data for the 5-year range
+            const yearRange = Array.from({length: 5}, (_, i) => yearRangeStart + i);
+            data.labels = yearRange;
+            data.pemasukan = Array(5).fill(0);
+            data.pengeluaran = Array(5).fill(0);
+            data.keuntungan = Array(5).fill(0);
+            
+            // Map actual yearly data to our fixed range
+            yearRange.forEach((year, idx) => {
+                const yearIdx = allYearlyData.years.indexOf(year);
+                if (yearIdx !== -1) {
+                    data.pemasukan[idx] = allYearlyData.pemasukan[yearIdx] || 0;
+                    data.pengeluaran[idx] = allYearlyData.pengeluaran[yearIdx] || 0;
+                    data.keuntungan[idx] = allYearlyData.keuntungan[yearIdx] || 0;
+                }
+            });
+            
+            // Calculate total for the selected range
+            data.total = data.keuntungan.reduce((sum, val) => sum + parseFloat(val || 0), 0);
+        }
+
+        return data;
     }
 
-    // Event Listener untuk Select Dropdown
-    document.getElementById('earningsPeriod').addEventListener('change', function() {
-        period = this.value;
-        updateChart(period);
-    });
+    // Function to update the chart
+    function updateChart() {
+        const data = getCurrentData();
+        
+        // Update chart with new data
+        earningsChart.data.labels = data.labels;
+        earningsChart.data.datasets[0].data = data.pemasukan;
+        earningsChart.data.datasets[1].data = data.pengeluaran;
+        earningsChart.data.datasets[2].data = data.keuntungan;
+        
+        // Update the chart
+        earningsChart.update();
+        
+        // Update total earnings display
+        const totalEarnings = document.getElementById('totalEarnings');
+        if (totalEarnings) {
+            totalEarnings.textContent = `Total: Rp ${new Intl.NumberFormat('id-ID').format(data.total)}`;
+        }
+    }
 
-    // Set total earnings pertama kali
-    document.getElementById('totalEarnings').textContent = 
-        `Total: Rp ${new Intl.NumberFormat('id-ID').format(dataSets[period].total)}`;
+    // Function to update the period display
+    function updatePeriodDisplay() {
+        const periodDisplay = document.getElementById('periodDisplay');
+        if (!periodDisplay) return;
+        
+        if (period === 'daily') {
+            periodDisplay.textContent = `${monthNames[currentMonth-1]} ${currentYear}`;
+        } else if (period === 'monthly') {
+            periodDisplay.textContent = `${currentYear}`;
+        } else if (period === 'yearly') {
+            periodDisplay.textContent = `${yearRangeStart} - ${yearRangeStart + 4}`;
+        }
+    }
+
+    // Initialize the chart with the default period
+    updateChart();
+    updatePeriodDisplay();
+
+    // Period selector event listener
+    const periodSelector = document.getElementById('earningsPeriod');
+    if (periodSelector) {
+        periodSelector.addEventListener('change', function() {
+            period = this.value;
+            updateChart();
+            updatePeriodDisplay();
+        });
+    }
+
+    // Next period button event listener
+    const nextButton = document.getElementById('nextPeriod');
+    if (nextButton) {
+        nextButton.addEventListener('click', function() {
+            if (period === 'daily') {
+                if (currentMonth < 12) {
+                    currentMonth++;
+                } else {
+                    currentMonth = 1;
+                    currentYear++;
+                }
+            } else if (period === 'monthly') {
+                currentYear++;
+            } else if (period === 'yearly') {
+                yearRangeStart += 5;
+            }
+            
+            updateChart();
+            updatePeriodDisplay();
+        });
+    }
+
+    // Previous period button event listener
+    const prevButton = document.getElementById('prevPeriod');
+    if (prevButton) {
+        prevButton.addEventListener('click', function() {
+            if (period === 'daily') {
+                if (currentMonth > 1) {
+                    currentMonth--;
+                } else {
+                    currentMonth = 12;
+                    currentYear--;
+                }
+            } else if (period === 'monthly') {
+                currentYear--;
+            } else if (period === 'yearly') {
+                yearRangeStart -= 5;
+            }
+            
+            updateChart();
+            updatePeriodDisplay();
+        });
+    }
 });
-
 </script>
 @endpush
