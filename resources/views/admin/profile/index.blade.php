@@ -9,14 +9,14 @@
     </div>
 </div>
 
-<div class="flex mt-6  bg-white shadow-2xl">
+<div class="flex mt-6  bg-white shadow-xl border-purple">
     <!-- Left Side with Logo -->
     <div class="w-1/3 bg-gray-200 flex items-center justify-center">
         <img src="{{ asset('storage/images/icon/LAblesMM.png') }}" alt="Labels Fashion Logo" class="w-86">
     </div>
 
     <!-- Right Side with Form -->
-    <div class="w-2/3 p-12">
+    <div class="w-2/3 p-12 ">
         @if (session('status'))
             <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4">
                 {{ session('status') }}

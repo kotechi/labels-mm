@@ -10,7 +10,7 @@
     </style>
 </head>
 
-<body class="flex items-center justify-center min-h-screen bg-gradient-to-b from-[#C890AF] to-[#6A1E55]">
+<body class="flex items-center justify-center min-h-screen bg-gradient-to-b from-[#5A074C] to-[#FF00CA]">
     <div class="container flex flex-col items-center justify-center min-h-screen">
         <h2 class="text-4xl font-extrabold text-white mb-8 mt-5 drop-shadow-[1px_9px_2px_rgba(0,0,0,0.3)]">
             Welcome to LabelsMM

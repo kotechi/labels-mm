@@ -69,9 +69,6 @@ class PesananController extends Controller
         return view('admin.pesanan.create', compact('products'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $request->validate([
@@ -97,62 +94,82 @@ class PesananController extends Controller
             'jumlah_pembayaran' => 'nullable|numeric',
         ]);
 
-        $request->merge([
-            'created_by' => auth()->user()->id_users
-        ]);
-
-        $pesanan = Pesanan::create($request->all());
-
-        // Add to pemasukan and transaksi if status is paid or completed
-        if (in_array($pesanan->status_pesanan, ['paid', 'completed'])) {
-            tbl_transaksi::create([
-                'id_referens' => $pesanan->id_pesanan,
-                'pelaku_transaksi' => $pesanan->created_by,
-                'keterangan' => "Order created for Order #{$pesanan->id_pesanan} - {$pesanan->nama_produk} (Qty: {$pesanan->jumlah_produk})",
-                'nominal' => $pesanan->total_harga,
-                'kategori' => 'pemasukan',
-                'tanggal' => now(),
+        // Begin transaction to ensure data consistency
+        DB::beginTransaction();
+        
+        try {
+            $request->merge([
+                'created_by' => auth()->user()->id_users
             ]);
 
-            Pemasukan::create([
-                'id_referensi' => $pesanan->id_pesanan,
-                'keterangan' => "Payment received for Order #{$pesanan->id_pesanan} - {$pesanan->nama_produk} (Qty: {$pesanan->jumlah_produk})",
-                'nominal' => $pesanan->total_harga,
-                'created_by' => $pesanan->created_by,
-                'created_at' => now(),
-            ]);
-        }
+            // Create the order
+            $pesanan = Pesanan::create($request->all());
 
-        if ($request->payment_method === 'midtrans') {
-            $snapToken = $this->midtransService->createTransaction($pesanan);
-            
-            if ($snapToken) {
-                return view('admin.pesanan.payment', compact('snapToken', 'pesanan'))->with('succes', 'Berhasil membuat pesanan');
+            // Update product stock
+            $product = Product::findOrFail($request->product_id);
+            if ($product->stock_product < $request->jumlah_produk) {
+                DB::rollBack();
+                return redirect()->back()->with('error', 'Stok produk tidak mencukupi');
             }
             
-            return redirect()->back()->with('error', 'Gagal membuat transaksi pembayaran');
-        }
-        
-        // For cash payments, fetch the product and show receipt
-        $product = Product::findOrFail($request->product_id);
-        
-        // If this is a cash payment, return receipt view
-        if ($request->payment_method === 'cash') {
-            return view('admin.pesanan.cash', compact('pesanan', 'product'))->with('success', 'berhasil membuat pesanan');
-        }
+            // Decrease product stock
+            $product->stock_product -= $request->jumlah_produk;
+            $product->save();
 
-        return redirect()->route('pemasukan.index')->with('success', 'Pesanan created successfully');
+            // Add to pemasukan and transaksi if status is paid or completed
+            if (in_array($pesanan->status_pesanan, ['paid', 'completed'])) {
+                tbl_transaksi::create([
+                    'id_referens' => $pesanan->id_pesanan,
+                    'pelaku_transaksi' => $pesanan->created_by,
+                    'keterangan' => "Order created for Order #{$pesanan->id_pesanan} - {$pesanan->nama_produk} (Qty: {$pesanan->jumlah_produk})",
+                    'nominal' => $pesanan->total_harga,
+                    'kategori' => 'pemasukan',
+                    'tanggal' => now(),
+                ]);
+
+                Pemasukan::create([
+                    'id_referensi' => $pesanan->id_pesanan,
+                    'keterangan' => "Payment received for Order #{$pesanan->id_pesanan} - {$pesanan->nama_produk} (Qty: {$pesanan->jumlah_produk})",
+                    'nominal' => $pesanan->total_harga,
+                    'created_by' => $pesanan->created_by,
+                    'created_at' => now(),
+                ]);
+            }
+
+            DB::commit();
+
+            if ($request->payment_method === 'midtrans') {
+                $snapToken = $this->midtransService->createTransaction($pesanan);
+                
+                if ($snapToken) {
+                    return view('admin.pesanan.payment', compact('snapToken', 'pesanan'))->with('succes', 'Berhasil membuat pesanan');
+                }
+                
+                return redirect()->back()->with('error', 'Gagal membuat transaksi pembayaran');
+            }
+            
+            // For cash payments, fetch the product and show receipt
+            $product = Product::findOrFail($request->product_id);
+            
+            // If this is a cash payment, return receipt view
+            if ($request->payment_method === 'cash') {
+                return view('admin.pesanan.cash', compact('pesanan', 'product'))->with('success', 'berhasil membuat pesanan');
+            }
+
+            return redirect()->route('pemasukan.index')->with('success', 'Pesanan created successfully');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Error creating order: ' . $e->getMessage());
+        }
     }
 
     // PesananController.php
     public function generateQRCode(Request $request)
     {
         $amount = $request->amount;
-        // Di sini Anda bisa menambahkan logika untuk generate QR code sesuai
-        // dengan spesifikasi QRIS dari payment gateway yang Anda gunakan
-        
+
         return response()->json([
-            'qr_string' => $qrString // String untuk generate QR code
+            'qr_string' => $qrString 
         ]);
     }
 

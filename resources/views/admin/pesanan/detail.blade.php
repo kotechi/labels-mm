@@ -126,6 +126,10 @@
                 </div>
             </div>
         </div>
+        <div class="mt-9 w-full items-center justify-center d-flex flex">
+            <button class="rounded-md bg-[#AF0893] text-white p-2 mx-5">cetak resi</button>
+            <button>kembali</button>
+        </div>
     </div>
 
     <div class="w-full">
