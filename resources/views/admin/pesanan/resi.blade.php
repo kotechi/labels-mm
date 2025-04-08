@@ -5,7 +5,7 @@
 @section('content')
 <div class="min-h-screen bg-gray-100 py-6 flex justify-center">
     <div class="w-full max-w-md">
-        <div class="bg-white overflow-hidden shadow-sm rounded-lg">
+        <div class="bg-white overflow-hidden shadow-lg rounded-lg">
             <!-- Header Resi -->
             <div class="p-4 text-center border-b border-gray-200">
                 <h1 class="text-2xl font-bold">Labels MM</h1>
@@ -74,14 +74,14 @@
             
             <!-- Tombol Download dan Kembali -->
             <div class="p-4 flex justify-between">
-                <a href="{{ route('pesanans.index') }}" class="px-4 py-2 bg-gray-500 text-white rounded-md flex items-center">
+                <a href="{{ route('pesanans.index') }}" class="px-4 py-2 bg-gray-500 text-white rounded-md flex items-center shadow-lg">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
                     </svg>
                     Kembali
                 </a>
                 
-                <button id="downloadBtn" class="px-4 py-2 bg-blue-500 text-white rounded-md flex items-center">
+                <button id="downloadBtn" class="px-4 py-2 bg-blue-500 text-white rounded-md flex items-center shadow-lg">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
                     </svg>

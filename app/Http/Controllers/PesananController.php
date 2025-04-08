@@ -153,7 +153,7 @@ class PesananController extends Controller
             
             // If this is a cash payment, return receipt view
             if ($request->payment_method === 'cash') {
-                return view('admin.pesanan.cash', compact('pesanan', 'product'))->with('success', 'berhasil membuat pesanan');
+                return view('admin.pesanan.resi', compact('pesanan', 'product'))->with('success', 'berhasil membuat pesanan');
             }
 
             return redirect()->route('pemasukan.index')->with('success', 'Pesanan created successfully');
@@ -187,6 +187,12 @@ class PesananController extends Controller
         $users = User::all();
         $products = Product::all();
         return view('admin.pesanan.detail', compact('pesanan', 'users', 'products'));
+    }
+
+    public function resi($id) {
+        $pesanan = Pesanan::findOrFail($id);
+        $product = Product::findOrFail($pesanan->product_id);
+        return view('admin.pesanan.resi', compact('pesanan', 'product'));
     }
 
 

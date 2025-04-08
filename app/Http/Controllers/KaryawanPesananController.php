@@ -32,49 +32,89 @@ class KaryawanPesananController extends Controller
             'nama_pemesan' => 'required|string|max:255',
             'status_pesanan' => 'required|string|in:proses,paid,completed',
             'total_harga' => 'required|numeric',
-            'jumlah_produk' => 'required|numeric|min:1',
+            'jumlah_produk' => 'required|numeric',
             'no_telp_pemesan' => 'required|string|max:15',
             'payment_method' => 'required|string|max:255',
+            'lebar_muka' => 'nullable|numeric',
+            'lebar_pundak' => 'nullable|numeric',
+            'lebar_punggung' => 'nullable|numeric',
+            'panjang_lengan' => 'nullable|numeric',
+            'panjang_punggung' => 'nullable|numeric',
+            'panjang_baju' => 'nullable|numeric',
+            'lingkar_badan' => 'nullable|numeric',
+            'lingkar_pinggang' => 'nullable|numeric',
+            'lingkar_panggul' => 'nullable|numeric',
+            'lingkar_kerung_lengan' => 'nullable|numeric',
+            'lingkar_pergelangan_lengan' => 'nullable|numeric',
+            'jumlah_pembayaran' => 'nullable|numeric',
         ]);
 
-        $request->merge(['created_by' => auth()->user()->id_users]);
-        $pesanan = Pesanan::create($request->all());
-
-        // Add to pemasukan and transaksi if status is paid or completed
-        if (in_array($pesanan->status_pesanan, ['paid', 'completed'])) {
-            tbl_transaksi::create([
-                'id_referens' => $pesanan->id_pesanan,
-                'pelaku_transaksi' => $pesanan->created_by,
-                'keterangan' => "Order created for Order #{$pesanan->id_pesanan} - {$pesanan->nama_produk} (Qty: {$pesanan->jumlah_produk})",
-                'nominal' => $pesanan->total_harga,
-                'kategori' => 'pemasukan',
-                'tanggal' => now(),
+        // Begin transaction to ensure data consistency
+        DB::beginTransaction();
+        
+        try {
+            $request->merge([
+                'created_by' => auth()->user()->id_users
             ]);
 
-            Pemasukan::create([
-                'id_referensi' => $pesanan->id_pesanan,
-                'keterangan' => "Payment received for Order #{$pesanan->id_pesanan} - {$pesanan->nama_produk} (Qty: {$pesanan->jumlah_produk})",
-                'nominal' => $pesanan->total_harga,
-                'created_by' => $pesanan->created_by,
-                'created_at' => now(),
-            ]);
-        }
+            // Create the order
+            $pesanan = Pesanan::create($request->all());
 
-        if ($request->payment_method === 'midtrans') {
-            $snapToken = $this->midtransService->createTransaction($pesanan);
-            
-            if ($snapToken) {
-                return view('karyawan.pesanan.payment', compact('snapToken', 'pesanan'));
+            // Update product stock
+            $product = Product::findOrFail($request->product_id);
+            if ($product->stock_product < $request->jumlah_produk) {
+                DB::rollBack();
+                return redirect()->back()->with('error', 'Stok produk tidak mencukupi');
             }
             
-            return redirect()->back()->with('error', 'Gagal membuat transaksi pembayaran');
-        }
-        // For cash payments, fetch the product and show receipt
-        $product = Product::findOrFail($request->product_id);
-        
-        // If this is a cash payment, return receipt view
-        if ($request->payment_method === 'cash') {
-            return view('karyawan.pesanan.cash', compact('pesanan', 'product'));
+            // Decrease product stock
+            $product->stock_product -= $request->jumlah_produk;
+            $product->save();
+
+            // Add to pemasukan and transaksi if status is paid or completed
+            if (in_array($pesanan->status_pesanan, ['paid', 'completed'])) {
+                tbl_transaksi::create([
+                    'id_referens' => $pesanan->id_pesanan,
+                    'pelaku_transaksi' => $pesanan->created_by,
+                    'keterangan' => "Order created for Order #{$pesanan->id_pesanan} - {$pesanan->nama_produk} (Qty: {$pesanan->jumlah_produk})",
+                    'nominal' => $pesanan->total_harga,
+                    'kategori' => 'pemasukan',
+                    'tanggal' => now(),
+                ]);
+
+                Pemasukan::create([
+                    'id_referensi' => $pesanan->id_pesanan,
+                    'keterangan' => "Payment received for Order #{$pesanan->id_pesanan} - {$pesanan->nama_produk} (Qty: {$pesanan->jumlah_produk})",
+                    'nominal' => $pesanan->total_harga,
+                    'created_by' => $pesanan->created_by,
+                    'created_at' => now(),
+                ]);
+            }
+
+            DB::commit();
+
+            if ($request->payment_method === 'midtrans') {
+                $snapToken = $this->midtransService->createTransaction($pesanan);
+                
+                if ($snapToken) {
+                    return view('karyawan.pesanan.payment', compact('snapToken', 'pesanan'))->with('succes', 'Berhasil membuat pesanan');
+                }
+                
+                return redirect()->back()->with('error', 'Gagal membuat transaksi pembayaran');
+            }
+            
+            // For cash payments, fetch the product and show receipt
+            $product = Product::findOrFail($request->product_id);
+            
+            // If this is a cash payment, return receipt view
+            if ($request->payment_method === 'cash') {
+                return view('karyawan.pesanan.resi', compact('pesanan', 'product'))->with('success', 'berhasil membuat pesanan');
+            }
+
+            return redirect()->route('pemasukan.index')->with('success', 'Pesanan created successfully');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Error creating order: ' . $e->getMessage());
         }
     }
 
@@ -92,6 +132,12 @@ class KaryawanPesananController extends Controller
         $users = User::all();
         $products = Product::all();
         return view('karyawan.pesanan.detail', compact('pesanan', 'users', 'products'));
+    }
+
+    public function resi($id) {
+        $pesanan = Pesanan::findOrFail($id);
+        $product = Product::findOrFail($pesanan->product_id);
+        return view('karyawan.pesanan.resi', compact('pesanan', 'product'));
     }
 
     public function update(Request $request, $id)

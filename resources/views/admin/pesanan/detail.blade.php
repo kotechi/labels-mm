@@ -18,7 +18,7 @@
                 <h2 class="text-xl font-semibold mb-6 pb-2 border-b">Informasi Pesanan</h2>
                 <div class="space-y-4">
                     <div class="grid grid-cols-2 items-center py-2">
-                        <span class="text-gray-600">ID Pesanan</span>
+                        <span class="text-gray-600">No Pesanan</span>
                         <span class="font-medium">#{{ $pesanan->id_pesanan }}</span>
                     </div>
                     
@@ -66,7 +66,7 @@
                         <span class="font-medium">{{ $pesanan->order_date }}</span>
                     </div>
                 </div>
-            </div>
+            </div>  
 
             <!-- Measurements -->
             <div class="bg-gray-50 p-6 rounded-lg border-purple shadow-lg">
@@ -127,8 +127,10 @@
             </div>
         </div>
         <div class="mt-9 w-full items-center justify-center d-flex flex">
-            <button class="rounded-md bg-[#AF0893] text-white p-2 mx-5">cetak resi</button>
-            <button>kembali</button>
+            <a href="{{ route('pesanans.resi', $pesanan->id_pesanan) }}" class="rounded-md bg-[#AF0893] text-white p-2 mx-5 flex">
+                cetak resi <i class="w-5 h-5" data-lucide="notepad-text"></i>
+            </a>
+            <button onclick="BackButton()">kembali</button>
         </div>
     </div>
 
@@ -136,4 +138,10 @@
 
     </div>
 </div>
+
+<script>
+    function BackButton() {
+        window.history.back();
+    }
+</script>
 @endsection

@@ -34,7 +34,7 @@ class UserController extends Controller
             User::create($request->all());
     
         return redirect()->route('users.index')
-            ->with('success', 'User(s) created successfully.');
+            ->with('success', 'New user created successfully.');
     }
 
     public function edit($id_users)

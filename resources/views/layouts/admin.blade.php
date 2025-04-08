@@ -5,7 +5,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link rel="icon" type="image/x-icon" href="{{ asset('storage/images/icon/favicon.ico') }}">
+    <link rel="icon" type="image/svg+xml" href="{{ asset('storage/images/icon/logo.svg') }}">
     <title>Admin | @yield('title')</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script src="{{ asset('assets/js/chart.min.js') }}"></script>
@@ -145,42 +145,190 @@
         background: transparent !important;
         border-color: transparent;
     }
+
+
+    aside {
+        transition: width 0.3s ease-in-out;
+        overflow: hidden;
+        width: 220px; /* Set fixed initial width */
+    }
+    
+    aside.collapsed {
+        width: 4rem !important;
+        padding: 1.25rem;
+    }
+    
+    aside.collapsed .sidebar-text {
+        display: none;
+    }
+    
+    aside.collapsed .sidebar-logo span {
+        display: none;
+    }
+    
+    aside.collapsed .sidebar-logo img {
+        width: 2.5rem;
+        height: 2.5rem;
+        margin: 0 auto;
+        transition: all 0.3s ease;
+    }
+
+    aside.collapsed nav ul li {
+        justify-content: center;
+        padding-left: 0 !important; /* Force no padding when collapsed */
+    }
+    
+    aside.collapsed nav ul li i {
+        margin-right: 0 !important; /* Force no margin when collapsed */
+    }
+
+    aside.collapsed nav ul li a {
+        margin-left: 0 !important; /* Force no margin when collapsed */
+        justify-content: center !important;
+    }
+
+    aside.collapsed .mt-auto form {
+        justify-content: center;
+        padding-left: 0 !important; /* Force no padding when collapsed */
+    }
+    
+    aside.collapsed .mt-auto form button {
+        display: none;
+    }
+
+    /* Hover state for collapsed sidebar */
+    aside.collapsed:hover {
+        width: 220px !important; /* Same as original width */
+    }
+
+    aside.collapsed:hover .sidebar-text {
+        display: inline;
+    }
+
+    aside.collapsed:hover .sidebar-logo img {
+        width: auto;
+        height: auto;
+        margin: 0; /* Reset margin on hover */
+    }
+
+    aside.collapsed:hover nav ul li {
+        justify-content: flex-start;
+    }
+
+    aside.collapsed:hover nav ul li i {
+        margin-right: 0.5rem !important; /* Same as original */
+    }
+
+    aside.collapsed:hover nav ul li a {
+        justify-content: flex-start !important;
+        margin-left: 0 !important;
+    }
+
+    aside.collapsed:hover .mt-auto form {
+        justify-content: flex-start;
+    }
+
+    aside.collapsed:hover .mt-auto form button {
+        display: block;
+    }
+
+    
+    /* Toggle button */
+    #sidebar-toggle {
+        position: absolute;
+        top: 1rem;
+        right: 15px;
+        background: #f9fafb;
+        border: none;
+        border-radius: 50%;
+        width: 25px;
+        height: 25px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        color: #374151;
+        z-index: 60;
+        transform: translateX(50%);
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    }
+    
+    #sidebar-toggle:hover {
+        background: #f3f4f6;
+        color: #1f2937;
+    }
+    
+    /* Animation for toggle icon */
+    #sidebar-toggle img {
+        transition: transform 0.3s ease;
+    }
+    
+    aside.collapsed #sidebar-toggle img {
+        transform: rotate(180deg);
+    }
+    
+
+    /* Adjust main content based on sidebar state */
+    main {
+        transition: padding-left 0.3s ease-in-out;
+    }
+    
+    main.sidebar-collapsed {
+        padding-left: 4rem !important;
+    }
 </style>
 <body class="min-h-screen font-sans bg-gray-100">
     <div class="flex min-h-screen">
         <!-- Sidebar -->
         <aside class="fixed top-0 left-0 h-screen w-48 lg:w-[220px] p-6 bg-white shadow-lg flex z-50 flex-col">
-            <div class="flex items-center gap-2 mb-6">
-                <img src="{{ asset('storage/images/icon/LAblesMM.png') }}" alt="Logo" class="w-[230] h-auto">
-                <span class="text-lg font-bold text-gray-700"></span>
+            <!-- Toggle Button -->
+            <button id="sidebar-toggle" aria-label="Toggle Sidebar">
+                <img src="{{ asset('storage/images/icon/minimize.png') }}" alt="">
+            </button>
+            
+            <div class="flex items-center gap-2 mb-6 sidebar-logo">
+                <img src="{{ asset('storage/images/icon/logo.svg') }}" alt="Logo" class="w-[230] h-auto">
+                <span class="text-lg font-bold text-gray-700 sidebar-text"></span>
             </div>
 
             <!-- Navigation -->
             <nav class="flex-1 items-center">
                 <ul>
                     <li class="mb-6 flex items-center">
-                        <i class="w-7 h-7 mr-2" data-lucide="layout-dashboard"></i>
-                        <a href="{{ route('admin.index') }}" class="text-gray-900 hover:text-gray-700 text-lg font-semibold">Dashboard</a>
+                        <a href="{{ route('admin.index') }}" class="flex items-center text-gray-900 hover:text-gray-700">
+                            <i class="w-7 h-7" data-lucide="layout-dashboard"></i>
+                            <span class="ml-2 text-lg font-semibold sidebar-text">Dashboard</span>
+                        </a>
                     </li>
                     <li class="mb-6 flex items-center">
-                        <i class="w-7 h-7 mr-2" data-lucide="credit-card"></i>
-                        <a href="{{ route('admin.pengeluaran.index') }}" class="text-gray-900 hover:text-gray-700 text-lg font-semibold">Pengeluaran</a>
+                        <a href="{{ route('admin.pengeluaran.index') }}" class="flex items-center text-gray-900 hover:text-gray-700">
+                            <i class="w-7 h-7" data-lucide="credit-card"></i>
+                            <span class="ml-2 text-lg font-semibold sidebar-text">Pengeluaran</span>
+                        </a>
                     </li>
                     <li class="mb-6 flex items-center">
-                        <i class="w-7 h-7 mr-2" data-lucide="wallet"></i>
-                        <a href="{{ route('pemasukan.index') }}" class="text-gray-900 hover:text-gray-700 text-lg font-semibold">Pemasukan</a>
+                        <a href="{{ route('pemasukan.index') }}" class="flex items-center text-gray-900 hover:text-gray-700">
+                            <i class="w-7 h-7" data-lucide="wallet"></i>
+                            <span class="ml-2 text-lg font-semibold sidebar-text">Pemasukan</span>
+                        </a>
                     </li>
                     <li class="mb-6 flex items-center">
-                        <i class="w-7 h-7 mr-2" data-lucide="image"></i>
-                        <a href="{{ route('products') }}" class="text-gray-900 hover:text-gray-700 text-lg font-semibold">Model</a>
+                        <a href="{{ route('products') }}" class="flex items-center text-gray-900 hover:text-gray-700">
+                            <i class="w-7 h-7" data-lucide="image"></i>
+                            <span class="ml-2 text-lg font-semibold sidebar-text">Model</span>
+                        </a>
                     </li>
                     <li class="mb-6 flex items-center">
-                        <i class="w-7 h-7 mr-2" data-lucide="users"></i>
-                        <a href="{{ route('users.index') }}" class="text-gray-900 hover:text-gray-700 text-lg font-semibold">User</a>
+                        <a href="{{ route('users.index') }}" class="flex items-center text-gray-900 hover:text-gray-700">
+                            <i class="w-7 h-7" data-lucide="users"></i>
+                            <span class="ml-2 text-lg font-semibold sidebar-text">User</span>
+                        </a>
                     </li>
                     <li class="mb-6 flex items-center">
-                        <i class="w-7 h-7 mr-2" data-lucide="user-pen"></i>
-                        <a href="{{ route('admin.profile.index') }}" class="text-gray-900 hover:text-gray-700 text-lg font-semibold">Profile</a>
+                        <a href="{{ route('admin.profile.index') }}" class="flex items-center text-gray-900 hover:text-gray-700">
+                            <i class="w-7 h-7" data-lucide="user-pen"></i>
+                            <span class="ml-2 text-lg font-semibold sidebar-text">Profile</span>
+                        </a>
                     </li>
                 </ul>
             </nav>
@@ -189,17 +337,16 @@
             <div class="mt-auto">
                 <form action="{{ route('logout') }}" method="POST" class="flex items-center space-x-3">
                     @csrf
-                    <div class="w-10 h-10 flex items-center justify-center bg-black rounded-lg">
+                    <div class="w-10 h-10 flex items-center justify-center bg-black rounded-lg" id="logout_icon" >
                         <i data-lucide="log-out" class="h-6 text-white"></i>
                     </div>
-                    <button type="submit" class="text-gray-700 hover:text-red-800 font-bold">Logout</button>
+                    <button type="submit" class="text-gray-700 hover:text-red-800 font-bold sidebar-text">Logout</button>
                 </form>
             </div>
         </aside>
 
         <!-- Main Content -->
-        <main class="flex-1  h-full pl-48 lg:pl-[220px]">
-
+        <main class="flex-1 h-full pl-48 mt-2 lg:pl-[220px]">
             <!-- Content Area -->
             <div class="px-5 pb-5 h-full">
                 @yield('content')
@@ -211,26 +358,72 @@
         // Initialize Lucide icons
         lucide.createIcons();
 
-        $(document).ready(function() {
-        $('table.datatable').DataTable({
-            responsive: true,
-            ordering: true,
-            language: {
-                search: "" // Menghilangkan label "Search:"
-            },
-            "createdRow": function(row, data, dataIndex, cells) {
-                // Ambil kategori dari data attribute
-                const kategori = $(row).data('kategori');
-                if (kategori === 'pemasukan') {
-                    $(row).addClass('bg-green-100-important');
-                } else if (kategori === 'pengeluaran') {
-                    $(row).addClass('bg-red-100-important');
-                }
-            },
-            "initComplete": function() {
-                $('.dataTables_filter input').attr('placeholder', 'Search here...');
+        // Sidebar toggle functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebar = document.querySelector('aside');
+            const mainContent = document.querySelector('main');
+            const toggleButton = document.getElementById('sidebar-toggle');
+            
+            // Check local storage for sidebar state
+            const isSidebarCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+            
+            // Apply saved state on page load
+            if (isSidebarCollapsed) {
+                sidebar.classList.add('collapsed');
+                mainContent.classList.add('sidebar-collapsed');
+                
+                // Update toggle button icon
+                toggleButton.innerHTML = `
+                    <img src="{{ asset('storage/images/icon/minimize.png') }}" alt="">
+                `;
             }
+            
+            // Toggle sidebar on button click
+            toggleButton.addEventListener('click', function() {
+                sidebar.classList.toggle('collapsed');
+                mainContent.classList.toggle('sidebar-collapsed');
+                
+                // Save state to local storage
+                const isNowCollapsed = sidebar.classList.contains('collapsed');
+                localStorage.setItem('sidebarCollapsed', isNowCollapsed);
+                
+                // Update toggle button icon based on state
+                if (isNowCollapsed) {
+                    toggleButton.innerHTML = `
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                    `;
+                } else {
+                    toggleButton.innerHTML = `
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="15 18 9 12 15 6"></polyline>
+                        </svg>
+                    `;
+                }
+            });
         });
+
+        $(document).ready(function() {
+            $('table.datatable').DataTable({
+                responsive: true,
+                ordering: true,
+                language: {
+                    search: "" // Menghilangkan label "Search:"
+                },
+                "createdRow": function(row, data, dataIndex, cells) {
+                    // Ambil kategori dari data attribute
+                    const kategori = $(row).data('kategori');
+                    if (kategori === 'pemasukan') {
+                        $(row).addClass('bg-green-100-important');
+                    } else if (kategori === 'pengeluaran') {
+                        $(row).addClass('bg-red-100-important');
+                    }
+                },
+                "initComplete": function() {
+                    $('.dataTables_filter input').attr('placeholder', 'Search here...');
+                }
+            });
         });
 
         // SweetAlert for delete confirmation
@@ -275,7 +468,6 @@
         }
     </script>
     @endif
-
 
     @stack('scripts')
 </body>

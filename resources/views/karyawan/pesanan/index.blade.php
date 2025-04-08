@@ -18,13 +18,11 @@
     </div>
     <div class="overflow-x-auto">
         <table class="datatable min-w-full divide-y divide-gray-200">
-    
             <thead class="bg-thead">
-                <tr >
+                <tr>
                     <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider border-r border-gray-200">#</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider border-r border-gray-200">Nama</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider border-r border-gray-200">Nama </th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider border-r border-gray-200">Model</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider border-r border-gray-200">Payment</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider border-r border-gray-200">Total Harga</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider border-r border-gray-200">Jumlah</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider border-r border-gray-200">No. telp</th>
@@ -34,14 +32,13 @@
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
                 <?php
-                $no_pesanan = 1;    
-            ?>
+                    $no_pesanan = 1;    
+                ?>
                 @foreach($pesanans as $pesanan)
-                <tr data-href="{{ route('karyawan.pesanans.detail', $pesanan->id_pesanan) }}" class="cursor-pointer hover:bg-gray-50">
+                    <tr data-href="{{ route('karyawan.pesanans.detail', $pesanan->id_pesanan) }}" class="cursor-pointer hover:bg-gray-50">
                     <td class="px-6 py-4 whitespace-nowrap">{{ $no_pesanan++ }}</td>
                     <td class="px-6 py-4 whitespace-nowrap">{{ $pesanan->nama_pemesan }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap">{{ $pesanan->nama_produk }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap">{{ $pesanan->payment_method }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">{{ $pesanan->nama_produk }}</td>    
                     <td class="px-6 py-4 whitespace-nowrap">Rp {{ number_format($pesanan->total_harga ?? 0, 0, ',', '.') }}</td>
                     <td class="px-6 py-4 whitespace-nowrap">{{ $pesanan->jumlah_produk }}</td>
                     <td class="px-6 py-4 whitespace-nowrap">{{ $pesanan->no_telp_pemesan }}</td>
@@ -57,12 +54,12 @@
                                 <button type="submit" class="px-3 py-2 bg-green-500 hover:bg-green-600 text-white rounded-md mark-as-paid-button">Selesaikan</button>
                             </form>
                         @elseif($pesanan->status_pesanan == 'completed')
-                            <span class="px-3 py-2 bg-blue-600 text-white rounded-md">Completed</span>
+                            <button class="px-3 py-2 bg-blue-600 text-white rounded-md">Completed</button>
                         @endif
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
                         <a href="{{ route('karyawan.pesanans.edit', $pesanan->id_pesanan) }}" class="px-3 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-md">Edit</a>
-                        <form action="{{ route('karyawan.pesanans.destroy', $pesanan->id_pesanan) }}" method="POST" class="inline-block delete-form">
+                        <form action="{{ route('karyawan.pesanans.destroyWithPemasukan', $pesanan->id_pesanan) }}" method="POST" class="inline-block delete-form">
                             @csrf
                             @method('DELETE')
                             <button type="button" class="px-3 py-2 bg-red-500 hover:bg-red-600 text-white rounded-md delete-button">Delete</button>

@@ -59,22 +59,23 @@
                     <label for="product_id" class="block text-gray-700">Model</label>
                     <select name="product_id" id="product_id" 
                         class="w-full p-2 border rounded-md" required>
-                        <option value="">masukan pesanan</option>
+                        <option value="">Pilih Model</option>
                         @foreach($products as $product)
                             <option value="{{ $product->id_product }}" 
                                 data-price="{{ $product->harga_jual }}"
-                                data-name="{{ $product->nama_produk }}">
-                                {{ $product->nama_produk }}
+                                data-name="{{ $product->nama_produk }}"
+                                data-stock="{{ $product->stock_product }}">
+                                {{ $product->nama_produk }} (Stok: {{ $product->stock_product }})
                             </option>
                         @endforeach
                     </select>
                     <input type="hidden" name="nama_produk" id="nama_produk">
+                    <div id="stock-message" class="text-sm text-red-600 hidden"></div>
                 </div>
 
                 <div class="space-y-2">
                     <label for="payment_method" class="block text-gray-700">Metode Pembayaran</label>
-                    <select name="payment_method" id="payment_method" 
-                        class="w-full p-2 border rounded-md" required>
+                    <select name="payment_method" id="payment_method" class="w-full p-2 border rounded-md" required>
                         <option value="">Pilih metode pembayaran</option>
                         <option value="cash">Cash</option>
                         <option value="midtrans" disabled>Online Payment (Midtrans)</option>
@@ -212,10 +213,11 @@
                         placeholder="Contoh: 70" required>
                 </div>
                 
+                <input type="hidden" name="status_pesanan" value="proses">
             </div>
 
             <div class="mt-6 flex justify-end space-x-2">
-                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                <button type="submit" id="submit-button" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
                     Simpan
                 </button>
             </div>
@@ -319,9 +321,13 @@
         }
     };
 
+    let currentStock = 0;
+
     document.getElementById('product_id').addEventListener('change', function() {
         const selectedOption = this.options[this.selectedIndex];
         document.getElementById('nama_produk').value = selectedOption.dataset.name;
+        currentStock = parseInt(selectedOption.dataset.stock) || 0;
+        updateStockMessage();
         updateTotal();
     });
 
@@ -354,19 +360,51 @@
         }
     });
 
-    // Existing functions
+    function updateStockMessage() {
+        const quantityInput = document.getElementById('jumlah_produk');
+        const stockMessage = document.getElementById('stock-message');
+        const submitButton = document.getElementById('submit-button');
+        
+        if (currentStock > 0) {
+            if (parseInt(quantityInput.value) > currentStock) {
+                stockMessage.textContent = `Jumlah melebihi stok tersedia (${currentStock})`;
+                stockMessage.classList.remove('hidden');
+                submitButton.disabled = true;
+                submitButton.classList.add('opacity-50', 'cursor-not-allowed');
+            } else {
+                stockMessage.textContent = `Stok tersedia: ${currentStock}`;
+                stockMessage.classList.remove('hidden', 'text-red-600');
+                stockMessage.classList.add('text-green-600');
+                submitButton.disabled = false;
+                submitButton.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+        } else {
+            stockMessage.textContent = 'Stok produk ini habis';
+            stockMessage.classList.remove('hidden');
+            stockMessage.classList.add('text-red-600');
+            submitButton.disabled = true;
+            submitButton.classList.add('opacity-50', 'cursor-not-allowed');
+        }
+    }
+
     function incrementQuantity() {
         const quantityInput = document.getElementById('jumlah_produk');
-        quantityInput.value = parseInt(quantityInput.value) + 1;
-        updateTotal();
+        const currentValue = parseInt(quantityInput.value) || 0;
+        
+        if (currentValue < currentStock) {
+            quantityInput.value = currentValue + 1;
+            updateTotal();
+            updateStockMessage();
+        }
     }
 
     function decrementQuantity() {
         const quantityInput = document.getElementById('jumlah_produk');
-        const currentValue = parseInt(quantityInput.value);
+        const currentValue = parseInt(quantityInput.value) || 0;
         if (currentValue > 1) {
             quantityInput.value = currentValue - 1;
             updateTotal();
+            updateStockMessage();
         }
     }
 
@@ -387,11 +425,19 @@
         const productSelect = document.getElementById('product_id');
         const quantityInput = document.getElementById('jumlah_produk');
         
-        productSelect.addEventListener('change', updateTotal);
-        quantityInput.addEventListener('input', updateTotal);
+        productSelect.addEventListener('change', function() {
+            updateTotal();
+            updateStockMessage();
+        });
+        
+        quantityInput.addEventListener('input', function() {
+            updateTotal();
+            updateStockMessage();
+        });
         
         // Initial calculation
         updateTotal();
+        updateStockMessage();
     });
 </script>
 @endsection

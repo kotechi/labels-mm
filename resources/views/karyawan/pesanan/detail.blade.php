@@ -5,7 +5,7 @@
 @section('content')
 <div class="p-5 rounded-lg shadow-md bg-white">
     <div class="flex justify-between items-center">
-        <u class="font-extrabold text-3xl">Admin | Detail Pesanan</u>
+        <u class="font-extrabold text-3xl">Karyawan | Detail Pesanan</u>
     </div>
 </div>
 <div class="max-w-6xl bg-white rounded-lg shadow-lg p-6 mx-auto  mt-4">
@@ -18,7 +18,7 @@
                 <h2 class="text-xl font-semibold mb-6 pb-2 border-b">Informasi Pesanan</h2>
                 <div class="space-y-4">
                     <div class="grid grid-cols-2 items-center py-2">
-                        <span class="text-gray-600">ID Pesanan</span>
+                        <span class="text-gray-600">No Pesanan</span>
                         <span class="font-medium">#{{ $pesanan->id_pesanan }}</span>
                     </div>
                     
@@ -126,10 +126,21 @@
                 </div>
             </div>
         </div>
+        <div class="mt-9 w-full items-center justify-center d-flex flex">
+            <a href="{{ route('karyawan.pesanans.resi', $pesanan->id_pesanan) }}" class="rounded-md bg-[#AF0893] text-white p-2 mx-5 flex">
+                cetak resi <i class="w-5 h-5" data-lucide="notepad-text"></i>
+            </a>
+            <button onclick="BackButton()">kembali</button>
+        </div>
     </div>
 
     <div class="w-full">
 
     </div>
 </div>
+<script>
+    function BackButton() {
+        window.history.back();
+    }
+</script>
 @endsection

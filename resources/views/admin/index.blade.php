@@ -38,17 +38,83 @@
             <span class="block mt-2 text-xl">Penghasilan</span>
         </div>
     </div>
-    <div class="w-full p-2 text-center bg-labels rounded-md shadow-sm hover:shadow-lg mt-4 ">
-        <a href="{{ route('report.pdf') }}" class="px-4 w-full py-2  text-white ">
+    <div class="w-full p-2 text-center bg-labels rounded-md shadow-sm hover:shadow-lg mt-4 relative">
+        <button id="downloadReportBtn" class="px-4 w-full py-2 text-white">
             Download PDF Report
-        </a>
+        </button>
+        
+        <!-- Report Options Dropdown (Hidden by default) -->
+        <div id="reportOptions" class="hidden absolute left-0 right-0 mt-2 bg-white rounded-md shadow-lg border border-gray-200 p-4 z-10">
+            <h4 class="font-medium text-gray-800 mb-3">Select Report Type:</h4>
+            <div class="flex gap-4 mb-4">
+                <button id="yearlyReportBtn" class="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700">1. Yearly Report</button>
+                <button id="monthlyReportBtn" class="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700">2. Monthly Report</button>
+            </div>
+            
+            <!-- Yearly Options (Hidden by default) -->
+            <div id="yearlyOptions" class="hidden mt-3">
+                <h4 class="font-medium text-gray-800 mb-2">Select Year:</h4>
+                <select id="yearSelect" class="w-full p-2 border border-gray-300 rounded-md">
+                    @php
+                        $currentYear = date('Y');
+                        $startYear = $currentYear - 5;
+                    @endphp
+                    
+                    @for($year = $currentYear; $year >= $startYear; $year--)
+                        <option value="{{ $year }}">{{ $year }}</option>
+                    @endfor
+                </select>
+                <button id="downloadYearlyReportBtn" class="mt-3 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 w-full">
+                    Download Yearly Report
+                </button>
+            </div>
+            
+            <!-- Monthly Options (Hidden by default) -->
+            <div id="monthlyOptions" class="hidden mt-3">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <h4 class="font-medium text-gray-800 mb-2">Select Year:</h4>
+                        <select id="monthlyYearSelect" class="w-full p-2 border border-gray-300 rounded-md">
+                            @php
+                                $currentYear = date('Y');
+                                $startYear = $currentYear - 5;
+                            @endphp
+                            
+                            @for($year = $currentYear; $year >= $startYear; $year--)
+                                <option value="{{ $year }}">{{ $year }}</option>
+                            @endfor
+                        </select>
+                    </div>
+                    <div>
+                        <h4 class="font-medium text-gray-800 mb-2">Select Month:</h4>
+                        <select id="monthSelect" class="w-full p-2 border border-gray-300 rounded-md">
+                            <option value="1">January</option>
+                            <option value="2">February</option>
+                            <option value="3">March</option>
+                            <option value="4">April</option>
+                            <option value="5">May</option>
+                            <option value="6">June</option>
+                            <option value="7">July</option>
+                            <option value="8">August</option>
+                            <option value="9">September</option>
+                            <option value="10">October</option>
+                            <option value="11">November</option>
+                            <option value="12">December</option>
+                        </select>
+                    </div>
+                </div>
+                <button id="downloadMonthlyReportBtn" class="mt-3 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 w-full">
+                    Download Monthly Report
+                </button>
+            </div>
+        </div>
     </div>
 </div>
 
 
 
 <!-- Earnings Chart -->
-<div class="mt-6 p-6 rounded-lg shadow-md bg-white">
+<div class="mt-6 p-6 rounded-lg shadow-lg bg-white">
     <div class="flex justify-between items-center mb-4">
         <h3 class="text-lg font-semibold text-gray-700">Grafik Pendapatan</h3>
         <div class="flex items-center gap-4">
@@ -84,7 +150,7 @@
 <!-- Orders Table -->
 <div class="mt-6 p-6 rounded-lg shadow-lg bg-white">
     <div class="flex justify-between items-center mb-4">
-        <h3 class="text-lg font-semibold text-gray-700">Daftar Pesanan</h3>
+        <h3 class="text-lg font-semibold text-gray-700"><a href="{{ route('pemasukan.index') }}">Daftar Pesanan</a></h3>
     </div>
 
     <div class="overflow-x-auto">
@@ -214,22 +280,22 @@ document.addEventListener('DOMContentLoaded', function() {
                 {
                     label: 'Pemasukan',
                     data: [],
-                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderColor: '#003cff',
                     backgroundColor: 'rgba(75, 192, 192, 0.2)',
                     borderWidth: 1
                 },
                 {
                     label: 'Pengeluaran',
                     data: [],
-                    borderColor: '#6A1E55',
-                    backgroundColor: 'rgba(106, 30, 85, 0.2)',
+                    borderColor: '#ff0000',
+                    backgroundColor: '#ffb3b3',
                     borderWidth: 1
                 },
                 {
                     label: 'Total Keuntungan',
                     data: [],
-                    borderColor: '#7C084E',
-                    backgroundColor: 'rgba(124, 8, 78, 0.2)',
+                    borderColor: '#15ff00',
+                    backgroundColor: '#c5fcc7',
                     borderWidth: 1
                 }
             ]
@@ -429,6 +495,59 @@ document.addEventListener('DOMContentLoaded', function() {
             updatePeriodDisplay();
         });
     }
+
+
+
+
+    const downloadReportBtn = document.getElementById('downloadReportBtn');
+    const reportOptions = document.getElementById('reportOptions');
+    const yearlyReportBtn = document.getElementById('yearlyReportBtn');
+    const monthlyReportBtn = document.getElementById('monthlyReportBtn');
+    const yearlyOptions = document.getElementById('yearlyOptions');
+    const monthlyOptions = document.getElementById('monthlyOptions');
+    const downloadYearlyReportBtn = document.getElementById('downloadYearlyReportBtn');
+    const downloadMonthlyReportBtn = document.getElementById('downloadMonthlyReportBtn');
+    
+    // Click outside to close dropdown
+    document.addEventListener('click', function(event) {
+        if (!reportOptions.contains(event.target) && event.target !== downloadReportBtn) {
+            reportOptions.classList.add('hidden');
+        }
+    });
+    
+    // Toggle report options dropdown
+    downloadReportBtn.addEventListener('click', function(event) {
+        event.stopPropagation();
+        reportOptions.classList.toggle('hidden');
+        // Reset sub-options when opening
+        yearlyOptions.classList.add('hidden');
+        monthlyOptions.classList.add('hidden');
+    });
+    
+    // Show yearly options
+    yearlyReportBtn.addEventListener('click', function() {
+        yearlyOptions.classList.remove('hidden');
+        monthlyOptions.classList.add('hidden');
+    });
+    
+    // Show monthly options
+    monthlyReportBtn.addEventListener('click', function() {
+        monthlyOptions.classList.remove('hidden');
+        yearlyOptions.classList.add('hidden');
+    });
+    
+    // Download yearly report
+    downloadYearlyReportBtn.addEventListener('click', function() {
+        const selectedYear = document.getElementById('yearSelect').value;
+        window.location.href = `{{ route('report.pdf') }}?type=yearly&year=${selectedYear}`;
+    });
+    
+    // Download monthly report
+    downloadMonthlyReportBtn.addEventListener('click', function() {
+        const selectedYear = document.getElementById('monthlyYearSelect').value;
+        const selectedMonth = document.getElementById('monthSelect').value;
+        window.location.href = `{{ route('report.pdf') }}?type=monthly&year=${selectedYear}&month=${selectedMonth}`;
+    });
 });
 </script>
 @endpush

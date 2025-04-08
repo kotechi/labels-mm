@@ -6,7 +6,7 @@
 @section('content')
 <div class="p-5 rounded-lg shadow bg-white">
     <div class="flex justify-between items-center">
-        <u class="font-extrabold text-3xl" >Karywan | model</u>
+        <u class="font-extrabold text-3xl" >karyawan | model</u>
     </div>
 </div>
 

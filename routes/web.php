@@ -83,6 +83,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::post('/admin/pesanan', [PesananController::class, 'store'])->name('pesanans.store');
     Route::get('/admin/pesanan/{pesanan}/edit', [PesananController::class, 'edit'])->name('pesanans.edit');
     Route::get('/admin/pesanan/{pesanan}/detail', [PesananController::class, 'detail'])->name('pesanans.detail');
+    Route::get('/admin/pesanan/{pesanan}/resi', [PesananController::class, 'resi'])->name('pesanans.resi');
     Route::patch('/admin/pesanan/{pesanan}', [PesananController::class, 'update'])->name('pesanans.update');
     Route::delete('/admin/pesanan/{pesanan}', [PesananController::class, 'destroy'])->name('pesanans.destroy');
     Route::post('/admin/pesanan/{pesanan}/markAsPaid', [PesananController::class, 'markAsPaid'])->name('pesanans.markAsPaid');
@@ -136,6 +137,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/pesanan', [KaryawanPesananController::class, 'store'])->name('karyawan.pesanans.store');
     Route::get('/pesanan/{pesanan}/edit', [KaryawanPesananController::class, 'edit'])->name('karyawan.pesanans.edit');
     Route::get('/pesanan/{pesanan}/detail', [KaryawanPesananController::class, 'detail'])->name('karyawan.pesanans.detail');
+    Route::get('/pesanan/{pesanan}/resi', [KaryawanPesananController::class, 'resi'])->name('karyawan.pesanans.resi');
     Route::patch('/pesanan/{pesanan}', [KaryawanPesananController::class, 'update'])->name('karyawan.pesanans.update');
     Route::delete('/pesanan/{pesanan}', [KaryawanPesananController::class, 'destroy'])->name('karyawan.pesanans.destroy');
     Route::post('/pesanan/{pesanan}/markAsPaid', [KaryawanPesananController::class, 'markAsPaid'])->name('karyawan.pesanans.markAsPaid');
