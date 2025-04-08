@@ -259,7 +259,7 @@
     }
     
     /* Animation for toggle icon */
-    #sidebar-toggle img {
+    #sidebar-toggle svg {
         transition: transform 0.3s ease;
     }
     
@@ -283,7 +283,9 @@
         <aside class="fixed top-0 left-0 h-screen w-48 lg:w-[220px] p-6 bg-white shadow-lg flex z-50 flex-col">
             <!-- Toggle Button -->
             <button id="sidebar-toggle" aria-label="Toggle Sidebar">
-                <img src="{{ asset('storage/images/icon/minimize.png') }}" alt="">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
             </button>
             
             <div class="flex items-center gap-2 mb-6 sidebar-logo">
@@ -337,7 +339,7 @@
             <div class="mt-auto">
                 <form action="{{ route('logout') }}" method="POST" class="flex items-center space-x-3">
                     @csrf
-                    <div class="w-10 h-10 flex items-center justify-center bg-black rounded-lg" id="logout_icon" >
+                    <div class="w-10 h-10 p-2 flex items-center justify-center bg-black rounded-lg" id="logout_icon" >
                         <i data-lucide="log-out" class="h-6 text-white"></i>
                     </div>
                     <button type="submit" class="text-gray-700 hover:text-red-800 font-bold sidebar-text">Logout</button>
@@ -374,7 +376,9 @@
                 
                 // Update toggle button icon
                 toggleButton.innerHTML = `
-                    <img src="{{ asset('storage/images/icon/minimize.png') }}" alt="">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="15 18 9 12 15 6"></polyline>
+                        </svg>
                 `;
             }
             
