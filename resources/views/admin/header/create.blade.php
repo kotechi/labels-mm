@@ -1,33 +1,39 @@
-<!DOCTYPE html>
-<html lang="en" class="antialiased">
-<head>
-    <!-- ...existing code... -->
-</head>
-<body class="bg-gray-100 text-gray-900 tracking-wider leading-normal">
-    <div class="container w-full md:w-4/5 xl:w-3/5 mx-auto px-2">
-        <h1 class="flex items-center font-sans font-bold break-normal text-indigo-500 px-2 py-8 text-xl md:text-2xl">
-            Create New Header
-        </h1>
-        <div class="p-8 mt-6 lg:mt-0 rounded shadow bg-white">
-            <form action="{{ route('headers.store') }}" method="POST" enctype="multipart/form-data">
-                @csrf
-                <div class="mb-4">
-                    <label for="tittle" class="block text-gray-700 text-sm font-bold mb-2">Title:</label>
-                    <input type="text" name="tittle" id="tittle" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                </div>
-                <div class="mb-4">
-                    <label for="description" class="block text-gray-700 text-sm font-bold mb-2">Description:</label>
-                    <textarea name="description" id="description" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"></textarea>
-                </div>
-                <div class="mb-4">
-                    <label for="image" class="block text-gray-700 text-sm font-bold mb-2">Image:</label>
-                    <input type="file" name="image" id="image" accept="image/*" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                </div>
-                <div class="flex items-center justify-between">
-                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Create</button>
-                </div>
-            </form>
+@extends('layouts.admin')  
+
+@section('title','Create Header') 
+
+@section('content') 
+<div class="p-5 rounded-lg shadow bg-white">
+    <div class="flex justify-between items-center">
+        <u class="font-extrabold text-3xl">Admin | Header</u>
+    </div>
+</div>
+
+<div class="bg-white shadow-md border mt-6">
+    <div class="bg-labels shadow-lg rounded-sm">
+        <div class="p-4 w-auto">
+            <h3 class="text-lg text-white font-semibold">Create New Header</h3>
         </div>
     </div>
-</body>
-</html>
+    <div class="p-6 mt-2">
+        <form action="{{ route('headers.store') }}" method="POST" enctype="multipart/form-data">
+            @csrf
+            <div class="mb-4">
+                <label for="tittle" class="block text-lg font-medium text-gray-700">Title</label>
+                <input type="text" name="tittle" id="tittle" placeholder="Enter title" class="p-3 block w-full border rounded-md" required>
+            </div>
+            <div class="mb-4">
+                <label for="description" class="block text-lg font-medium text-gray-700">Description</label>
+                <textarea name="description" id="description" placeholder="Enter description" class="p-3 block w-full border rounded-md" required></textarea>
+            </div>
+            <div class="mb-4">
+                <label for="image" class="block text-lg font-medium text-gray-700">Image</label>
+                <input type="file" name="image" id="image" accept="image/*" class="p-3 block w-full border rounded-md" required>
+            </div>
+            <div class="flex justify-end">
+                <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg">Submit</button>
+            </div>
+        </form>
+    </div>
+</div>
+@endsection

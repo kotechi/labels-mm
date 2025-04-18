@@ -21,13 +21,14 @@ class ContactController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'tittle' => 'required',
-            'link' => 'required',
+            'nama' => 'required',
+            'email' => 'required|email',
+            'message' => 'required',
         ]);
 
         Contact::create($request->all());
 
-        return redirect()->route('content.index')
+        return redirect()->route('admin.index')
                          ->with('success', 'Contact created successfully.');
     }
 
@@ -44,13 +45,14 @@ class ContactController extends Controller
     public function update(Request $request, Contact $contact)
     {
         $request->validate([
-            'tittle' => 'required',
-            'link' => 'required',
+            'nama' => 'required',
+            'email' => 'required|email',
+            'message' => 'required',
         ]);
 
         $contact->update($request->all());
 
-        return redirect()->route('content.index')
+        return redirect()->route('admin.index')
                          ->with('success', 'Contact updated successfully.');
     }
 
@@ -58,7 +60,7 @@ class ContactController extends Controller
     {
         $contact->delete();
 
-        return redirect()->route('content.index')
+        return redirect()->route('admin.index')
                          ->with('success', 'Contact deleted successfully.');
     }
 }

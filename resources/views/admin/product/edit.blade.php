@@ -1,5 +1,6 @@
 @extends('layouts.admin')
 
+@section('title','Product')
 @section('content')
 <div class="p-5 rounded-lg shadow bg-white">
     <div class="flex justify-between items-center">

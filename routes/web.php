@@ -21,7 +21,7 @@ use App\Http\Controllers\RouteController;
 use App\Http\Controllers\AdminTransaksiController;
 use App\Http\Controllers\KaryawanGalleryController;
 use App\Http\Controllers\ReportController;
-
+use App\Http\Controllers\CompanyProfileController;
 
 
 Route::middleware('auth')->group(function () {
@@ -39,6 +39,8 @@ Route::middleware('auth')->group(function () {
 
 Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/admin',[AdminController::class, 'index'])->name('admin.index');
+
+    Route::get('/admin/company',[CompanyProfileController::class, 'index'])->name('admin.company.index');
     Route::get('/admin/profile', [ProfileController::class, 'index'])->name('admin.profile.index');
 
     Route::get('/admin/product', [ProductController::class, 'index'])->name('products');
@@ -69,7 +71,6 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::patch('/admin/contact/{contact}', [ContactController::class, 'update'])->name('contacts.update');
     Route::delete('/admin/contact/{contact}', [ContactController::class, 'destroy'])->name('contacts.destroy');
 
-    Route::get('/admin/content', [ContentController::class, 'index'])->name('content.index');
 
     Route::get('/admin/user', [UserController::class, 'index'])->name('users.index');
     Route::get('/admin/user/create', [UserController::class, 'create'])->name('users.create');

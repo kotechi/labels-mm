@@ -42,7 +42,7 @@ class AboutController extends Controller
                     'deskripsi' => $request->deskripsi
                 ]);
 
-                return redirect()->route('content.index')->with('success', 'About created successfully');
+                return redirect()->route('admin.company.index')->with('success', 'About created successfully');
             }
             
             throw new \Exception('Invalid image file');
@@ -94,7 +94,7 @@ class AboutController extends Controller
                 ]);
             }
 
-            return redirect()->route('content.index')->with('success', 'About updated successfully');
+            return redirect()->route('admin.company.index')->with('success', 'About updated successfully');
             
         } catch (\Exception $e) {
             return back()
@@ -111,7 +111,7 @@ class AboutController extends Controller
             }
             
             $about->delete();
-            return redirect()->route('content.index')->with('success', 'About deleted successfully');
+            return redirect()->route('admin.company.index')->with('success', 'About deleted successfully');
         } catch (\Exception $e) {
             return back()->withErrors(['error' => 'Failed to delete about']);
         }

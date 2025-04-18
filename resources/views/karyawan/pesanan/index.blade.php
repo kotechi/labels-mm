@@ -46,7 +46,7 @@
                         @if($pesanan->status_pesanan == 'proses')
                             <form action="{{ route('karyawan.pesanans.markAsPaid', $pesanan->id_pesanan) }}" method="POST" class="inline-block">
                                 @csrf
-                                <button type="submit" class="px-3 py-2 bg-green-500 hover:bg-green-600 text-white rounded-md mark-as-paid-button">Tandai sudah bayar</button>
+                                <button type="submit" class="px-3 py-2 bg-green-500 hover:bg-green-600 text-white rounded-md mark-as-paid-button">sudah bayar</button>
                             </form>
                         @elseif($pesanan->status_pesanan == 'paid')
                             <form action="{{ route('karyawan.pesanans.markAsCompleted', $pesanan->id_pesanan) }}" method="POST" class="inline-block">

@@ -7,12 +7,14 @@ use Illuminate\Http\Request;
 use App\Models\Pengeluaran;
 use App\Models\Pemasukan;
 use App\Models\Pesanan;
+use App\Models\Contact;
 use App\Models\tbl_transaksi;
 
 class AdminController extends Controller
 {
     public function index(Request $request)
     {
+        $contact = Contact::all();
         $pengeluaran = Pengeluaran::all();
         $pemasukan = Pemasukan::all();
         $pesanans = Pesanan::all();
@@ -144,7 +146,7 @@ class AdminController extends Controller
             'transaksis', 'pesanans', 'pengeluaran', 'pemasukan',
             'allMonthlyData', 'allDailyData', 'yearlyData',
             'currentMonth', 'currentYear', 'startYear',
-            'totalPengeluaran', 'totalPemasukan', 'totalPenghasilan'
+            'totalPengeluaran', 'totalPemasukan', 'totalPenghasilan', 'contact'
         ));
     }
 }

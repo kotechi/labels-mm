@@ -5,7 +5,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link rel="icon" type="image/svg+xml" href="{{ asset('storage/images/icon/logo.svg') }}">
+    <link rel="icon" type="image/svg+xml" href="{{ asset('storage/images/icon/logo.jpg') }}">
     <title>Admin | @yield('title')</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script src="{{ asset('assets/js/chart.min.js') }}"></script>
@@ -158,6 +158,14 @@
         padding: 1.25rem;
     }
     
+    aside.collapsed #sidebar-toggle {
+        opacity: 0;
+    }
+    aside.collapsed:hover #sidebar-toggle {
+        opacity: 1;
+    }
+
+
     aside.collapsed .sidebar-text {
         display: none;
     }
@@ -192,10 +200,6 @@
         padding-left: 0 !important; /* Force no padding when collapsed */
     }
     
-    aside.collapsed .mt-auto form button {
-        display: none;
-    }
-
     /* Hover state for collapsed sidebar */
     aside.collapsed:hover {
         width: 220px !important; /* Same as original width */
@@ -228,9 +232,6 @@
         justify-content: flex-start;
     }
 
-    aside.collapsed:hover .mt-auto form button {
-        display: block;
-    }
 
     
     /* Toggle button */
@@ -272,9 +273,29 @@
     main {
         transition: padding-left 0.3s ease-in-out;
     }
+
+    .sidebar-notification {
+        transition: all 0.3s ease;
+    }
     
     main.sidebar-collapsed {
         padding-left: 4rem !important;
+    }
+
+    aside.collapsed .sidebar-notification {
+        transform: scale(0.5);
+    }
+
+    /* Sidebar tooltip position adjustments when collapsed */
+    aside.collapsed li:hover div[class*="absolute left-full"] {
+        left: 4rem;
+        top: 0;
+    }
+
+    /* Fix sidebar notification position when sidebar is expanded after hover */
+    aside.collapsed:hover .sidebar-notification {
+        right: 4px;
+        transform: scale(1);
     }
 </style>
 <body class="min-h-screen font-sans bg-gray-100">
@@ -282,13 +303,13 @@
         <!-- Sidebar -->
         <aside class="fixed top-0 left-0 h-screen w-48 lg:w-[220px] p-6 bg-white shadow-lg flex z-50 flex-col">
             <!-- Toggle Button -->
-            <button id="sidebar-toggle" aria-label="Toggle Sidebar">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <button id="sidebar-toggle" aria-label="Toggle Sidebar" class="w-2 h-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <polyline points="15 18 9 12 15 6"></polyline>
                 </svg>
             </button>
             
-            <div class="flex items-center gap-2 mb-6 sidebar-logo">
+            <div class="flex items-center gap-2 mb-4 sidebar-logo">
                 <img src="{{ asset('storage/images/icon/logo.svg') }}" alt="Logo" class="w-[230] h-auto">
                 <span class="text-lg font-bold text-gray-700 sidebar-text"></span>
             </div>
@@ -296,40 +317,56 @@
             <!-- Navigation -->
             <nav class="flex-1 items-center">
                 <ul>
-                    <li class="mb-6 flex items-center">
+                    <li class="mb-4 flex items-center">
                         <a href="{{ route('admin.index') }}" class="flex items-center text-gray-900 hover:text-gray-700">
                             <i class="w-7 h-7" data-lucide="layout-dashboard"></i>
                             <span class="ml-2 text-lg font-semibold sidebar-text">Dashboard</span>
                         </a>
                     </li>
-                    <li class="mb-6 flex items-center">
+                    <li class="mb-4 flex items-center">
                         <a href="{{ route('admin.pengeluaran.index') }}" class="flex items-center text-gray-900 hover:text-gray-700">
                             <i class="w-7 h-7" data-lucide="credit-card"></i>
                             <span class="ml-2 text-lg font-semibold sidebar-text">Pengeluaran</span>
                         </a>
                     </li>
-                    <li class="mb-6 flex items-center">
+                    <li class="mb-4 flex items-center">
                         <a href="{{ route('pemasukan.index') }}" class="flex items-center text-gray-900 hover:text-gray-700">
                             <i class="w-7 h-7" data-lucide="wallet"></i>
                             <span class="ml-2 text-lg font-semibold sidebar-text">Pemasukan</span>
                         </a>
                     </li>
-                    <li class="mb-6 flex items-center">
-                        <a href="{{ route('products') }}" class="flex items-center text-gray-900 hover:text-gray-700">
+                    <li class="mb-4 flex items-center relative">
+                        <a href="{{ route('products') }}" class="flex items-center text-gray-900 hover:text-gray-700 group">
                             <i class="w-7 h-7" data-lucide="image"></i>
                             <span class="ml-2 text-lg font-semibold sidebar-text">Model</span>
+                            @if(isset($outOfStockCount) && $outOfStockCount > 0)
+                                <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center sidebar-notification">
+                                    {{ $outOfStockCount }}
+                                </span>
+                            @endif
                         </a>
+                        @if(isset($outOfStockCount) && $outOfStockCount > 0)
+                            <div class="absolute left-full ml-2 bg-gray-800 text-white text-xs py-1 px-2 rounded whitespace-nowrap z-50  group-hover:opacity-100 group-hover:visible transition-all duration-300">
+                                {{ $outOfStockCount }} produk habis stok!
+                            </div>
+                        @endif
                     </li>
-                    <li class="mb-6 flex items-center">
+                    <li class="mb-4 flex items-center">
                         <a href="{{ route('users.index') }}" class="flex items-center text-gray-900 hover:text-gray-700">
                             <i class="w-7 h-7" data-lucide="users"></i>
                             <span class="ml-2 text-lg font-semibold sidebar-text">User</span>
                         </a>
                     </li>
-                    <li class="mb-6 flex items-center">
+                    <li class="mb-4 flex items-center">
                         <a href="{{ route('admin.profile.index') }}" class="flex items-center text-gray-900 hover:text-gray-700">
                             <i class="w-7 h-7" data-lucide="user-pen"></i>
                             <span class="ml-2 text-lg font-semibold sidebar-text">Profile</span>
+                        </a>
+                    </li>
+                    <li class="mb-4 flex items-center">
+                        <a href="{{ route('admin.company.index') }}" class="flex items-center text-gray-900 hover:text-gray-700">
+                            <i class="w-7 h-7" data-lucide="layout-template"></i>
+                            <span class="ml-2 text-lg font-semibold sidebar-text">Company Profile</span>
                         </a>
                     </li>
                 </ul>
@@ -337,12 +374,14 @@
 
             <!-- Logout -->
             <div class="mt-auto">
-                <form action="{{ route('logout') }}" method="POST" class="flex items-center space-x-3">
+                <form action="{{ route('logout') }}" method="POST" class="flex space-x-2">
                     @csrf
-                    <div class="w-10 h-10 p-2 flex items-center justify-center bg-black rounded-lg" id="logout_icon" >
-                        <i data-lucide="log-out" class="h-6 text-white"></i>
-                    </div>
-                    <button type="submit" class="text-gray-700 hover:text-red-800 font-bold sidebar-text">Logout</button>
+                    <button type="submit" class="flex items-center">
+                        <div class="w-9 h-9 p-2 flex items-center justify-center bg-black rounded-lg hover:bg-gray-800 cursor-pointer" id="logout_icon">
+                            <i data-lucide="log-out" class="h-6 text-white"></i>
+                        </div>
+                        <span class="ml-3 text-gray-700 hover:text-red-800 font-bold sidebar-text">Logout</span>
+                    </button>
                 </form>
             </div>
         </aside>
@@ -376,7 +415,7 @@
                 
                 // Update toggle button icon
                 toggleButton.innerHTML = `
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <polyline points="15 18 9 12 15 6"></polyline>
                         </svg>
                 `;
@@ -394,13 +433,13 @@
                 // Update toggle button icon based on state
                 if (isNowCollapsed) {
                     toggleButton.innerHTML = `
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <svg xmlns="http://www.w3.org/2000/svg"  width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <polyline points="9 18 15 12 9 6"></polyline>
                         </svg>
                     `;
                 } else {
                     toggleButton.innerHTML = `
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <svg xmlns="http://www.w3.org/2000/svg"  width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <polyline points="15 18 9 12 15 6"></polyline>
                         </svg>
                     `;

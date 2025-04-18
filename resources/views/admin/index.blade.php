@@ -9,7 +9,7 @@
 </div>
 
 <div class="p-6 mt-6 rounded-lg shadow-md bg-white ">
-    <h3 class="text-lg font-semibold text-gray-700 mb-4">Overview</h3>
+    <h3 class="text-2xl font-semibold text-gray-700 mb-4">Overview</h3>
     <div class="grid grid-cols-3 gap-6">
         <!-- Pengeluaran -->
         <div class="relative p-4 shadow-md border border-black rounded-lg ">
@@ -46,9 +46,9 @@
         <!-- Report Options Dropdown (Hidden by default) -->
         <div id="reportOptions" class="hidden absolute left-0 right-0 mt-2 bg-white rounded-md shadow-lg border border-gray-200 p-4 z-10">
             <h4 class="font-medium text-gray-800 mb-3">Select Report Type:</h4>
-            <div class="flex gap-4 mb-4">
-                <button id="yearlyReportBtn" class="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700">1. Yearly Report</button>
-                <button id="monthlyReportBtn" class="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700">2. Monthly Report</button>
+            <div class="flex w-full gap-4 mb-4">
+                <button id="yearlyReportBtn" class="w-full px-4 py-2 bg-blue-700 text-white rounded-md hover:bg-purple-700">1. Yearly Report</button>
+                <button id="monthlyReportBtn" class="w-full px-4 py-2 bg-blue-700 text-white rounded-md hover:bg-purple-700">2. Monthly Report</button>
             </div>
             
             <!-- Yearly Options (Hidden by default) -->
@@ -116,7 +116,7 @@
 <!-- Earnings Chart -->
 <div class="mt-6 p-6 rounded-lg shadow-lg bg-white">
     <div class="flex justify-between items-center mb-4">
-        <h3 class="text-lg font-semibold text-gray-700">Grafik Pendapatan</h3>
+        <h3 class="text-2xl font-semibold text-gray-700">Grafik Pendapatan</h3>
         <div class="flex items-center gap-4">
             <select id="earningsPeriod" class="px-4 py-2 bg-gray-200 rounded">
                 <option value="daily">Daily</option>
@@ -150,7 +150,7 @@
 <!-- Orders Table -->
 <div class="mt-6 p-6 rounded-lg shadow-lg bg-white">
     <div class="flex justify-between items-center mb-4">
-        <h3 class="text-lg font-semibold text-gray-700"><a href="{{ route('pemasukan.index') }}">Daftar Pesanan</a></h3>
+        <h3 class="text-2xl font-semibold text-gray-700"><a href="{{ route('pemasukan.index') }}">Daftar Pesanan</a></h3>
     </div>
 
     <div class="overflow-x-auto">
@@ -198,7 +198,7 @@
 <!-- Transaksi Table -->
 <div class="mt-6 p-6 rounded-lg shadow-lg bg-white">
     <div class="flex justify-between items-center mb-4">
-        <h3 class="text-lg font-semibold text-gray-700">History transaksi</h3>
+        <h3 class="text-2xl font-semibold text-gray-700">History transaksi</h3>
     </div>
 
     <div class="overflow-x-auto">
@@ -229,6 +229,50 @@
                     <td class="px-6 py-4 whitespace-nowrap">{{$transaksi->tanggal}}</td>
                     <td class="px-6 py-4 whitespace-nowrap">
                         <form action="{{ route('transaksi.destroy', $transaksi->id_transaksi) }}" 
+                              method="POST" class="inline-block delete-form">
+                            @csrf
+                            @method('DELETE')
+                            <button type="button" 
+                                    class="px-3 py-2 bg-red-500 hover:bg-red-600 text-white rounded-md delete-button">
+                                Delete
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Contact Section -->
+<div class="mt-6 p-6 rounded-lg shadow-md bg-white">
+    <div class="flex justify-between items-center mb-4">
+        <h2 class="text-2xl font-semibold text-gray-700">Contact</h2>
+        <a href="{{ route('contacts.create') }}" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+            <span class="mr-2">+</span> Add New Contact
+        </a>
+    </div>
+    <div class="overflow-x-auto">
+        <table class="datatable min-w-full divide-y divide-gray-200">
+            <thead class="bg-thead">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Name</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Email</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Message</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+                @foreach($contact as $item)
+                <tr>
+                    <td class="px-6 py-4 whitespace-nowrap">{{ $item->nama }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">{{ $item->email }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">{{ Str::limit($item->message, 50) }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <a href="{{ route('contacts.edit', $item->id) }}" 
+                           class="px-3 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-md">Edit</a>
+                        <form action="{{ route('contacts.destroy', $item->id) }}" 
                               method="POST" class="inline-block delete-form">
                             @csrf
                             @method('DELETE')

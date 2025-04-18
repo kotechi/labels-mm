@@ -1,5 +1,6 @@
 @extends('layouts.admin')
 
+@section('title','Modal')
 @section('content')
 <div class="container">
     <h1>Create Modal</h1>
@@ -16,7 +17,7 @@
         <div class="form-group">
             <label for="jumlah">Jumlah</label>
             <input type="number" class="form-control" id="jumlah" name="jumlah" required>
-        </div>
+        </div>  
         <button type="submit" class="btn btn-primary">Submit</button>
     </form>
 </div>

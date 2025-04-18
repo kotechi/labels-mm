@@ -13,7 +13,7 @@
 <!-- Data Bahan Section -->
 <div class="mt-6 p-6 rounded-lg shadow bg-white">
     <div class="flex justify-between items-center mb-4">
-        <h2 class="text-lg font-semibold text-gray-700">Daftar Bahan</h2>
+        <h2 class="text-2xl font-semibold text-gray-700">Daftar Bahan</h2>
         <a href="{{ route('admin.bahan.create') }}" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-600">
             <span class="mr-2">+</span>Buat Bahan Baru
         </a>
@@ -65,7 +65,7 @@
 <!-- Data Pengeluaran Section -->
 <div class="mt-6 p-6 rounded-lg shadow bg-white">
     <div class="flex justify-between items-center mb-4">
-        <h2 class="text-lg font-semibold text-gray-700">Daftar Pengeluaran</h2>
+        <h2 class="text-2xl font-semibold text-gray-700">Daftar Pengeluaran</h2>
         <a href="{{ route('admin.pengeluaran.create') }}" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-600">
             <span class="mr-2">+</span>Buat Pengeluaran Baru
         </a>
@@ -78,7 +78,7 @@
                     <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">ID</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Keterangan</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Nominal</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Created By</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Pelaku</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Actions</th>
                 </tr>
             </thead>

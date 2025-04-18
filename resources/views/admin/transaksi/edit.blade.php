@@ -1,5 +1,6 @@
 @extends('layouts.admin')
 
+@section('title','transaksi')
 @section('content')
 <div class="container mx-auto px-4 py-8">
     <h1 class="text-3xl font-bold text-gray-800 mb-8">Edit Transaksi</h1>

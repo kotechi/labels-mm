@@ -51,44 +51,45 @@
                 <!-- Row 1 -->
                 <div class="space-y-2">
                     <label for="nama_pemesan" class="block text-gray-700">Nama</label>
-                    <input type="text" name="nama_pemesan" id="nama_pemesan" 
+                    <input type="text" name="nama_pemesan" value="{{ old('nama_pemesan') }}" id="nama_pemesan" 
                         class="w-full p-2 border rounded-md" 
-                        placeholder="masukan nama" required>
+                        placeholder="masukan nama" >
                 </div>
                 <div class="space-y-2">
                     <label for="product_id" class="block text-gray-700">Model</label>
                     <select name="product_id" id="product_id" 
-                        class="w-full p-2 border rounded-md" required>
+                        class="w-full p-2 border rounded-md" >
                         <option value="">Pilih Model</option>
                         @foreach($products as $product)
                             <option value="{{ $product->id_product }}" 
                                 data-price="{{ $product->harga_jual }}"
                                 data-name="{{ $product->nama_produk }}"
-                                data-stock="{{ $product->stock_product }}">
+                                data-stock="{{ $product->stock_product }}"
+                                {{ old('product_id') == $product->id_product ? 'selected' : '' }}>
                                 {{ $product->nama_produk }} (Stok: {{ $product->stock_product }})
                             </option>
                         @endforeach
                     </select>
-                    <input type="hidden" name="nama_produk" id="nama_produk">
+                    <input type="hidden" name="nama_produk" id="nama_produk" value="{{ old('nama_produk') }}">
                     <div id="stock-message" class="text-sm text-red-600 hidden"></div>
                 </div>
 
                 <div class="space-y-2">
                     <label for="payment_method" class="block text-gray-700">Metode Pembayaran</label>
-                    <select name="payment_method" id="payment_method" class="w-full p-2 border rounded-md" required>
+                    <select name="payment_method" id="payment_method" class="w-full p-2 border rounded-md" >
                         <option value="">Pilih metode pembayaran</option>
-                        <option value="cash">Cash</option>
-                        <option value="midtrans" disabled>Online Payment (Midtrans)</option>
+                        <option value="cash" {{ old('payment_method') == 'cash' ? 'selected' : '' }}>Cash</option>
+                        <option value="midtrans" {{ old('payment_method') == 'midtrans' ? 'selected' : '' }}>Online Payment (Midtrans)</option>
                     </select>
                 </div>
 
                 <div class="space-y-2">
                     <label for="status_pesanan" class="block text-gray-700">Status Pesanan</label>
                     <select name="status_pesanan" id="status_pesanan" 
-                        class="w-full p-2 border rounded-md" required>
-                        <option value="proses">Proses</option>
-                        <option value="paid">Paid</option>
-                        <option value="completed">Completed</option>
+                        class="w-full p-2 border rounded-md" >
+                        <option value="proses" {{ old('status_pesanan', 'proses') == 'proses' ? 'selected' : '' }}>Proses</option>
+                        <option value="paid" {{ old('status_pesanan') == 'paid' ? 'selected' : '' }}>Paid</option>
+                        <option value="completed" {{ old('status_pesanan') == 'completed' ? 'selected' : '' }}>Completed</option>
                     </select>
                 </div>
 
@@ -98,13 +99,14 @@
                     <input type="text" id="total_harga_display" 
                         class="w-full p-2 border rounded-md" 
                         readonly>
-                    <input type="hidden" name="total_harga" id="total_harga">
+                    <input type="hidden" name="total_harga" id="total_harga" value="{{ old('total_harga') }}">
                 </div>
                 <div class="space-y-2">
                     <label for="no_telp_pemesan" class="block text-gray-700">Nomor telepon</label>
                     <input type="text" name="no_telp_pemesan" id="no_telp_pemesan" 
+                        value="{{ old('no_telp_pemesan') }}"
                         class="w-full p-2 border rounded-md" 
-                        placeholder="masukan nomor telepon" required>
+                        placeholder="masukan nomor telepon" >
                 </div>
 
                 <!-- Row 3 -->
@@ -114,7 +116,7 @@
                         <button type="button" class="px-3 py-1 border rounded" onclick="decrementQuantity()">-</button>
                         <input type="number" name="jumlah_produk" id="jumlah_produk" 
                             class="w-20 p-2 border rounded-md text-center" 
-                            value="1" min="1" required>
+                            value="{{ old('jumlah_produk', 1) }}" min="1" >
                         <button type="button" class="px-3 py-1 border rounded" onclick="incrementQuantity()">+</button>
                     </div>
                 </div>
@@ -123,14 +125,14 @@
                 <div class="space-y-2">
                     <label for="size_option" class="block text-gray-700">Pilihan Ukuran</label>
                     <select name="size_option" id="size_option" class="w-full p-2 border rounded-md">
-                        <option value="custom">Ukuran Kustom</option>
-                        <option value="S">Small (S)</option>
-                        <option value="M">Medium (M)</option>
-                        <option value="L">Large (L)</option>
-                        <option value="XL">Extra Large (XL)</option>
-                        <option value="2XL">2XL</option>
-                        <option value="3XL">3XL</option>
-                        <option value="4XL">4XL</option>
+                        <option value="custom" {{ old('size_option', 'custom') == 'custom' ? 'selected' : '' }}>Ukuran Kustom</option>
+                        <option value="S" {{ old('size_option') == 'S' ? 'selected' : '' }}>Small (S)</option>
+                        <option value="M" {{ old('size_option') == 'M' ? 'selected' : '' }}>Medium (M)</option>
+                        <option value="L" {{ old('size_option') == 'L' ? 'selected' : '' }}>Large (L)</option>
+                        <option value="XL" {{ old('size_option') == 'XL' ? 'selected' : '' }}>Extra Large (XL)</option>
+                        <option value="2XL" {{ old('size_option') == '2XL' ? 'selected' : '' }}>2XL</option>
+                        <option value="3XL" {{ old('size_option') == '3XL' ? 'selected' : '' }}>3XL</option>
+                        <option value="4XL" {{ old('size_option') == '4XL' ? 'selected' : '' }}>4XL</option>
                     </select>
                 </div>
 
@@ -145,75 +147,86 @@
                 <div class="space-y-2">
                     <label for="lingkar_badan" class="block text-gray-700">Lingkar Badan (cm)</label>
                     <input type="number" step="0.01" name="lingkar_badan" id="lingkar_badan" 
+                        value="{{ old('lingkar_badan') }}"
                         class="w-full p-2 border rounded-md" 
-                        placeholder="Contoh: 96" required>
+                        placeholder="Contoh: 96" >
                 </div>
                 <div class="space-y-2">
                     <label for="lingkar_pinggang" class="block text-gray-700">Lingkar pinggang (cm)</label>
                     <input type="number" step="0.01" name="lingkar_pinggang" id="lingkar_pinggang" 
+                        value="{{ old('lingkar_pinggang') }}"
                         class="w-full p-2 border rounded-md" 
-                        placeholder="Contoh: 80" required>
+                        placeholder="Contoh: 80" >
                 </div>
 
                 <div class="space-y-2">
                     <label for="lingkar_panggul" class="block text-gray-700">Lingkar pinggul (cm)</label>
                     <input type="number" step="0.01" name="lingkar_panggul" id="lingkar_panggul" 
+                        value="{{ old('lingkar_panggul') }}"
                         class="w-full p-2 border rounded-md" 
-                        placeholder="Contoh: 100" required>
+                        placeholder="Contoh: 100" >
                 </div>
                 <div class="space-y-2">
                     <label for="lebar_pundak" class="block text-gray-700">Lebar pundak (cm)</label>
                     <input type="number" step="0.01" name="lebar_pundak" id="lebar_pundak" 
+                        value="{{ old('lebar_pundak') }}"
                         class="w-full p-2 border rounded-md" 
-                        placeholder="Contoh: 42" required>
+                        placeholder="Contoh: 42" >
                 </div>
 
                 <div class="space-y-2">
                     <label for="panjang_lengan" class="block text-gray-700">Panjang lengan (cm)</label>
                     <input type="number" step="0.01" name="panjang_lengan" id="panjang_lengan" 
+                        value="{{ old('panjang_lengan') }}"
                         class="w-full p-2 border rounded-md" 
-                        placeholder="Contoh: 60" required>
+                        placeholder="Contoh: 60" >
                 </div>
                 <div class="space-y-2">
                     <label for="lingkar_kerung_lengan" class="block text-gray-700">Lingkar kerung lengan (cm)</label>
                     <input type="number" step="0.01" name="lingkar_kerung_lengan" id="lingkar_kerung_lengan" 
+                        value="{{ old('lingkar_kerung_lengan') }}"
                         class="w-full p-2 border rounded-md" 
-                        placeholder="Contoh: 45" required>
+                        placeholder="Contoh: 45" >
                 </div>
 
                 <div class="space-y-2">
                     <label for="lingkar_pergelangan_lengan" class="block text-gray-700">Lingkar pergelangan lengan (cm)</label>
                     <input type="number" step="0.01" name="lingkar_pergelangan_lengan" id="lingkar_pergelangan_lengan" 
+                        value="{{ old('lingkar_pergelangan_lengan') }}"
                         class="w-full p-2 border rounded-md" 
-                        placeholder="Contoh: 20" required>
+                        placeholder="Contoh: 20" >
                 </div>
                 <div class="space-y-2">
                     <label for="panjang_punggung" class="block text-gray-700">Panjang punggung (cm)</label>
                     <input type="number" step="0.01" name="panjang_punggung" id="panjang_punggung" 
+                        value="{{ old('panjang_punggung') }}"
                         class="w-full p-2 border rounded-md" 
-                        placeholder="Contoh: 40" required>
+                        placeholder="Contoh: 40" >
                 </div>
 
                 <div class="space-y-2">
                     <label for="lebar_punggung" class="block text-gray-700">Lebar punggung (cm)</label>
                     <input type="number" step="0.01" name="lebar_punggung" id="lebar_punggung" 
+                        value="{{ old('lebar_punggung') }}"
                         class="w-full p-2 border rounded-md" 
-                        placeholder="Contoh: 43" required>
+                        placeholder="Contoh: 43" >
                 </div>
                 <div class="space-y-2">
                     <label for="lebar_muka" class="block text-gray-700">Lebar muka (cm)</label>
                     <input type="number" step="0.01" name="lebar_muka" id="lebar_muka" 
+                        value="{{ old('lebar_muka') }}"
                         class="w-full p-2 border rounded-md" 
-                        placeholder="Contoh: 33" required>
+                        placeholder="Contoh: 33" >
                 </div>
                 <div class="space-y-2">
                     <label for="panjang_baju" class="block text-gray-700">Panjang Baju (cm)</label>
                     <input type="number" step="0.01" name="panjang_baju" id="panjang_baju" 
+                        value="{{ old('panjang_baju') }}"
                         class="w-full p-2 border rounded-md" 
-                        placeholder="Contoh: 70" required>
+                        placeholder="Contoh: 70" >
                 </div>
                 
-                <input type="hidden" name="status_pesanan" value="proses">
+                <input type="hidden" name="status_pesanan" value="{{ old('status_pesanan', 'proses') }}">
             </div>
 
             <div class="mt-6 flex justify-end space-x-2">
@@ -424,6 +437,13 @@
     document.addEventListener('DOMContentLoaded', function() {
         const productSelect = document.getElementById('product_id');
         const quantityInput = document.getElementById('jumlah_produk');
+        
+        // Initialize current stock from selected product (if any)
+        if (productSelect.selectedIndex > 0) {
+            const selectedOption = productSelect.options[productSelect.selectedIndex];
+            currentStock = parseInt(selectedOption.dataset.stock) || 0;
+            document.getElementById('nama_produk').value = selectedOption.dataset.name;
+        }
         
         productSelect.addEventListener('change', function() {
             updateTotal();

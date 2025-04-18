@@ -29,17 +29,19 @@
                 <div class="space-y-2">
                     <label for="product_id" class="block text-gray-700">Model</label>
                     <select name="product_id" id="product_id" 
-                        class="w-full p-2 border rounded-md" required>
-                        @foreach($products as $product)
-                            <option value="{{ $product->id_product }}" 
-                                data-price="{{ $product->harga_jual }}"
-                                data-name="{{ $product->nama_produk }}"
-                                {{ $pesanan->product_id == $product->id_product ? 'selected' : '' }}>
-                                {{ $product->nama_produk }}
-                            </option>
-                        @endforeach
-                    </select>
-                    <input type="hidden" name="nama_produk" id="nama_produk" value="{{ $pesanan->nama_produk }}">
+                    class="w-full p-2 border rounded-md" required>
+                    @foreach($products as $product)
+                        <option value="{{ $product->id_product }}" 
+                            data-price="{{ $product->harga_jual }}"
+                            data-name="{{ $product->nama_produk }}"
+                            data-stock="{{ $product->stock_product }}"
+                            {{ $pesanan->product_id == $product->id_product ? 'selected' : '' }}>
+                            {{ $product->nama_produk }} (Stok: {{ $product->stock_product }})
+                        </option>
+                    @endforeach
+                </select>
+                <input type="hidden" name="nama_produk" id="nama_produk" value="{{ $pesanan->nama_produk }}">
+                <div id="stock-message" class="text-sm text-red-600 hidden"></div>
                 </div>
 
                 <div class="space-y-2">
@@ -172,10 +174,19 @@
 </div>
 
 <script>
+    let currentStock = 0;
+    let originalQuantity = parseInt(document.getElementById('jumlah_produk').value) || 0;
+    let originalProductId = document.getElementById('product_id').value;
+
     function incrementQuantity() {
         const quantityInput = document.getElementById('jumlah_produk');
-        quantityInput.value = parseInt(quantityInput.value) + 1;
-        updateTotal();
+        const newValue = parseInt(quantityInput.value) + 1;
+        
+        // Check if we have enough stock for increment
+        if (checkStockAvailability(newValue)) {
+            quantityInput.value = newValue;
+            updateTotal();
+        }
     }
 
     function decrementQuantity() {
@@ -184,6 +195,80 @@
         if (currentValue > 1) {
             quantityInput.value = currentValue - 1;
             updateTotal();
+            updateStockMessage();
+        }
+    }
+    
+    function checkStockAvailability(requestedQuantity) {
+        const productSelect = document.getElementById('product_id');
+        const selectedId = productSelect.value;
+        
+        // If it's the same product as original order, we only need to check additional quantity
+        if (selectedId == originalProductId) {
+            // We only need to account for additional units beyond original order
+            const additionalQuantity = requestedQuantity - originalQuantity;
+            if (additionalQuantity > 0 && additionalQuantity > currentStock) {
+                return false;
+            }
+            return true;
+        } else {
+            // It's a different product, so we need to check the full quantity
+            return requestedQuantity <= currentStock;
+        }
+    }
+
+    function updateStockMessage() {
+        const quantityInput = document.getElementById('jumlah_produk');
+        const stockMessage = document.getElementById('stock-message');
+        const submitButton = document.querySelector('button[type="submit"]');
+        const productSelect = document.getElementById('product_id');
+        const selectedId = productSelect.value;
+        const quantity = parseInt(quantityInput.value) || 0;
+        
+        stockMessage.classList.remove('hidden');
+        
+        if (selectedId == originalProductId) {
+            // Same product as original order
+            const additionalQuantity = quantity - originalQuantity;
+            
+            if (additionalQuantity > 0) {
+                // Need additional stock
+                if (additionalQuantity > currentStock) {
+                    stockMessage.textContent = `Stok tidak cukup (sisa: ${currentStock})`;
+                    stockMessage.classList.add('text-red-600');
+                    stockMessage.classList.remove('text-green-600');
+                    submitButton.disabled = true;
+                    submitButton.classList.add('opacity-50', 'cursor-not-allowed');
+                } else {
+                    stockMessage.textContent = `Stok tersedia: ${currentStock}`;
+                    stockMessage.classList.add('text-green-600');
+                    stockMessage.classList.remove('text-red-600');
+                    submitButton.disabled = false;
+                    submitButton.classList.remove('opacity-50', 'cursor-not-allowed');
+                }
+            } else {
+                // Reducing quantity, always allowed
+                stockMessage.textContent = `Stok tersedia: ${currentStock}`;
+                stockMessage.classList.add('text-green-600');
+                stockMessage.classList.remove('text-red-600');
+                submitButton.disabled = false;
+                submitButton.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+        } else {
+            // Different product
+            if (quantity > currentStock) {
+                stockMessage.textContent = `Stok tidak cukup (sisa: ${currentStock})`;
+                stockMessage.classList.add('text-red-600');
+                stockMessage.classList.remove('text-green-600');
+                submitButton.disabled = true;
+                submitButton.classList.add('opacity-50', 'cursor-not-allowed');
+            } else {
+                stockMessage.textContent = `Stok tersedia: ${currentStock}`;
+                stockMessage.classList.add('text-green-600');
+                stockMessage.classList.remove('text-red-600');
+                submitButton.disabled = false;
+                submitButton.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
         }
     }
 
@@ -198,19 +283,27 @@
         const total = price * quantity;
         totalPriceDisplay.value = 'Rp ' + total.toLocaleString('id-ID');
         totalPriceInput.value = total;
+        updateStockMessage();
     }
 
     document.addEventListener('DOMContentLoaded', function() {
         const productSelect = document.getElementById('product_id');
         const quantityInput = document.getElementById('jumlah_produk');
         
+        // Initialize with the current selected product's stock
+        const selectedOption = productSelect.options[productSelect.selectedIndex];
+        currentStock = parseInt(selectedOption.dataset.stock) || 0;
+        
         productSelect.addEventListener('change', function() {
             const selectedOption = this.options[this.selectedIndex];
             document.getElementById('nama_produk').value = selectedOption.dataset.name;
+            currentStock = parseInt(selectedOption.dataset.stock) || 0;
             updateTotal();
         });
         
-        quantityInput.addEventListener('input', updateTotal);
+        quantityInput.addEventListener('input', function() {
+            updateTotal();
+        });
         
         // Initial calculation
         updateTotal();

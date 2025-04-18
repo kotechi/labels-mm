@@ -166,95 +166,170 @@ class KaryawanPesananController extends Controller
     
         $pesanan = Pesanan::findOrFail($id);
         
-        // Mengabaikan created_by dari request
-        $input = $request->except('created_by');
+        // Begin transaction
+        DB::beginTransaction();
         
-        // Check if total_harga or jumlah_produk has changed
-        if ($pesanan->total_harga != $input['total_harga'] || $pesanan->jumlah_produk != $input['jumlah_produk']) {
-            // Create transaction tracking
-            $transaction = new tbl_transaksi();
-            $transaction->id_referens = $pesanan->id_pesanan;
-            $transaction->pelaku_transaksi = $pesanan->created_by;
-            $transaction->keterangan = sprintf(
-                'Order updated for Order #%d - %s (Qty: %d)', 
-                $pesanan->id_pesanan,
-                $pesanan->nama_produk,
-                $input['jumlah_produk']
-            );
-            $transaction->nominal = intval($input['total_harga']); // Convert to integer if stored as string
-            $transaction->kategori = 'pemasukan';
-            $transaction->tanggal = now();
-            $transaction->save();
-
-            // Update associated pemasukan
-            $pemasukan = Pemasukan::where('id_referensi', $pesanan->id_pesanan)->first();
-            if ($pemasukan) {
-                $pemasukan->nominal = intval($input['total_harga']); // Convert to integer if stored as string
-                $pemasukan->save();
+        try {
+            // Check stock if product changes or quantity increases
+            if ($pesanan->product_id != $request->product_id || 
+                ($pesanan->product_id == $request->product_id && $pesanan->jumlah_produk < $request->jumlah_produk)) {
+                
+                $product = Product::findOrFail($request->product_id);
+                $additionalQuantity = 0;
+                
+                if ($pesanan->product_id == $request->product_id) {
+                    // Same product, calculate additional quantity
+                    $additionalQuantity = $request->jumlah_produk - $pesanan->jumlah_produk;
+                } else {
+                    // Different product, need full quantity
+                    $additionalQuantity = $request->jumlah_produk;
+                }
+                
+                // Check if enough stock is available
+                if ($product->stock_product < $additionalQuantity) {
+                    DB::rollBack();
+                    return redirect()->back()->with('error', 'Stok produk tidak mencukupi');
+                }
+                
+                // If changing product, return original quantity to old product
+                if ($pesanan->product_id != $request->product_id) {
+                    $oldProduct = Product::findOrFail($pesanan->product_id);
+                    $oldProduct->stock_product += $pesanan->jumlah_produk;
+                    $oldProduct->save();
+                    
+                    // Reduce stock from new product
+                    $product->stock_product -= $request->jumlah_produk;
+                    $product->save();
+                } else {
+                    // Same product, just adjust the difference
+                    $product->stock_product -= $additionalQuantity;
+                    $product->save();
+                }
+            } elseif ($pesanan->product_id == $request->product_id && $pesanan->jumlah_produk > $request->jumlah_produk) {
+                // Returning some items to stock
+                $product = Product::findOrFail($request->product_id);
+                $returnedQuantity = $pesanan->jumlah_produk - $request->jumlah_produk;
+                $product->stock_product += $returnedQuantity;
+                $product->save();
             }
-        }
-        $pesanan->update($input);
-
-        // Remove pemasukan if status is changed to 'proses'
-        if ($pesanan->status_pesanan === 'proses') {
-            Pemasukan::where('id_referensi', $pesanan->id_pesanan)->delete();
-        } else {
-            // Add to pemasukan and transaksi if status is paid or completed
-            if (in_array($pesanan->status_pesanan, ['paid', 'completed'])) {
-                tbl_transaksi::create([
-                    'id_referens' => $pesanan->id_pesanan,
-                    'pelaku_transaksi' => $pesanan->created_by,
-                    'keterangan' => "Order updated for Order #{$pesanan->id_pesanan} - {$pesanan->nama_produk} (Qty: {$pesanan->jumlah_produk})",
-                    'nominal' => $pesanan->total_harga,
-                    'kategori' => 'pemasukan',
-                    'tanggal' => now(),
-                ]);
-
+            
+            // Mengabaikan created_by dari request
+            $input = $request->except('created_by');
+            
+            // Check if total_harga or jumlah_produk has changed
+            if ($pesanan->total_harga != $input['total_harga'] || $pesanan->jumlah_produk != $input['jumlah_produk']) {
+                // Create transaction tracking
+                $transaction = new tbl_transaksi();
+                $transaction->id_referens = $pesanan->id_pesanan;
+                $transaction->pelaku_transaksi = $pesanan->created_by;
+                $transaction->keterangan = sprintf(
+                    'Order updated for Order #%d - %s (Qty: %d)', 
+                    $pesanan->id_pesanan,
+                    $pesanan->nama_produk,
+                    $input['jumlah_produk']
+                );
+                $transaction->nominal = intval($input['total_harga']); // Convert to integer if stored as string
+                $transaction->kategori = 'pemasukan';
+                $transaction->tanggal = now();
+                $transaction->save();
+    
+                // Update associated pemasukan
                 $pemasukan = Pemasukan::where('id_referensi', $pesanan->id_pesanan)->first();
                 if ($pemasukan) {
-                    $pemasukan->nominal = $pesanan->total_harga;
+                    $pemasukan->nominal = intval($input['total_harga']); // Convert to integer if stored as string
                     $pemasukan->save();
-                } else {
-                    Pemasukan::create([
-                        'id_referensi' => $pesanan->id_pesanan,
-                        'keterangan' => "Payment received for Order #{$pesanan->id_pesanan} - {$pesanan->nama_produk} (Qty: {$pesanan->jumlah_produk})",
-                        'nominal' => $pesanan->total_harga,
-                        'created_by' => $pesanan->created_by,
-                        'created_at' => now(),
-                    ]);
                 }
             }
-        }
+            $pesanan->update($input);
     
-        return redirect()->route('karyawan.pesanans.index')
-            ->with('success', 'Pesanan updated successfully');
+            // Remove pemasukan if status is changed to 'proses'
+            if ($pesanan->status_pesanan === 'proses') {
+                Pemasukan::where('id_referensi', $pesanan->id_pesanan)->delete();
+            } else {
+                // Add to pemasukan and transaksi if status is paid or completed
+                if (in_array($pesanan->status_pesanan, ['paid', 'completed'])) {
+                    tbl_transaksi::create([
+                        'id_referens' => $pesanan->id_pesanan,
+                        'pelaku_transaksi' => $pesanan->created_by,
+                        'keterangan' => "Order updated for Order #{$pesanan->id_pesanan} - {$pesanan->nama_produk} (Qty: {$pesanan->jumlah_produk})",
+                        'nominal' => $pesanan->total_harga,
+                        'kategori' => 'pemasukan',
+                        'tanggal' => now(),
+                    ]);
+    
+                    $pemasukan = Pemasukan::where('id_referensi', $pesanan->id_pesanan)->first();
+                    if ($pemasukan) {
+                        $pemasukan->nominal = $pesanan->total_harga;
+                        $pemasukan->save();
+                    } else {
+                        Pemasukan::create([
+                            'id_referensi' => $pesanan->id_pesanan,
+                            'keterangan' => "Payment received for Order #{$pesanan->id_pesanan} - {$pesanan->nama_produk} (Qty: {$pesanan->jumlah_produk})",
+                            'nominal' => $pesanan->total_harga,
+                            'created_by' => $pesanan->created_by,
+                            'created_at' => now(),
+                        ]);
+                    }
+                }
+            }
+            
+            DB::commit();
+            return redirect()->route('karyawan.pesanans.index')
+                ->with('success', 'Pesanan updated successfully');
+                
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Error updating order: ' . $e->getMessage());
+        }
     }
 
     public function destroy($id)
     {
-        $pesanan = Pesanan::findOrFail($id);
-        $pesanan->delete();
-
-        return redirect()->route('karyawan.pesanans.index')->with('success', 'Pesanan deleted successfully.');
-    }
-
-    public function destroyWithPemasukan($id)
-    {
+        // Begin transaction
+        DB::beginTransaction();
+        
         try {
-            DB::beginTransaction();
-
             $pesanan = Pesanan::findOrFail($id);
-            Pemasukan::where('id_referensi', $pesanan->id_pesanan)->delete();
+            
+            // Return the product stock
+            $product = Product::findOrFail($pesanan->product_id);
+            $product->stock_product += $pesanan->jumlah_produk;
+            $product->save();
+            
+            // Delete the order
             $pesanan->delete();
-
+            
             DB::commit();
-            return redirect()->route('karyawan.pesanans.index')->with('success', 'Pesanan and associated pemasukan deleted successfully.');
+            return redirect()->route('karyawan.pesanans.index')->with('success', 'Pesanan deleted successfully and stock returned.');
         } catch (\Exception $e) {
             DB::rollBack();
             return redirect()->route('karyawan.pesanans.index')->with('error', 'Failed to delete pesanan: ' . $e->getMessage());
         }
     }
-
+    
+    public function destroyWithPemasukan($id)
+    {
+        try {
+            DB::beginTransaction();
+    
+            $pesanan = Pesanan::findOrFail($id);
+            
+            // Return the product stock
+            $product = Product::findOrFail($pesanan->product_id);
+            $product->stock_product += $pesanan->jumlah_produk;
+            $product->save();
+            
+            // Delete related records
+            Pemasukan::where('id_referensi', $pesanan->id_pesanan)->delete();
+            $pesanan->delete();
+    
+            DB::commit();
+            return redirect()->route('karyawan.pesanans.index')->with('success', 'Pesanan and associated pemasukan deleted successfully. Stock has been returned.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->route('karyawan.pesanans.index')->with('error', 'Failed to delete pesanan: ' . $e->getMessage());
+        }
+    }
     public function markAsPaid($id)
     {
         try {
