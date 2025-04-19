@@ -158,7 +158,7 @@
             <thead class="bg-thead">
                 <tr>
                     <th  h class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">ID Pesanan</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">User</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Nama</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">jumlah</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Product</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Status</th>
@@ -223,7 +223,7 @@
                 <tr data-kategori="{{ strtolower($transaksi->kategori) }}">
                     <td class="px-6 py-4 whitespace-nowrap">{{ $no_transaksi }}</td>
                     <td class="px-6 py-4 whitespace-nowrap">{{ $transaksi->kategori }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap">{{ $transaksi->user->nama_lengkap }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">{{ $transaksi->user ? $transaksi->user->nama_lengkap : 'Null' }}</td>
                     <td class="px-6 py-4 whitespace-nowrap">{{ $transaksi->keterangan }}</td>
                     <td class="px-6 py-4 whitespace-nowrap">Rp. {{ number_format($transaksi->nominal ?? 0, 0, ',', '.') }}</td>
                     <td class="px-6 py-4 whitespace-nowrap">{{$transaksi->tanggal}}</td>

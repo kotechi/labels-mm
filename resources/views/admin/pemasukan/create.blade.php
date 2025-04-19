@@ -27,6 +27,8 @@
             </div>
             <input type="hidden" name="created_by" value="{{ auth()->user()->id }}">
             <div class="flex justify-end">
+                
+                <a onclick="history.back()" class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-700">Kembali</a>
                 <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg">Create</button>
             </div>
         </form>

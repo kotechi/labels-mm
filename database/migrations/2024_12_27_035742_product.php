@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id('id_product');
             $table->string('nama_produk');
             $table->text('description')->nullable();
-            $table->decimal('harga_jual', 8, 2);
+            $table->decimal('harga_jual', 20, 2);
             $table->integer('stock_product')->default(0);
             $table->string('image');
             $table->timestamps();

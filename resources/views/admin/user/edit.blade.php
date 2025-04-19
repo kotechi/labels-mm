@@ -4,7 +4,7 @@
 @section('content')
 <div class="p-5 rounded-lg shadow bg-white">
     <div class="flex justify-between items-center">
-        <u class="font-extrabold text-3xl">Admin | Edit User</u>
+        <u class="font-extrabold text-3xl">Admin | Edit {{ $user->username }}</u>
     </div>
 </div>
 <div class="bg-white shadow-md border mt-6">
@@ -77,6 +77,7 @@
             </div>
 
             <div class="flex justify-end">
+                <a onclick="history.back()" class="mr-3 px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-700">Kembali</a>
                 <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg">Update</button>
             </div>
         </form>

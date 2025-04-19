@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id("id_pengeluaran");
             $table->string("id_modal")->nullable();
             $table->string("keterangan");
-            $table->integer("nominal_pengeluaran");
+            $table->decimal("nominal_pengeluaran", 20, 2);
             $table->integer("created_by");
             $table->timestamps();
         });

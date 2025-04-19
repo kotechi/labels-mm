@@ -41,7 +41,7 @@
                 <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->nama_produk }}" class="h-32 w-32 object-cover rounded-lg mt-2">
             </div>
             <div class="flex justify-end">
-                <a href="{{ route('karyawan.gallery.index') }}" class="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg">Cancel</a>
+                <a onclick="history.back()" class="mr-3 px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-700">Kembali</a>
                 <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg">Update</button>
             </div>
         </form>

@@ -14,7 +14,7 @@
         </div>
     </div>
     <div class="p-6 mt-2">
-        <form action="{{ route('admin.bahan.update', $bahan->id_bhn) }}" method="POST">
+        <form action="{{ route('admin.bahan.update', $bahan->id_bhn) }}" method="POST" id="bahanForm">
             @csrf
             @method('PATCH')
             <div class="mb-4">
@@ -27,15 +27,27 @@
             </div>
             <div class="mb-4">
                 <label for="harga_satuan" class="block text-lg font-medium text-gray-700">Harga Satuan</label>
-                <input type="text" name="harga_satuan" id="harga_satuan" value="{{ number_format($bahan->harga_satuan, 0, ',', '.') }}" class="p-3 block w-full border rounded-md" required oninput="formatRupiah(this); calculateTotal()">
-                <input type="hidden" name="harga_satuan" id="harga_satuan_hidden" value="{{ $bahan->harga_satuan }}">
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-700">Rp</span>
+                    <input type="text" name="harga_satuan" id="harga_satuan" 
+                           value="{{ number_format($bahan->harga_satuan, 0, ',', '.') }}" 
+                           class="p-3 block w-full border rounded-md pl-10" 
+                           required oninput="formatRupiah(this, 'harga_satuan_hidden'); calculateTotal()">
+                    <input type="hidden" name="harga_satuan" id="harga_satuan_hidden" value="{{ $bahan->harga_satuan }}">
+                </div>
             </div>
             <div class="mb-4">
                 <label for="total_harga" class="block text-lg font-medium text-gray-700">Total Harga</label>
-                <input type="text" name="total_harga" id="total_harga" value="{{ number_format($bahan->total_harga, 0, ',', '.') }}" class="p-3 block w-full border rounded-md" readonly>
-                <input type="hidden" name="total_harga" id="total_harga_hidden" value="{{ $bahan->total_harga }}">
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-700">Rp</span>
+                    <input type="text" name="total_harga" id="total_harga" 
+                           value="{{ number_format($bahan->total_harga, 0, ',', '.') }}" 
+                           class="p-3 block w-full border rounded-md pl-10 bg-gray-100" readonly>
+                    <input type="hidden" name="total_harga" id="total_harga_hidden" value="{{ $bahan->total_harga }}">
+                </div>
             </div>
             <div class="flex justify-end">
+                <a onclick="history.back()" class="mr-3 px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-700">Kembali</a>
                 <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg">Update</button>
             </div>
         </form>
@@ -43,18 +55,55 @@
 </div>
 
 <script>
-    function formatRupiah(element) {
-        let value = element.value.replace(/\D/g, '');
-        element.value = new Intl.NumberFormat('id-ID', { style: 'decimal', maximumFractionDigits: 0 }).format(value);
-        document.getElementById(element.id + '_hidden').value = value;
+    document.getElementById('bahanForm').addEventListener('submit', function() {
+        // Format harga satuan sebelum submit
+        const hargaSatuan = document.getElementById('harga_satuan');
+        hargaSatuan.value = hargaSatuan.value.replace(/[^0-9]/g, '');
+        
+        // Format total harga sebelum submit
+        const totalHarga = document.getElementById('total_harga');
+        totalHarga.value = totalHarga.value.replace(/[^0-9]/g, '');
+    });
+
+    function formatRupiah(element, hiddenId) {
+        // Hapus semua karakter selain angka
+        let value = element.value.replace(/[^0-9]/g, '');
+        
+        // Simpan nilai asli ke hidden input
+        document.getElementById(hiddenId).value = value;
+        
+        // Format tampilan dengan "Rp" dan titik sebagai pemisah ribuan
+        if(value.length > 0) {
+            element.value =  new Intl.NumberFormat('id-ID').format(value);
+        } else {
+            element.value = '';
+        }
     }
 
     function calculateTotal() {
         const jumlahBahan = document.getElementById('jumlah_bahan').value;
         const hargaSatuan = document.getElementById('harga_satuan_hidden').value;
-        const totalHarga = jumlahBahan * hargaSatuan;
-        document.getElementById('total_harga').value = new Intl.NumberFormat('id-ID', { style: 'decimal', maximumFractionDigits: 0 }).format(totalHarga);
-        document.getElementById('total_harga_hidden').value = totalHarga;
+        
+        if(jumlahBahan && hargaSatuan) {
+            const totalHarga = jumlahBahan * hargaSatuan;
+            document.getElementById('total_harga').value = 'Rp ' + new Intl.NumberFormat('id-ID').format(totalHarga);
+            document.getElementById('total_harga_hidden').value = totalHarga;
+        }
     }
+
+    // Format awal saat halaman dimuat
+    window.onload = function() {
+        const hargaSatuan = document.getElementById('harga_satuan');
+        if(hargaSatuan.value) {
+            let value = hargaSatuan.value.replace(/[^0-9]/g, '');
+            hargaSatuan.value =  new Intl.NumberFormat('id-ID').format(value);
+        }
+        
+        const totalHarga = document.getElementById('total_harga');
+        if(totalHarga.value) {
+            let value = totalHarga.value.replace(/[^0-9]/g, '');
+            totalHarga.value =  new Intl.NumberFormat('id-ID').format(value);
+        }
+    };
 </script>
 @endsection

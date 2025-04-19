@@ -149,7 +149,7 @@
 
     aside {
         transition: width 0.3s ease-in-out;
-        overflow: hidden;
+        overflow: visible !important;
         width: 220px; /* Set fixed initial width */
     }
     
@@ -275,7 +275,16 @@
     }
 
     .sidebar-notification {
-        transition: all 0.3s ease;
+        position: absolute;
+        right: 4px;
+        top: -4px;
+        min-width: 20px;
+        height: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 4px;
+        z-index: 10; /* Pastikan lebih tinggi dari elemen lain */
     }
     
     main.sidebar-collapsed {
@@ -284,6 +293,7 @@
 
     aside.collapsed .sidebar-notification {
         transform: scale(0.5);
+        right: 10px;
     }
 
     /* Sidebar tooltip position adjustments when collapsed */
@@ -296,6 +306,98 @@
     aside.collapsed:hover .sidebar-notification {
         right: 4px;
         transform: scale(1);
+    }
+
+    /* Add this to your CSS */
+    aside:not(.collapsed) li:hover div[class*="absolute left-full"] {
+        display: block !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+    }
+
+    /* Make sure the tooltip has proper z-index */
+    aside li div[class*="absolute left-full"] {
+        z-index: 100;
+        transition: all 0.3s ease;
+        opacity: 0;
+        visibility: hidden;
+        display: none;
+    }
+
+    aside li:hover div[class*="absolute left-full"] {
+        opacity: 1;
+        visibility: visible;
+        display: block;
+    }
+
+    /* Tooltip styling for both collapsed and expanded states */
+    aside li .absolute.left-full {
+        left: 100%;
+        top: 0;
+        margin-left: 8px;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+    }
+
+    aside li:hover .absolute.left-full {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    /* Specific adjustments for collapsed state */
+    aside.collapsed li .absolute.left-full {
+        left: 4rem;
+    }
+
+    aside.collapsed:hover li .absolute.left-full {
+        left: 100%;
+    }
+
+    .tooltip {
+        position: absolute;
+        left: 100%;
+        top: 50%;
+        transform: translateY(-50%);
+        margin-left: 12px;
+        background: #1f2937;
+        color: white;
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 14px;
+        white-space: nowrap;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.2s ease;
+        z-index: 100;
+        pointer-events: none;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    /* Tooltip arrow */
+    aside li .tooltip::after {
+        content: '';
+        position: absolute;
+        right: 100%;
+        top: 50%;
+        transform: translateY(-50%);
+        border-width: 5px;
+        border-style: solid;
+        border-color: transparent #1f2937 transparent transparent;
+    }
+
+    aside li:hover .tooltip {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    /* Adjust for collapsed sidebar */
+    aside.collapsed li .tooltip {
+        left: calc(4rem + 12px);
+    }
+
+    aside.collapsed:hover li .tooltip {
+        left: 100%;
     }
 </style>
 <body class="min-h-screen font-sans bg-gray-100">
@@ -336,20 +438,18 @@
                         </a>
                     </li>
                     <li class="mb-4 flex items-center relative">
-                        <a href="{{ route('products') }}" class="flex items-center text-gray-900 hover:text-gray-700 group">
+                        <a href="{{ route('products') }}" class="flex items-center text-gray-900 hover:text-gray-700">
                             <i class="w-7 h-7" data-lucide="image"></i>
                             <span class="ml-2 text-lg font-semibold sidebar-text">Model</span>
                             @if(isset($outOfStockCount) && $outOfStockCount > 0)
                                 <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center sidebar-notification">
                                     {{ $outOfStockCount }}
                                 </span>
+                                <div class="tooltip">
+                                    {{ $outOfStockCount }} model habis stok!
+                                </div>
                             @endif
                         </a>
-                        @if(isset($outOfStockCount) && $outOfStockCount > 0)
-                            <div class="absolute left-full ml-2 bg-gray-800 text-white text-xs py-1 px-2 rounded whitespace-nowrap z-50  group-hover:opacity-100 group-hover:visible transition-all duration-300">
-                                {{ $outOfStockCount }} produk habis stok!
-                            </div>
-                        @endif
                     </li>
                     <li class="mb-4 flex items-center">
                         <a href="{{ route('users.index') }}" class="flex items-center text-gray-900 hover:text-gray-700">

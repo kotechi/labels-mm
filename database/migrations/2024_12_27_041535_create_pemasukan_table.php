@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id('id_pemasukan');
             $table->integer('id_referensi')->nullable();
             $table->string('keterangan');
-            $table->integer('nominal');
+            $table->decimal('nominal', 20, 2);
             $table->string('created_by');
             $table->timestamps();
         });

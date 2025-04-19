@@ -14,7 +14,7 @@ return new class extends Migration
             $table->integer('pelaku_transaksi');
             $table->string('keterangan');
             $table->string('kategori');
-            $table->integer('nominal');
+            $table->decimal('nominal', 20, 2);
             $table->date('tanggal');
             $table->timestamps();
         });

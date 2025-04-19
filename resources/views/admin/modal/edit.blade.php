@@ -18,6 +18,7 @@
             <label for="jumlah">Jumlah</label>
             <input type="number" class="form-control" id="jumlah" name="jumlah" value="{{ $modal->jumlah }}" required>
         </div>
+        <a onclick="history.back()" class="mr-3 px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-700">Kembali</a>
         <button type="submit" class="btn btn-primary">Update</button>
     </form>
 </div>

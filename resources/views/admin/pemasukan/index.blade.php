@@ -64,7 +64,7 @@
                         $no_pesanan = 1;    
                     ?>
                     @foreach($pesanans as $pesanan)
-                        <tr data-href="{{ route('pesanans.detail', $pesanan->id_pesanan) }}" class="cursor-pointer hover:bg-gray-50">
+                    <tr class="cursor-pointer hover:bg-gray-50">
                         <td class="px-6 py-4 whitespace-nowrap">{{ $no_pesanan++ }}</td>
                         <td class="px-6 py-4 whitespace-nowrap">{{ $pesanan->nama_pemesan }}</td>
                         <td class="px-6 py-4 whitespace-nowrap">{{ $pesanan->nama_produk }}</td>    
@@ -75,7 +75,7 @@
                             @if($pesanan->status_pesanan == 'proses')
                                 <form action="{{ route('pesanans.markAsPaid', $pesanan->id_pesanan) }}" method="POST" class="inline-block">
                                     @csrf
-                                    <button type="submit" class="px-3 py-2 bg-green-500 hover:bg-green-600 text-white rounded-md mark-as-paid-button"> sudah bayar</button>
+                                    <button type="submit" class="px-3 py-2 bg-yellow-500 hover:bg-yello-600 text-white rounded-md mark-as-paid-button"> sudah bayar</button>
                                 </form>
                             @elseif($pesanan->status_pesanan == 'paid')
                                 <form action="{{ route('pesanans.markAsCompleted', $pesanan->id_pesanan) }}" method="POST" class="inline-block">
@@ -87,6 +87,7 @@
                             @endif
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
+                            <a href="{{ route('pesanans.detail', $pesanan->id_pesanan) }}" class="p-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md"><i data-lucide="view" class="w-6 h-6 inline "></i></a>
                             <a href="{{ route('pesanans.edit', $pesanan->id_pesanan) }}" class="px-3 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-md">Edit</a>
                             <form action="{{ route('pesanans.destroyWithPemasukan', $pesanan->id_pesanan) }}" method="POST" class="inline-block delete-form">
                                 @csrf
@@ -129,7 +130,7 @@
                         <td class="px-6 py-4 whitespace-nowrap">{{ $no_pemasukan++ }}</td>
                         <td class="px-6 py-4 whitespace-nowrap">{{ $pemasukan->keterangan }}</td>
                         <td class="px-6 py-4 whitespace-nowrap">Rp {{ number_format($pemasukan->nominal ?? 0, 0, ',', '.') }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap">{{ $pemasukan->user->username }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">{{$pemasukan->user ? $pemasukan->user->nama_lengkap : 'Unknown'}}</td>
                         <td class="px-6 py-4 whitespace-nowrap">{{ $pemasukan->created_at }}</td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <form action="{{ route('pemasukan.destroy', $pemasukan->id_pemasukan) }}" method="POST" class="inline-block delete-form">

@@ -91,8 +91,12 @@
                     <td class="px-6 py-4 whitespace-nowrap">{{ $no_pengeluaran++ }}</td>
                     <td class="px-6 py-4 whitespace-nowrap">{{ $pengeluaran->keterangan }}</td>
                     <td class="px-6 py-4 whitespace-nowrap">Rp {{ number_format($pengeluaran->nominal_pengeluaran, 0, ',', '.') }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap">{{ $pengeluaran->user->username }}</td>
                     <td class="px-6 py-4 whitespace-nowrap">
+                        {{ $pengeluaran->user ? $pengeluaran->user->nama_lengkap : 'Unknown' }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <a href="{{ route('admin.pengeluaran.edit', $pengeluaran->id_pengeluaran) }}" 
+                            class="px-3 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-md">Edit</a>
                         <form action="{{ route('admin.pengeluaran.destroy', $pengeluaran->id_pengeluaran) }}" 
                               method="POST" class="inline-block delete-form">
                             @csrf
@@ -110,13 +114,11 @@
     </div>
 </div>
 
-
 @endsection
 
 @push('scripts')
 <script>
     $(document).ready(function() {
-
         // SweetAlert for delete confirmation
         $('.delete-button').on('click', function() {
             var form = $(this).closest('form');

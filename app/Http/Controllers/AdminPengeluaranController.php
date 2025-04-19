@@ -36,6 +36,7 @@ class AdminPengeluaranController extends Controller
 
     public function edit(Pengeluaran $pengeluaran)
     {
+        $pengeluaran = Pengeluaran::findOrFail($pengeluaran->id_pengeluaran);
         return view('admin.pengeluaran.edit', compact('pengeluaran'));
     }
 

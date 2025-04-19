@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id('id_bhn');
             $table->string('nama_bahan');
             $table->integer('jumlah_bahan');
-            $table->integer('harga_satuan');
-            $table->integer('total_harga'); // changed from subtotal to total_harga
+            $table->decimal('harga_satuan', 10, 2);
+            $table->decimal('total_harga', 10, 2); // changed from subtotal to total_harga
             $table->timestamps();
         });
     }

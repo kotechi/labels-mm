@@ -28,6 +28,7 @@
             <input type="date" name="tanggal" id="tanggal" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" value="{{ $transaksi->tanggal }}" required>
         </div>
         <div class="flex justify-end">
+            <a onclick="history.back()" class="mr-3 px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-700">Kembali</a>
             <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg">Update</button>
         </div>
     </form>

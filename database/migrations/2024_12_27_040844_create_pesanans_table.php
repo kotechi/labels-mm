@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('no_telp_pemesan');
             $table->string('nama_produk');
             $table->integer('jumlah_produk');
-            $table->string('total_harga');
+            $table->decimal('total_harga', 20, 2);
             $table->string('payment_method');
             $table->integer('created_by');
             $table->string('status_pesanan');
