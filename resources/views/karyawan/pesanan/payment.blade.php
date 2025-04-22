@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+@extends('layouts.karyawan')
 
 @section('title', 'Pembayaran Pesanan')
 
@@ -53,7 +53,7 @@
             
             <!-- Tombol Kembali -->
             <div class="p-4 flex justify-center">
-                <a href="{{ route('pesanans.index') }}" class="px-4 py-2 bg-gray-500 text-white rounded-md flex items-center shadow-lg">
+                <a href="{{ route('karyawan.pesanans.index') }}" class="px-4 py-2 bg-gray-500 text-white rounded-md flex items-center shadow-lg">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
                     </svg>
@@ -64,25 +64,23 @@
     </div>
 </div>
 
-@endsection
-@push('scripts')
 <script type="text/javascript" src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="{{ config('midtrans.client_key') }}"></script>
 <script type="text/javascript">
     window.snapToken = "{{ $snapToken }}";
     
     window.snap.pay(window.snapToken, {
         onSuccess: function(result) {
-            window.location.href = "{{ route('pesanans.index') }}?status=success";
+            window.location.href = "{{ route('karyawan.pesanans.index') }}?status=success";
         },
         onPending: function(result) {
-            window.location.href = "{{ route('pesanans.index') }}?status=pending";
+            window.location.href = "{{ route('karyawan.pesanans.index') }}?status=pending";
         },
         onError: function(result) {
-            window.location.href = "{{ route('pesanans.index') }}?status=error";
+            window.location.href = "{{ route('karyawan.pesanans.index') }}?status=error";
         },
         onClose: function() {
-            window.location.href = "{{ route('pesanans.index') }}?status=close";
+            window.location.href = "{{ route('karyawan.pesanans.index') }}?status=close";
         }
     });
 </script>
-@endpush
+@endsection

@@ -23,6 +23,55 @@
     body {
         font-family: 'Poppins', sans-serif;
     }
+
+    {{-- main content style --}}
+    main {
+        transition: padding-left 0.3s ease-in-out;
+    }
+
+    {{-- loading screen styles --}}
+    #loading-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(255, 255, 255, 0.9);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+        transition: opacity 0.5s ease-out;
+    }
+    
+    .loading-spinner {
+        text-align: center;
+    }
+    
+    .spinner {
+        border: 5px solid #f3f3f3;
+        border-top: 5px solid #3498db;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 15px;
+    }
+    
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    {{-- validation form message --}}
+    .text-red-500 {
+        transition: opacity 0.5s ease-out;
+    }
+    .text-red-500.hide {
+        opacity: 0;
+    }
+
+    {{-- DataTables styles --}}
     .dataTables_wrapper .dataTables_filter {
         margin-bottom: 16px;
     }
@@ -150,7 +199,7 @@
     aside {
         transition: width 0.3s ease-in-out;
         overflow: visible !important;
-        width: 220px; /* Set fixed initial width */
+        width: 220px; 
     }
     
     aside.collapsed {
@@ -183,26 +232,25 @@
 
     aside.collapsed nav ul li {
         justify-content: center;
-        padding-left: 0 !important; /* Force no padding when collapsed */
+        padding-left: 0 !important; 
     }
     
     aside.collapsed nav ul li i {
-        margin-right: 0 !important; /* Force no margin when collapsed */
+        margin-right: 0 !important; 
     }
 
     aside.collapsed nav ul li a {
-        margin-left: 0 !important; /* Force no margin when collapsed */
+        margin-left: 0 !important; 
         justify-content: center !important;
     }
 
     aside.collapsed .mt-auto form {
         justify-content: center;
-        padding-left: 0 !important; /* Force no padding when collapsed */
+        padding-left: 0 !important;
     }
     
-    /* Hover state for collapsed sidebar */
     aside.collapsed:hover {
-        width: 220px !important; /* Same as original width */
+        width: 220px !important; 
     }
 
     aside.collapsed:hover .sidebar-text {
@@ -212,7 +260,7 @@
     aside.collapsed:hover .sidebar-logo img {
         width: auto;
         height: auto;
-        margin: 0; /* Reset margin on hover */
+        margin: 0; 
     }
 
     aside.collapsed:hover nav ul li {
@@ -220,7 +268,7 @@
     }
 
     aside.collapsed:hover nav ul li i {
-        margin-right: 0.5rem !important; /* Same as original */
+        margin-right: 0.5rem !important; 
     }
 
     aside.collapsed:hover nav ul li a {
@@ -232,9 +280,6 @@
         justify-content: flex-start;
     }
 
-
-    
-    /* Toggle button */
     #sidebar-toggle {
         position: absolute;
         top: 1rem;
@@ -259,7 +304,6 @@
         color: #1f2937;
     }
     
-    /* Animation for toggle icon */
     #sidebar-toggle svg {
         transition: transform 0.3s ease;
     }
@@ -269,10 +313,7 @@
     }
     
 
-    /* Adjust main content based on sidebar state */
-    main {
-        transition: padding-left 0.3s ease-in-out;
-    }
+
 
     .sidebar-notification {
         position: absolute;
@@ -284,7 +325,7 @@
         align-items: center;
         justify-content: center;
         padding: 0 4px;
-        z-index: 10; /* Pastikan lebih tinggi dari elemen lain */
+        z-index: 10; 
     }
     
     main.sidebar-collapsed {
@@ -296,26 +337,22 @@
         right: 10px;
     }
 
-    /* Sidebar tooltip position adjustments when collapsed */
     aside.collapsed li:hover div[class*="absolute left-full"] {
         left: 4rem;
         top: 0;
     }
 
-    /* Fix sidebar notification position when sidebar is expanded after hover */
     aside.collapsed:hover .sidebar-notification {
         right: 4px;
         transform: scale(1);
     }
 
-    /* Add this to your CSS */
     aside:not(.collapsed) li:hover div[class*="absolute left-full"] {
         display: block !important;
         opacity: 1 !important;
         visibility: visible !important;
     }
 
-    /* Make sure the tooltip has proper z-index */
     aside li div[class*="absolute left-full"] {
         z-index: 100;
         transition: all 0.3s ease;
@@ -330,7 +367,6 @@
         display: block;
     }
 
-    /* Tooltip styling for both collapsed and expanded states */
     aside li .absolute.left-full {
         left: 100%;
         top: 0;
@@ -345,7 +381,6 @@
         visibility: visible;
     }
 
-    /* Specific adjustments for collapsed state */
     aside.collapsed li .absolute.left-full {
         left: 4rem;
     }
@@ -391,7 +426,6 @@
         visibility: visible;
     }
 
-    /* Adjust for collapsed sidebar */
     aside.collapsed li .tooltip {
         left: calc(4rem + 12px);
     }
@@ -401,6 +435,13 @@
     }
 </style>
 <body class="min-h-screen font-sans bg-gray-100">
+    <!-- Loading Screen -->
+<div id="loading-screen">
+    <div class="loading-spinner">
+        <div class="spinner"></div>
+        <p>Loading...</p>
+    </div>
+</div>
     <div class="flex min-h-screen">
         <!-- Sidebar -->
         <aside class="fixed top-0 left-0 h-screen w-48 lg:w-[220px] p-6 bg-white shadow-lg flex z-50 flex-col">
@@ -611,6 +652,31 @@
         }
     </script>
     @endif
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Sembunyikan loading screen saat halaman selesai dimuat
+            const loadingScreen = document.getElementById('loading-screen');
+            
+            // Tambahkan delay kecil untuk memastikan semua aset dimuat
+            setTimeout(function() {
+                loadingScreen.style.opacity = '0';
+                setTimeout(function() {
+                    loadingScreen.style.display = 'none';
+                }, 500); // Waktu sesuai dengan durasi transisi CSS
+            }, 300);
+        });
+        
+        // Tampilkan loading saat navigasi halaman
+        document.addEventListener('click', function(e) {
+            // Periksa jika yang diklik adalah link halaman internal
+            const target = e.target.closest('a');
+            if (target && target.href && target.href.startsWith(window.location.origin) && !target.hasAttribute('data-no-loading')) {
+                const loadingScreen = document.getElementById('loading-screen');
+                loadingScreen.style.display = 'flex';
+                loadingScreen.style.opacity = '1';
+            }
+        });
+    </script>
 
     @stack('scripts')
 </body>

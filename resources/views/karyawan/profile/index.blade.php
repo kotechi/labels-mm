@@ -5,7 +5,7 @@
 @section('content')
 <div class="p-5 rounded-lg shadow bg-white">
     <div class="flex justify-between items-center">
-        <u class="font-extrabold text-3xl" >Karyawan | Profile</u>
+        <u class="font-extrabold text-3xl" >{{$user->username}} | Karyawan</u>
     </div>
 </div>
 

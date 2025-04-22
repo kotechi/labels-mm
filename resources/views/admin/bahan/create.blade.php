@@ -82,6 +82,32 @@
                 @endif
             </div>
             
+            <!-- Period Days Field -->
+            <div class="mb-4">
+                <label for="periode_hari" class="block text-lg font-medium text-gray-700">Periode Hari</label>
+                <input type="number" name="periode_hari" id="periode_hari" 
+                       value="{{ old('periode_hari', 1) }}" 
+                       min="1"
+                       placeholder="masukan jumlah hari" 
+                       class="p-3 block w-full border rounded-md @if($errors->has('periode_hari')) border-red-500 @endif" 
+                       required oninput="calculateDailyAmount()">
+                @if($errors->has('periode_hari'))
+                    <span class="text-red-500 text-sm">{{ $errors->first('periode_hari') }}</span>
+                @endif
+            </div>
+            
+            <!-- Daily Amount Preview -->
+            <div class="mb-4">
+                <label for="nominal_per_hari_display" class="block text-lg font-medium text-gray-700">Nominal Per Hari</label>
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-700">Rp</span>
+                    <input type="text" name="nominal_per_hari_display" id="nominal_per_hari_display" 
+                           value="{{ old('nominal_per_hari_display', '0') }}" 
+                           class="p-3 block w-full border rounded-md pl-10 bg-gray-100" readonly>
+                    <input type="hidden" name="nominal_per_hari" id="nominal_per_hari" value="{{ old('nominal_per_hari', 0) }}">
+                </div>
+            </div>
+            
             <input type="hidden" name="id_user" value="{{ auth()->user()->id }}">
             
             <div class="flex justify-end">
@@ -106,6 +132,9 @@
         if(hargaSatuan.value && document.getElementById('jumlah_bahan').value) {
             calculateTotal();
         }
+        
+        // Calculate daily amount on page load
+        calculateDailyAmount();
     });
 
     document.getElementById('bahanForm').addEventListener('submit', function(e) {
@@ -125,13 +154,18 @@
         if(totalHargaDisplay.value) {
             totalHarga.value = totalHargaDisplay.value.replace(/[^0-9]/g, '');
         }
+        
+        // Format nominal per hari sebelum submit
+        const nominalPerHariDisplay = document.getElementById('nominal_per_hari_display');
+        const nominalPerHari = document.getElementById('nominal_per_hari');
+        
+        if(nominalPerHariDisplay.value) {
+            nominalPerHari.value = nominalPerHariDisplay.value.replace(/[^0-9]/g, '');
+        }
     });
 
     function formatRupiah(element, targetId) {
-
         let value = element.value.replace(/[^0-9]/g, '');
-        
-
         document.getElementById(targetId).value = value;
         
         if(value.length > 0) {
@@ -142,8 +176,8 @@
     }
 
     function calculateTotal() {
-        const jumlahBahan = document.getElementById('jumlah_bahan').value;
-        const hargaSatuan = document.getElementById('harga_satuan').value;
+        const jumlahBahan = document.getElementById('jumlah_bahan').value || 0;
+        const hargaSatuan = document.getElementById('harga_satuan').value || 0;
         
         if(jumlahBahan && hargaSatuan) {
             const totalHarga = jumlahBahan * hargaSatuan;
@@ -152,6 +186,23 @@
         } else {
             document.getElementById('total_harga_display').value = '0';
             document.getElementById('total_harga').value = '0';
+        }
+        
+        // Always recalculate daily amount when total changes
+        calculateDailyAmount();
+    }
+    
+    function calculateDailyAmount() {
+        const totalHarga = parseInt(document.getElementById('total_harga').value) || 0;
+        const periodeHari = parseInt(document.getElementById('periode_hari').value) || 1;
+        
+        if(totalHarga && periodeHari && periodeHari > 0) {
+            const nominalPerHari = Math.floor(totalHarga / periodeHari);
+            document.getElementById('nominal_per_hari_display').value = new Intl.NumberFormat('id-ID').format(nominalPerHari);
+            document.getElementById('nominal_per_hari').value = nominalPerHari;
+        } else {
+            document.getElementById('nominal_per_hari_display').value = '0';
+            document.getElementById('nominal_per_hari').value = '0';
         }
     }
 </script>

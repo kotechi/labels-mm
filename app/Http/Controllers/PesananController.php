@@ -13,7 +13,6 @@ use App\Services\MidtransService;
 
 class PesananController extends Controller
 {
-    /** midtrans controller pesanan  **/
     protected $midtransService;
 
     public function __construct(MidtransService $midtransService)
@@ -35,7 +34,6 @@ class PesananController extends Controller
                     $pesanan->status_pesanan = 'paid';
                     $pesanan->save();
                     
-                    // Create transaction record
                     $transaction = new tbl_transaksi();
                     $transaction->id_referens = $pesanan->id_pesanan;
                     $transaction->pelaku_transaksi = $pesanan->created_by;
@@ -51,17 +49,11 @@ class PesananController extends Controller
         return response()->json(['status' => 'OK']);
     }
 
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         return redirect()->route('pemasukan.index');
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         $products = Product::all();
@@ -76,24 +68,23 @@ class PesananController extends Controller
             'nama_pemesan' => 'required|string|max:255',
             'status_pesanan' => 'required|string|in:proses,paid,completed',
             'total_harga' => 'required|numeric',
-            'jumlah_produk' => 'required|numeric',
+            'jumlah_produk' => 'required|numeric|min:1',
             'no_telp_pemesan' => 'required|string|max:15',
             'payment_method' => 'required|string|max:255',
-            'lebar_muka' => 'nullable|numeric',
-            'lebar_pundak' => 'nullable|numeric',
-            'lebar_punggung' => 'nullable|numeric',
-            'panjang_lengan' => 'nullable|numeric',
-            'panjang_punggung' => 'nullable|numeric',
-            'panjang_baju' => 'nullable|numeric',
-            'lingkar_badan' => 'nullable|numeric',
-            'lingkar_pinggang' => 'nullable|numeric',
-            'lingkar_panggul' => 'nullable|numeric',
-            'lingkar_kerung_lengan' => 'nullable|numeric',
-            'lingkar_pergelangan_lengan' => 'nullable|numeric',
+            'lebar_muka' => 'required|numeric',
+            'lebar_pundak' => 'required|numeric',
+            'lebar_punggung' => 'required|numeric',
+            'panjang_lengan' => 'required|numeric',
+            'panjang_punggung' => 'required|numeric',
+            'panjang_baju' => 'required|numeric',
+            'lingkar_badan' => 'required|numeric',
+            'lingkar_pinggang' => 'required|numeric',
+            'lingkar_panggul' => 'required|numeric',
+            'lingkar_kerung_lengan' => 'required|numeric',
+            'lingkar_pergelangan_lengan' => 'required|numeric',
             'jumlah_pembayaran' => 'nullable|numeric',
         ]);
 
-        // Begin transaction to ensure data consistency
         DB::beginTransaction();
         
         try {
@@ -101,21 +92,17 @@ class PesananController extends Controller
                 'created_by' => auth()->user()->id_users
             ]);
 
-            // Create the order
             $pesanan = Pesanan::create($request->all());
 
-            // Update product stock
             $product = Product::findOrFail($request->product_id);
             if ($product->stock_product < $request->jumlah_produk) {
                 DB::rollBack();
                 return redirect()->back()->with('error', 'Stok produk tidak mencukupi');
             }
             
-            // Decrease product stock
             $product->stock_product -= $request->jumlah_produk;
             $product->save();
 
-            // Add to pemasukan and transaksi if status is paid or completed
             if (in_array($pesanan->status_pesanan, ['paid', 'completed'])) {
                 tbl_transaksi::create([
                     'id_referens' => $pesanan->id_pesanan,
@@ -147,12 +134,10 @@ class PesananController extends Controller
                 return redirect()->back()->with('error', 'Gagal membuat transaksi pembayaran');
             }
             
-            // For cash payments, fetch the product and show receipt
             $product = Product::findOrFail($request->product_id);
             
-            // If this is a cash payment, return receipt view
             if ($request->payment_method === 'cash') {
-                return view('admin.pesanan.resi', compact('pesanan', 'product'))->with('success', 'berhasil membuat pesanan');
+                return view('admin.pesanan.detail', compact('pesanan', 'product'))->with('success', 'berhasil membuat pesanan');
             }
 
             return redirect()->route('pemasukan.index')->with('success', 'Pesanan created successfully');
@@ -162,7 +147,6 @@ class PesananController extends Controller
         }
     }
 
-    // PesananController.php
     public function generateQRCode(Request $request)
     {
         $amount = $request->amount;
@@ -220,14 +204,11 @@ public function update(Request $request, $id)
 
     $pesanan = Pesanan::findOrFail($id);
     
-    // Get the currently authenticated user (who is performing the update)
     $currentUser = auth()->user()->id_users;
     
-    // Begin transaction
     DB::beginTransaction();
     
     try {
-        // Check stock if product changes or quantity increases
         if ($pesanan->product_id != $request->product_id || 
             ($pesanan->product_id == $request->product_id && $pesanan->jumlah_produk < $request->jumlah_produk)) {
             
@@ -240,20 +221,16 @@ public function update(Request $request, $id)
             $additionalQuantity = 0;
             
             if ($pesanan->product_id == $request->product_id) {
-                // Same product, calculate additional quantity
                 $additionalQuantity = $request->jumlah_produk - $pesanan->jumlah_produk;
             } else {
-                // Different product, need full quantity
                 $additionalQuantity = $request->jumlah_produk;
             }
             
-            // Check if enough stock is available
             if ($product->stock_product < $additionalQuantity) {
                 DB::rollBack();
                 return redirect()->back()->with('error', 'Stok produk tidak mencukupi');
             }
             
-            // If changing product, return original quantity to old product if it exists
             if ($pesanan->product_id != $request->product_id) {
                 $oldProduct = Product::find($pesanan->product_id);
                 if ($oldProduct) {
@@ -261,16 +238,13 @@ public function update(Request $request, $id)
                     $oldProduct->save();
                 }
                 
-                // Reduce stock from new product
                 $product->stock_product -= $request->jumlah_produk;
                 $product->save();
             } else {
-                // Same product, just adjust the difference
                 $product->stock_product -= $additionalQuantity;
                 $product->save();
             }
         } elseif ($pesanan->product_id == $request->product_id && $pesanan->jumlah_produk > $request->jumlah_produk) {
-            // Returning some items to stock if product still exists
             $product = Product::find($request->product_id);
             if ($product) {
                 $returnedQuantity = $pesanan->jumlah_produk - $request->jumlah_produk;
@@ -279,12 +253,9 @@ public function update(Request $request, $id)
             }
         }
         
-        // Mengabaikan created_by dari request
         $input = $request->except('created_by');
         
-        // Check if total_harga or jumlah_produk has changed
         if ($pesanan->total_harga != $input['total_harga'] || $pesanan->jumlah_produk != $input['jumlah_produk']) {
-            // Create transaction tracking
             $transaction = new tbl_transaksi();
             $transaction->id_referens = $pesanan->id_pesanan;
             $transaction->pelaku_transaksi = $currentUser; // Menggunakan user yang sedang login
@@ -299,7 +270,6 @@ public function update(Request $request, $id)
             $transaction->tanggal = now();
             $transaction->save();
 
-            // Update associated pemasukan
             $pemasukan = Pemasukan::where('id_referensi', $pesanan->id_pesanan)->first();
             if ($pemasukan) {
                 $pemasukan->nominal = intval($input['total_harga']); // Convert to integer if stored as string
@@ -310,11 +280,9 @@ public function update(Request $request, $id)
         
         $pesanan->update($input);
 
-        // Remove pemasukan if status is changed to 'proses'
         if ($pesanan->status_pesanan === 'proses') {
             Pemasukan::where('id_referensi', $pesanan->id_pesanan)->delete();
         } else {
-            // Add to pemasukan and transaksi if status is paid or completed
             if (in_array($pesanan->status_pesanan, ['paid', 'completed'])) {
                 tbl_transaksi::create([
                     'id_referens' => $pesanan->id_pesanan,
@@ -360,10 +328,8 @@ public function update(Request $request, $id)
             $pesanan = Pesanan::findOrFail($id);
             $pesanan->update(['status_pesanan' => 'paid']);
     
-            // Use the currently authenticated user instead of the order creator
             $currentUserId = auth()->user()->id_users;
     
-            // Create transaction with the current user as the actor
             $transaction = new tbl_transaksi();
             $transaction->id_referens = $pesanan->id_pesanan;
             $transaction->pelaku_transaksi = $currentUserId; // Changed from $pesanan->created_by
@@ -378,7 +344,6 @@ public function update(Request $request, $id)
             $transaction->tanggal = now();
             $transaction->save();
     
-            // Insert into pemasukan table with the current user
             $pemasukan = new Pemasukan();
             $pemasukan->id_referensi = $pesanan->id_pesanan;
             $pemasukan->keterangan = sprintf(
@@ -434,18 +399,15 @@ public function update(Request $request, $id)
 
     public function destroy($id)
     {
-        // Begin transaction
         DB::beginTransaction();
         
         try {
             $pesanan = Pesanan::findOrFail($id);
             
-            // Return the product stock
             $product = Product::findOrFail($pesanan->product_id);
             $product->stock_product += $pesanan->jumlah_produk;
             $product->save();
             
-            // Delete the order
             $pesanan->delete();
             
             DB::commit();
@@ -463,13 +425,11 @@ public function update(Request $request, $id)
         try {
             $pesanan = Pesanan::findOrFail($id);
             
-            // Hanya kembalikan stok jika produk masih ada
             if ($product = Product::find($pesanan->product_id)) {
                 $product->stock_product += $pesanan->jumlah_produk;
                 $product->save();
             }
             
-            // Hapus pemasukan terkait
             Pemasukan::where('id_referensi', $pesanan->id_pesanan)->delete();
             $pesanan->delete();
     

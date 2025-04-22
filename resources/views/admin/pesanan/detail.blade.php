@@ -132,7 +132,7 @@
                 cetak resi <i class="w-5 h-5" data-lucide="notepad-text"></i>
             </button>
             @endif
-            <a href="{{ url()->previous() }}">kembali</a>
+            <a href="{{ route('pemasukan.index')}}">kembali</a>
         </div>
     </div>
 </div>
@@ -234,6 +234,10 @@
     </div>
 </div>
 
+
+@endsection
+
+@push('scripts')
 <!-- Script untuk download resi sebagai gambar dan handling modal -->
 <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 <!-- Add this style section to your existing styles or adjust your current @media print section -->
@@ -360,4 +364,4 @@
         });
     });
 </script>
-@endsection
+@endpush

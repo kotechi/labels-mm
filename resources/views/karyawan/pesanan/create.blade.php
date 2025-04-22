@@ -1,5 +1,6 @@
 @extends('layouts.karyawan')
 
+@section('title', 'pesanan')
 @section('content')
 <div class="p-5 rounded-lg shadow bg-white">
     <div class="flex justify-between items-center">
@@ -46,7 +47,7 @@
                     <select name="payment_method" id="payment_method" class="w-full p-2 border rounded-md" required>
                         <option value="">Pilih metode pembayaran</option>
                         <option value="cash">Cash</option>
-                        <option value="midtrans" disabled>Online Payment (Midtrans)</option>
+                        <option value="midtrans">Online Payment (Midtrans)</option>
                     </select>
                 </div>
 

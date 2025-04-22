@@ -24,11 +24,11 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\CompanyProfileController;
 
 
+Route::get('/',[RouteController::class, 'index'])->name('home');
 Route::middleware('auth')->group(function () {
     Route::post('payments/midtrans-callback', [PesananController::class, 'handleCallback'])->name('midtrans.callback');
 
     Route::get('/report/pdf', [ReportController::class, 'generatePDF'])->name('report.pdf');
-    Route::get('/',[RouteController::class, 'index'])->name('home');
 
 
     Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');

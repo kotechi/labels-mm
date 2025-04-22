@@ -2,22 +2,67 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\Request;
 use App\Models\Pesanan;
 use App\Models\tbl_transaksi;
 use App\Models\Pemasukan;
 use App\Models\Product;
 use App\Models\User;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Services\MidtransService;
 
 class KaryawanPesananController extends Controller
 {
+    /** midtrans controller pesanan  **/
+    protected $midtransService;
+
+    public function __construct(MidtransService $midtransService)
+    {
+        $this->midtransService = $midtransService;
+    }
+
+    public function handleCallback(Request $request)
+    {
+        $serverKey = config('midtrans.server_key');
+        $hashed = hash("sha512", $request->order_id . $request->status_code . $request->gross_amount . $serverKey);
+        
+        if ($hashed == $request->signature_key) {
+            if ($request->transaction_status == 'capture' || $request->transaction_status == 'settlement') {
+                $orderId = explode('-', $request->order_id)[1];
+                $pesanan = Pesanan::find($orderId);
+                
+                if ($pesanan) {
+                    $pesanan->status_pesanan = 'paid';
+                    $pesanan->save();
+                    
+                    // Create transaction record
+                    $transaction = new tbl_transaksi();
+                    $transaction->id_referens = $pesanan->id_pesanan;
+                    $transaction->pelaku_transaksi = $pesanan->created_by;
+                    $transaction->keterangan = 'Payment received via Midtrans';
+                    $transaction->nominal = $pesanan->total_harga;
+                    $transaction->kategori = 'pemasukan';
+                    $transaction->tanggal = now();
+                    $transaction->save();
+                }
+            }
+        }
+        
+        return response()->json(['status' => 'OK']);
+    }
+
+    /**
+     * Display a listing of the resource.
+     */
     public function index()
     {
         $pesanans = Pesanan::all();
         return view('karyawan.pesanan.index', compact('pesanans'));
     }
 
+    /**
+     * Show the form for creating a new resource.
+     */
     public function create()
     {
         $products = Product::all();
@@ -111,11 +156,21 @@ class KaryawanPesananController extends Controller
                 return view('karyawan.pesanan.resi', compact('pesanan', 'product'))->with('success', 'berhasil membuat pesanan');
             }
 
-            return redirect()->route('pemasukan.index')->with('success', 'Pesanan created successfully');
+            return redirect()->route('karyawan.pesanans.index')->with('success', 'Pesanan created successfully');
         } catch (\Exception $e) {
             DB::rollBack();
             return redirect()->back()->with('error', 'Error creating order: ' . $e->getMessage());
         }
+    }
+
+    // PesananController.php
+    public function generateQRCode(Request $request)
+    {
+        $amount = $request->amount;
+
+        return response()->json([
+            'qr_string' => $qrString 
+        ]);
     }
 
     public function edit($id)
@@ -130,8 +185,8 @@ class KaryawanPesananController extends Controller
     {
         $pesanan = Pesanan::findOrFail($id);
         $users = User::all();
-        $products = Product::all();
-        return view('karyawan.pesanan.detail', compact('pesanan', 'users', 'products'));
+        $product = Product::findOrFail($pesanan->product_id);
+        return view('karyawan.pesanan.detail', compact('pesanan', 'users', 'product'));
     }
 
     public function resi($id) {
@@ -163,8 +218,11 @@ class KaryawanPesananController extends Controller
             'lingkar_kerung_lengan' => 'nullable|numeric',
             'lingkar_pergelangan_lengan' => 'nullable|numeric',
         ]);
-    
+
         $pesanan = Pesanan::findOrFail($id);
+        
+        // Get the currently authenticated user (who is performing the update)
+        $currentUser = auth()->user()->id_users;
         
         // Begin transaction
         DB::beginTransaction();
@@ -174,7 +232,12 @@ class KaryawanPesananController extends Controller
             if ($pesanan->product_id != $request->product_id || 
                 ($pesanan->product_id == $request->product_id && $pesanan->jumlah_produk < $request->jumlah_produk)) {
                 
-                $product = Product::findOrFail($request->product_id);
+                $product = Product::find($request->product_id);
+                if (!$product) {
+                    DB::rollBack();
+                    return redirect()->back()->with('error', 'Produk tidak ditemukan');
+                }
+                
                 $additionalQuantity = 0;
                 
                 if ($pesanan->product_id == $request->product_id) {
@@ -191,11 +254,13 @@ class KaryawanPesananController extends Controller
                     return redirect()->back()->with('error', 'Stok produk tidak mencukupi');
                 }
                 
-                // If changing product, return original quantity to old product
+                // If changing product, return original quantity to old product if it exists
                 if ($pesanan->product_id != $request->product_id) {
-                    $oldProduct = Product::findOrFail($pesanan->product_id);
-                    $oldProduct->stock_product += $pesanan->jumlah_produk;
-                    $oldProduct->save();
+                    $oldProduct = Product::find($pesanan->product_id);
+                    if ($oldProduct) {
+                        $oldProduct->stock_product += $pesanan->jumlah_produk;
+                        $oldProduct->save();
+                    }
                     
                     // Reduce stock from new product
                     $product->stock_product -= $request->jumlah_produk;
@@ -206,11 +271,13 @@ class KaryawanPesananController extends Controller
                     $product->save();
                 }
             } elseif ($pesanan->product_id == $request->product_id && $pesanan->jumlah_produk > $request->jumlah_produk) {
-                // Returning some items to stock
-                $product = Product::findOrFail($request->product_id);
-                $returnedQuantity = $pesanan->jumlah_produk - $request->jumlah_produk;
-                $product->stock_product += $returnedQuantity;
-                $product->save();
+                // Returning some items to stock if product still exists
+                $product = Product::find($request->product_id);
+                if ($product) {
+                    $returnedQuantity = $pesanan->jumlah_produk - $request->jumlah_produk;
+                    $product->stock_product += $returnedQuantity;
+                    $product->save();
+                }
             }
             
             // Mengabaikan created_by dari request
@@ -221,7 +288,7 @@ class KaryawanPesananController extends Controller
                 // Create transaction tracking
                 $transaction = new tbl_transaksi();
                 $transaction->id_referens = $pesanan->id_pesanan;
-                $transaction->pelaku_transaksi = $pesanan->created_by;
+                $transaction->pelaku_transaksi = $currentUser; // Menggunakan user yang sedang login
                 $transaction->keterangan = sprintf(
                     'Order updated for Order #%d - %s (Qty: %d)', 
                     $pesanan->id_pesanan,
@@ -232,16 +299,18 @@ class KaryawanPesananController extends Controller
                 $transaction->kategori = 'pemasukan';
                 $transaction->tanggal = now();
                 $transaction->save();
-    
+
                 // Update associated pemasukan
                 $pemasukan = Pemasukan::where('id_referensi', $pesanan->id_pesanan)->first();
                 if ($pemasukan) {
                     $pemasukan->nominal = intval($input['total_harga']); // Convert to integer if stored as string
+                    $pemasukan->created_by = $currentUser; // Update dengan user yang sedang login
                     $pemasukan->save();
                 }
             }
+            
             $pesanan->update($input);
-    
+
             // Remove pemasukan if status is changed to 'proses'
             if ($pesanan->status_pesanan === 'proses') {
                 Pemasukan::where('id_referensi', $pesanan->id_pesanan)->delete();
@@ -250,23 +319,24 @@ class KaryawanPesananController extends Controller
                 if (in_array($pesanan->status_pesanan, ['paid', 'completed'])) {
                     tbl_transaksi::create([
                         'id_referens' => $pesanan->id_pesanan,
-                        'pelaku_transaksi' => $pesanan->created_by,
+                        'pelaku_transaksi' => $currentUser, // Menggunakan user yang sedang login
                         'keterangan' => "Order updated for Order #{$pesanan->id_pesanan} - {$pesanan->nama_produk} (Qty: {$pesanan->jumlah_produk})",
                         'nominal' => $pesanan->total_harga,
                         'kategori' => 'pemasukan',
                         'tanggal' => now(),
                     ]);
-    
+
                     $pemasukan = Pemasukan::where('id_referensi', $pesanan->id_pesanan)->first();
                     if ($pemasukan) {
                         $pemasukan->nominal = $pesanan->total_harga;
+                        $pemasukan->created_by = $currentUser; // Update dengan user yang sedang login
                         $pemasukan->save();
                     } else {
                         Pemasukan::create([
                             'id_referensi' => $pesanan->id_pesanan,
                             'keterangan' => "Payment received for Order #{$pesanan->id_pesanan} - {$pesanan->nama_produk} (Qty: {$pesanan->jumlah_produk})",
                             'nominal' => $pesanan->total_harga,
-                            'created_by' => $pesanan->created_by,
+                            'created_by' => $currentUser, // Menggunakan user yang sedang login
                             'created_at' => now(),
                         ]);
                     }
@@ -280,6 +350,86 @@ class KaryawanPesananController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             return redirect()->back()->with('error', 'Error updating order: ' . $e->getMessage());
+        }
+    }
+
+    public function markAsPaid($id)
+    {
+        try {
+            DB::beginTransaction();
+    
+            $pesanan = Pesanan::findOrFail($id);
+            $pesanan->update(['status_pesanan' => 'paid']);
+    
+            // Use the currently authenticated user instead of the order creator
+            $currentUserId = auth()->user()->id_users;
+    
+            // Create transaction with the current user as the actor
+            $transaction = new tbl_transaksi();
+            $transaction->id_referens = $pesanan->id_pesanan;
+            $transaction->pelaku_transaksi = $currentUserId; // Changed from $pesanan->created_by
+            $transaction->keterangan = sprintf(
+                'Payment received for Order #%d - %s (Qty: %d)', 
+                $pesanan->id_pesanan,
+                $pesanan->nama_produk,
+                $pesanan->jumlah_produk
+            );
+            $transaction->nominal = intval($pesanan->total_harga);
+            $transaction->kategori = 'pemasukan';
+            $transaction->tanggal = now();
+            $transaction->save();
+    
+            // Insert into pemasukan table with the current user
+            $pemasukan = new Pemasukan();
+            $pemasukan->id_referensi = $pesanan->id_pesanan;
+            $pemasukan->keterangan = sprintf(
+                'Payment received for Order #%d - %s (Qty: %d)', 
+                $pesanan->id_pesanan,
+                $pesanan->nama_produk,
+                $pesanan->jumlah_produk
+            );
+            $pemasukan->nominal = intval($pesanan->total_harga);
+            $pemasukan->created_by = $currentUserId; // Changed from $pesanan->created_by
+            $pemasukan->created_at = now();
+            $pemasukan->save();
+    
+            DB::commit();
+    
+            return redirect()->route('karyawan.pesanans.index')
+                ->with('success', 'Order marked as paid and transaction recorded successfully.');
+    
+        } catch (\Exception $e) {
+            DB::rollBack();
+            
+            return redirect()->route('karyawan.pesanans.index')
+                ->with('error', 'Failed to process payment: ' . $e->getMessage());
+        }
+    }
+
+    public function markAsCompleted($id)
+    {
+        try {
+            DB::beginTransaction();
+
+            $pesanan = Pesanan::findOrFail($id);
+            
+            // Only allow completing if status is 'paid'
+            if ($pesanan->status_pesanan !== 'paid') {
+                return redirect()->route('karyawan.pesanans.index')
+                    ->with('error', 'Invalid status transition. Order must be paid first.');
+            }
+
+            $pesanan->update(['status_pesanan' => 'completed']);
+
+            DB::commit();
+
+            return redirect()->route('karyawan.pesanans.index')
+                ->with('success', 'Order marked as completed successfully.');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->route('karyawan.pesanans.index')
+                ->with('error', 'Failed to complete order: ' . $e->getMessage());
         }
     }
 
@@ -306,80 +456,33 @@ class KaryawanPesananController extends Controller
             return redirect()->route('karyawan.pesanans.index')->with('error', 'Failed to delete pesanan: ' . $e->getMessage());
         }
     }
-    
+
     public function destroyWithPemasukan($id)
     {
-        try {
-            DB::beginTransaction();
+        DB::beginTransaction();
     
+        try {
             $pesanan = Pesanan::findOrFail($id);
             
-            // Return the product stock
-            $product = Product::findOrFail($pesanan->product_id);
-            $product->stock_product += $pesanan->jumlah_produk;
-            $product->save();
+            // Hanya kembalikan stok jika produk masih ada
+            if ($product = Product::find($pesanan->product_id)) {
+                $product->stock_product += $pesanan->jumlah_produk;
+                $product->save();
+            }
             
-            // Delete related records
+            // Hapus pemasukan terkait
             Pemasukan::where('id_referensi', $pesanan->id_pesanan)->delete();
             $pesanan->delete();
     
             DB::commit();
-            return redirect()->route('karyawan.pesanans.index')->with('success', 'Pesanan and associated pemasukan deleted successfully. Stock has been returned.');
+    
+            return redirect()->route('karyawan.pesanans.index')
+                ->with('success', 'Pesanan dan pemasukan terkait berhasil dihapus');
+    
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->route('karyawan.pesanans.index')->with('error', 'Failed to delete pesanan: ' . $e->getMessage());
-        }
-    }
-    public function markAsPaid($id)
-    {
-        try {
-            DB::beginTransaction();
-
-            $pesanan = Pesanan::findOrFail($id);
-            $pesanan->update(['status_pesanan' => 'paid']);
-
-            tbl_transaksi::create([
-                'id_referens' => $pesanan->id_pesanan,
-                'pelaku_transaksi' => $pesanan->created_by,
-                'keterangan' => "Payment received for Order #{$pesanan->id_pesanan} - {$pesanan->nama_produk} (Qty: {$pesanan->jumlah_produk})",
-                'nominal' => $pesanan->total_harga,
-                'kategori' => 'pemasukan',
-                'tanggal' => now(),
-            ]);
-
-            Pemasukan::create([
-                'id_referensi' => $pesanan->id_pesanan,
-                'keterangan' => "Payment received for Order #{$pesanan->id_pesanan} - {$pesanan->nama_produk} (Qty: {$pesanan->jumlah_produk})",
-                'nominal' => $pesanan->total_harga,
-                'created_by' => $pesanan->created_by,
-                'created_at' => now(),
-            ]);
-
-            DB::commit();
-            return redirect()->route('karyawan.pesanans.index')->with('success', 'Order marked as paid successfully.');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return redirect()->route('karyawan.pesanans.index')->with('error', 'Failed to mark as paid: ' . $e->getMessage());
-        }
-    }
-
-    public function markAsCompleted($id)
-    {
-        try {
-            DB::beginTransaction();
-
-            $pesanan = Pesanan::findOrFail($id);
-            if ($pesanan->status_pesanan !== 'paid') {
-                return redirect()->route('karyawan.pesanans.index')->with('error', 'Order must be paid first.');
-            }
-
-            $pesanan->update(['status_pesanan' => 'completed']);
-
-            DB::commit();
-            return redirect()->route('karyawan.pesanans.index')->with('success', 'Order marked as completed successfully.');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return redirect()->route('karyawan.pesanans.index')->with('error', 'Failed to mark as completed: ' . $e->getMessage());
+            return redirect()->route('karyawan.pesanans.index')
+                ->with('error', 'Gagal menghapus pesanan: ' . $e->getMessage());
         }
     }
 }

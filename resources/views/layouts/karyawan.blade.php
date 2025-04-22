@@ -2,6 +2,7 @@
 <html lang="en" class="antialiased">
 <head>
     <meta charset="UTF-8">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Karyawan | @yield('title')</title>
@@ -20,6 +21,39 @@
     @import 'fonts.css';
     body {
         font-family: 'Poppins', sans-serif;
+    }
+
+    #loading-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(255, 255, 255, 0.9);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+        transition: opacity 0.5s ease-out;
+    }
+    
+    .loading-spinner {
+        text-align: center;
+    }
+    
+    .spinner {
+        border: 5px solid #f3f3f3;
+        border-top: 5px solid #3498db;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 15px;
+    }
+    
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
     }
     .dataTables_wrapper .dataTables_filter {
         margin-bottom: 16px;
@@ -144,11 +178,11 @@
         border-color: transparent;
     }
 
-    /* Sidebar styles */
+
     aside {
         transition: width 0.3s ease-in-out;
-        overflow: hidden;
-        width: 220px; /* Set fixed initial width */
+        overflow: visible !important;
+        width: 220px; 
     }
     
     aside.collapsed {
@@ -156,6 +190,13 @@
         padding: 1.25rem;
     }
     
+    aside.collapsed #sidebar-toggle {
+        opacity: 0;
+    }
+    aside.collapsed:hover #sidebar-toggle {
+        opacity: 1;
+    }
+
     aside.collapsed .sidebar-text {
         display: none;
     }
@@ -173,26 +214,25 @@
 
     aside.collapsed nav ul li {
         justify-content: center;
-        padding-left: 0 !important; /* Force no padding when collapsed */
+        padding-left: 0 !important; 
     }
     
     aside.collapsed nav ul li i {
-        margin-right: 0 !important; /* Force no margin when collapsed */
+        margin-right: 0 !important; 
     }
 
     aside.collapsed nav ul li a {
-        margin-left: 0 !important; /* Force no margin when collapsed */
+        margin-left: 0 !important; 
         justify-content: center !important;
     }
 
     aside.collapsed .mt-auto form {
         justify-content: center;
-        padding-left: 0 !important; /* Force no padding when collapsed */
+        padding-left: 0 !important;
     }
     
-    /* Hover state for collapsed sidebar */
     aside.collapsed:hover {
-        width: 220px !important; /* Same as original width */
+        width: 220px !important; 
     }
 
     aside.collapsed:hover .sidebar-text {
@@ -202,7 +242,7 @@
     aside.collapsed:hover .sidebar-logo img {
         width: auto;
         height: auto;
-        margin: 0; /* Reset margin on hover */
+        margin: 0; 
     }
 
     aside.collapsed:hover nav ul li {
@@ -210,7 +250,7 @@
     }
 
     aside.collapsed:hover nav ul li i {
-        margin-right: 0.5rem !important; /* Same as original */
+        margin-right: 0.5rem !important; 
     }
 
     aside.collapsed:hover nav ul li a {
@@ -222,7 +262,6 @@
         justify-content: flex-start;
     }
 
-    /* Toggle button */
     #sidebar-toggle {
         position: absolute;
         top: 1rem;
@@ -247,7 +286,6 @@
         color: #1f2937;
     }
     
-    /* Animation for toggle icon */
     #sidebar-toggle svg {
         transition: transform 0.3s ease;
     }
@@ -256,37 +294,137 @@
         transform: rotate(180deg);
     }
     
-    /* Adjust main content based on sidebar state */
     main {
         transition: padding-left 0.3s ease-in-out;
+    }
+
+    .sidebar-notification {
+        position: absolute;
+        right: 4px;
+        top: -4px;
+        min-width: 20px;
+        height: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 4px;
+        z-index: 10; 
     }
     
     main.sidebar-collapsed {
         padding-left: 4rem !important;
     }
 
-    aside.collapsed .group:hover .absolute.left-full {
-        left: 3.5rem;
+    aside.collapsed .sidebar-notification {
+        transform: scale(0.5);
+        right: 10px;
+    }
+
+    aside.collapsed li:hover div[class*="absolute left-full"] {
+        left: 4rem;
         top: 0;
     }
-    
-    /* Fix notification badge position when sidebar is collapsed */
-    aside.collapsed .sidebar-notification {
-        right: 4px;
-    }
-    
-    /* Fix notification badge position when sidebar is expanded after hover */
+
     aside.collapsed:hover .sidebar-notification {
-        right: -1px;
+        right: 4px;
+        transform: scale(1);
     }
-    
-    /* Make sure the tooltip is visible when sidebar is collapsed */
-    aside.collapsed li:hover div[class*="absolute left-full"] {
+
+    aside:not(.collapsed) li:hover div[class*="absolute left-full"] {
+        display: block !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+    }
+
+    aside li div[class*="absolute left-full"] {
+        z-index: 100;
+        transition: all 0.3s ease;
+        opacity: 0;
+        visibility: hidden;
+        display: none;
+    }
+
+    aside li:hover div[class*="absolute left-full"] {
+        opacity: 1;
+        visibility: visible;
+        display: block;
+    }
+
+    aside li .absolute.left-full {
+        left: 100%;
+        top: 0;
+        margin-left: 8px;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+    }
+
+    aside li:hover .absolute.left-full {
         opacity: 1;
         visibility: visible;
     }
+
+    aside.collapsed li .absolute.left-full {
+        left: 4rem;
+    }
+
+    aside.collapsed:hover li .absolute.left-full {
+        left: 100%;
+    }
+
+    .tooltip {
+        position: absolute;
+        left: 100%;
+        top: 50%;
+        transform: translateY(-50%);
+        margin-left: 12px;
+        background: #1f2937;
+        color: white;
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 14px;
+        white-space: nowrap;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.2s ease;
+        z-index: 100;
+        pointer-events: none;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    /* Tooltip arrow */
+    aside li .tooltip::after {
+        content: '';
+        position: absolute;
+        right: 100%;
+        top: 50%;
+        transform: translateY(-50%);
+        border-width: 5px;
+        border-style: solid;
+        border-color: transparent #1f2937 transparent transparent;
+    }
+
+    aside li:hover .tooltip {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    aside.collapsed li .tooltip {
+        left: calc(4rem + 12px);
+    }
+
+    aside.collapsed:hover li .tooltip {
+        left: 100%;
+    }
 </style>
 <body class="min-h-screen font-sans bg-gray-100">
+    <!-- Loading Screen -->
+    <div id="loading-screen">
+        <div class="loading-spinner">
+            <div class="spinner"></div>
+            <p>Loading...</p>
+        </div>
+    </div>
     <div class="flex min-h-screen">
         <!-- Sidebar -->
         <aside class="fixed top-0 left-0 h-screen w-48 lg:w-[220px] p-6 bg-white shadow-lg flex z-50 flex-col">
@@ -318,21 +456,20 @@
                         </a>
                     </li>
 
-                    <!-- For the Karyawan sidebar - replace your gallery list item with this -->
+                    <!-- Updated Model link with proper tooltip implementation -->
                     <li class="mb-4 flex items-center relative">
-                        <a href="{{ route('karyawan.gallery.index') }}" class="flex items-center text-gray-900 hover:text-gray-700 group">
+                        <a href="{{ route('karyawan.gallery.index') }}" class="flex items-center text-gray-900 hover:text-gray-700">
                             <i class="w-7 h-7" data-lucide="image"></i>
                             <span class="ml-2 text-lg font-semibold sidebar-text">Model</span>
                             @if(isset($outOfStockCount) && $outOfStockCount > 0)
                                 <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center sidebar-notification">
                                     {{ $outOfStockCount }}
                                 </span>
+                                <div class="tooltip">
+                                    {{ $outOfStockCount }} model habis stok!
+                                </div>
                             @endif
                         </a>
-                        <!-- Improved tooltip that works in both collapsed and expanded states -->
-                        <div class="absolute left-full ml-2 bg-gray-800 text-white text-xs py-1 px-2 rounded whitespace-nowrap z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300">
-                            Stock product habis!
-                        </div>
                     </li>
                     <li class="mb-4 flex items-center">
                         <a href="{{ route('karyawan.profile.index') }}" class="flex items-center text-gray-900 hover:text-gray-700">
@@ -482,6 +619,32 @@
         }
     </script>
     @endif
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Sembunyikan loading screen saat halaman selesai dimuat
+        const loadingScreen = document.getElementById('loading-screen');
+        
+        // Tambahkan delay kecil untuk memastikan semua aset dimuat
+        setTimeout(function() {
+            loadingScreen.style.opacity = '0';
+            setTimeout(function() {
+                loadingScreen.style.display = 'none';
+            }, 500); // Waktu sesuai dengan durasi transisi CSS
+        }, 300);
+    });
+    
+    // Tampilkan loading saat navigasi halaman
+    document.addEventListener('click', function(e) {
+        // Periksa jika yang diklik adalah link halaman internal
+        const target = e.target.closest('a');
+        if (target && target.href && target.href.startsWith(window.location.origin) && !target.hasAttribute('data-no-loading')) {
+            const loadingScreen = document.getElementById('loading-screen');
+            loadingScreen.style.display = 'flex';
+            loadingScreen.style.opacity = '1';
+        }
+    });
+</script>
 
     @stack('scripts')
 </body>

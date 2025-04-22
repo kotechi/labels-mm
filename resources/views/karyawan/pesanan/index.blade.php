@@ -35,7 +35,7 @@
                     $no_pesanan = 1;    
                 ?>
                 @foreach($pesanans as $pesanan)
-                    <tr data-href="{{ route('karyawan.pesanans.detail', $pesanan->id_pesanan) }}" class="cursor-pointer hover:bg-gray-50">
+                    <tr  class="cursor-pointer hover:bg-gray-50">
                     <td class="px-6 py-4 whitespace-nowrap">{{ $no_pesanan++ }}</td>
                     <td class="px-6 py-4 whitespace-nowrap">{{ $pesanan->nama_pemesan }}</td>
                     <td class="px-6 py-4 whitespace-nowrap">{{ $pesanan->nama_produk }}</td>    
@@ -58,6 +58,7 @@
                         @endif
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
+                        <a href="{{ route('karyawan.pesanans.detail', $pesanan->id_pesanan) }}" class="p-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md"><i data-lucide="view" class="w-6 h-6 inline "></i></a>
                         <a href="{{ route('karyawan.pesanans.edit', $pesanan->id_pesanan) }}" class="px-3 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-md">Edit</a>
                         <form action="{{ route('karyawan.pesanans.destroyWithPemasukan', $pesanan->id_pesanan) }}" method="POST" class="inline-block delete-form">
                             @csrf

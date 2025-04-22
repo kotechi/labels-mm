@@ -17,6 +17,7 @@ return new class extends Migration
             $table->integer('jumlah_bahan');
             $table->decimal('harga_satuan', 10, 2);
             $table->decimal('total_harga', 10, 2); // changed from subtotal to total_harga
+            $table->integer('periode_hari')->default(1); // New field for the number of days
             $table->timestamps();
         });
     }

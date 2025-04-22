@@ -1,5 +1,5 @@
 @extends('layouts.karyawan')
-
+@section('title', 'resi')
 @section('content')
 <div class="min-h-screen bg-gray-100 py-6 flex justify-center">
     <div class="w-full max-w-md">
