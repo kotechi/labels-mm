@@ -69,7 +69,6 @@ class ProductController extends Controller
     
         try {
             if ($request->hasFile('image') && $request->file('image')->isValid()) {
-                // Hapus gambar lama
                 if ($product->image) {
                     $oldPath = public_path('storage/' . $product->image);
                     if (file_exists($oldPath)) {

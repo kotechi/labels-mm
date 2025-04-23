@@ -77,20 +77,20 @@ class KaryawanPesananController extends Controller
             'nama_pemesan' => 'required|string|max:255',
             'status_pesanan' => 'required|string|in:proses,paid,completed',
             'total_harga' => 'required|numeric',
-            'jumlah_produk' => 'required|numeric',
+            'jumlah_produk' => 'required|numeric|min:1',
             'no_telp_pemesan' => 'required|string|max:15',
             'payment_method' => 'required|string|max:255',
-            'lebar_muka' => 'nullable|numeric',
-            'lebar_pundak' => 'nullable|numeric',
-            'lebar_punggung' => 'nullable|numeric',
-            'panjang_lengan' => 'nullable|numeric',
-            'panjang_punggung' => 'nullable|numeric',
-            'panjang_baju' => 'nullable|numeric',
-            'lingkar_badan' => 'nullable|numeric',
-            'lingkar_pinggang' => 'nullable|numeric',
-            'lingkar_panggul' => 'nullable|numeric',
-            'lingkar_kerung_lengan' => 'nullable|numeric',
-            'lingkar_pergelangan_lengan' => 'nullable|numeric',
+            'lebar_muka' => 'required|numeric',
+            'lebar_pundak' => 'required|numeric',
+            'lebar_punggung' => 'required|numeric',
+            'panjang_lengan' => 'required|numeric',
+            'panjang_punggung' => 'required|numeric',
+            'panjang_baju' => 'required|numeric',
+            'lingkar_badan' => 'required|numeric',
+            'lingkar_pinggang' => 'required|numeric',
+            'lingkar_panggul' => 'required|numeric',
+            'lingkar_kerung_lengan' => 'required|numeric',
+            'lingkar_pergelangan_lengan' => 'required|numeric',
             'jumlah_pembayaran' => 'nullable|numeric',
         ]);
 
@@ -153,7 +153,7 @@ class KaryawanPesananController extends Controller
             
             // If this is a cash payment, return receipt view
             if ($request->payment_method === 'cash') {
-                return view('karyawan.pesanan.resi', compact('pesanan', 'product'))->with('success', 'berhasil membuat pesanan');
+                return view('karyawan.pesanan.detail', compact('pesanan', 'product'))->with('success', 'berhasil membuat pesanan');
             }
 
             return redirect()->route('karyawan.pesanans.index')->with('success', 'Pesanan created successfully');
@@ -206,17 +206,17 @@ class KaryawanPesananController extends Controller
             'jumlah_produk' => 'required|numeric|min:1',
             'no_telp_pemesan' => 'required|string|max:15',
             'payment_method' => 'required|string|max:255',
-            'lebar_muka' => 'nullable|numeric',
-            'lebar_pundak' => 'nullable|numeric',
-            'lebar_punggung' => 'nullable|numeric',
-            'panjang_lengan' => 'nullable|numeric',
-            'panjang_punggung' => 'nullable|numeric',
-            'panjang_baju' => 'nullable|numeric',
-            'lingkar_badan' => 'nullable|numeric',
-            'lingkar_pinggang' => 'nullable|numeric',
-            'lingkar_panggul' => 'nullable|numeric',
-            'lingkar_kerung_lengan' => 'nullable|numeric',
-            'lingkar_pergelangan_lengan' => 'nullable|numeric',
+            'lebar_muka' => 'required|numeric',
+            'lebar_pundak' => 'required|numeric',
+            'lebar_punggung' => 'required|numeric',
+            'panjang_lengan' => 'required|numeric',
+            'panjang_punggung' => 'required|numeric',
+            'panjang_baju' => 'required|numeric',
+            'lingkar_badan' => 'required|numeric',
+            'lingkar_pinggang' => 'required|numeric',
+            'lingkar_panggul' => 'required|numeric',
+            'lingkar_kerung_lengan' => 'required|numeric',
+            'lingkar_pergelangan_lengan' => 'required|numeric',
         ]);
 
         $pesanan = Pesanan::findOrFail($id);

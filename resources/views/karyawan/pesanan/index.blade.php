@@ -82,7 +82,7 @@
                     window.location.href = href;
                 }
             }
-        });
+        }); 
 
         // SweetAlert for delete confirmation
         $('.delete-button').on('click', function() {

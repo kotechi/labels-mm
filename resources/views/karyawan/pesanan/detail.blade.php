@@ -132,7 +132,7 @@
                 cetak resi <i class="w-5 h-5" data-lucide="notepad-text"></i>
             </button>
             @endif
-            <a href="{{ url()->previous() }}">kembali</a>
+            <a href="{{ route('karyawan.pesanans.index')}}">kembali</a>
         </div>
     </div>
 </div>

@@ -112,7 +112,7 @@
                 </div>
                 <div class="space-y-2">
                     <label for="no_telp_pemesan" class="block text-gray-700">Nomor telepon</label>
-                    <input type="text" name="no_telp_pemesan" id="no_telp_pemesan" 
+                    <input type="number" name="no_telp_pemesan" id="no_telp_pemesan" 
                         class="w-full p-2 border rounded-md @error('no_telp_pemesan') border-red-500 @enderror" 
                         placeholder="masukan nomor telepon"  value="{{ old('no_telp_pemesan') }}">
                     @error('no_telp_pemesan')
@@ -264,7 +264,7 @@
             <div class="mt-6 flex justify-end space-x-2">
                 <a onclick="history.back()" class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-700 cursor-pointer">Kembali</a>
                 <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700" id="submit-button">
-                    Simpan
+                    Submit
                 </button>
             </div>
             
@@ -373,7 +373,7 @@
 
     let currentStock = 0;
 
-    @if(session('error'))
+    @if(session('error') || isset($error))
         Swal.fire({
             title: 'Error!',
             text: "{{ session('error') }}",
@@ -382,7 +382,7 @@
         });
     @endif
 
-    @if(session('success'))
+    @if(session('success') || isset($success))
         Swal.fire({
             title: 'Success!',
             text: "{{ session('success') }}",

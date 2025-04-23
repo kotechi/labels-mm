@@ -12,6 +12,6 @@ class tbl_bahan extends Model
         'jumlah_bahan',
         'harga_satuan',
         'total_harga',
-        'periode_hari' // changed from subtotal to total_harga
+        'periode_hari' 
     ];
 }

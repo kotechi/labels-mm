@@ -1,4 +1,3 @@
-{{-- resources/views/reports/financial-report.blade.php --}}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -170,7 +169,7 @@
                 <tr>
                     <td>{{ $index + 1 }}</td>
                     <td>{{ $transaksi->kategori }}</td>
-                    <td>{{ $transaksi->user->nama_lengkap }}</td>
+                    <td>{{ isset($transaksi->user) ? ($transaksi->user->nama_lengkap ?? '-') : '-' }}</td>
                     <td>{{ $transaksi->keterangan }}</td>
                     <td>Rp {{ number_format($transaksi->nominal, 0, ',', '.') }}</td>
                     <td>{{ $transaksi->tanggal }}</td>

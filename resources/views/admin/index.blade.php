@@ -1,4 +1,3 @@
-{{-- resources/views/admin/dashboard.blade.php --}}
 @extends('layouts.admin')
 
 @section('title', 'Dashboard')
@@ -293,7 +292,6 @@
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Check if the chart canvas exists
     const canvas = document.getElementById('earningsChart');
     if (!canvas) {
         console.error('Canvas element not found!');
@@ -301,21 +299,18 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     const ctx = canvas.getContext('2d');
-    let period = 'monthly'; // Default period
-    let currentMonth = new Date().getMonth() + 1; // Current month (1-12)
-    let currentYear = new Date().getFullYear(); // Current year
-    let yearRangeStart = currentYear - 5; // Start of 5-year period for yearly view
+    let period = 'monthly'; 
+    let currentMonth = new Date().getMonth() + 1; 
+    let currentYear = new Date().getFullYear();
+    let yearRangeStart = currentYear - 5; 
 
-    // Initialize data from PHP variables
     const allYearlyData = @json($yearlyData);
     const allMonthlyData = @json($allMonthlyData);
     const allDailyData = @json($allDailyData);
     
-    // Month names for display
     const monthNames = ["January", "February", "March", "April", "May", "June", 
                         "July", "August", "September", "October", "November", "December"];
 
-    // Create and configure the chart
     let earningsChart = new Chart(ctx, {
         type: 'line',
         data: {
@@ -370,7 +365,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Function to get current data based on period, month, and year
     function getCurrentData() {
         let data = {
             labels: [],
@@ -381,17 +375,14 @@ document.addEventListener('DOMContentLoaded', function() {
         };
 
         if (period === 'daily') {
-            // Generate empty data for all days if needed
             const daysInMonth = new Date(currentYear, currentMonth, 0).getDate();
             data.labels = Array.from({length: daysInMonth}, (_, i) => i + 1);
             data.pemasukan = Array(daysInMonth).fill(0);
             data.pengeluaran = Array(daysInMonth).fill(0);
             data.keuntungan = Array(daysInMonth).fill(0);
             
-            // Check if data exists for the specified month and year and override with actual data
             if (allDailyData[currentYear] && allDailyData[currentYear][currentMonth]) {
                 const actualData = allDailyData[currentYear][currentMonth];
-                // Map actual data values to their correct day position
                 actualData.days.forEach((day, index) => {
                     const dayIdx = parseInt(day) - 1;
                     if (dayIdx >= 0 && dayIdx < daysInMonth) {
@@ -403,16 +394,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 data.total = actualData.total || 0;
             }
         } else if (period === 'monthly') {
-            // Generate empty data for all months
             data.labels = monthNames;
             data.pemasukan = Array(12).fill(0);
             data.pengeluaran = Array(12).fill(0);
             data.keuntungan = Array(12).fill(0);
             
-            // Check if data exists for the specified year and override with actual data
             if (allMonthlyData[currentYear]) {
                 const actualData = allMonthlyData[currentYear];
-                // Map actual data values to their correct month position
                 actualData.months.forEach((month, index) => {
                     const monthIdx = monthNames.indexOf(month);
                     if (monthIdx >= 0) {
@@ -424,14 +412,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 data.total = actualData.total || 0;
             }
         } else if (period === 'yearly') {
-            // Generate empty data for the 5-year range
             const yearRange = Array.from({length: 5}, (_, i) => yearRangeStart + i);
             data.labels = yearRange;
             data.pemasukan = Array(5).fill(0);
             data.pengeluaran = Array(5).fill(0);
             data.keuntungan = Array(5).fill(0);
             
-            // Map actual yearly data to our fixed range
             yearRange.forEach((year, idx) => {
                 const yearIdx = allYearlyData.years.indexOf(year);
                 if (yearIdx !== -1) {
@@ -441,34 +427,28 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
             
-            // Calculate total for the selected range
             data.total = data.keuntungan.reduce((sum, val) => sum + parseFloat(val || 0), 0);
         }
 
         return data;
     }
 
-    // Function to update the chart
     function updateChart() {
         const data = getCurrentData();
         
-        // Update chart with new data
         earningsChart.data.labels = data.labels;
         earningsChart.data.datasets[0].data = data.pemasukan;
         earningsChart.data.datasets[1].data = data.pengeluaran;
         earningsChart.data.datasets[2].data = data.keuntungan;
         
-        // Update the chart
         earningsChart.update();
         
-        // Update total earnings display
         const totalEarnings = document.getElementById('totalEarnings');
         if (totalEarnings) {
             totalEarnings.textContent = `Total: Rp ${new Intl.NumberFormat('id-ID').format(data.total)}`;
         }
     }
 
-    // Function to update the period display
     function updatePeriodDisplay() {
         const periodDisplay = document.getElementById('periodDisplay');
         if (!periodDisplay) return;
@@ -482,11 +462,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Initialize the chart with the default period
     updateChart();
     updatePeriodDisplay();
 
-    // Period selector event listener
     const periodSelector = document.getElementById('earningsPeriod');
     if (periodSelector) {
         periodSelector.addEventListener('change', function() {
@@ -496,7 +474,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Next period button event listener
     const nextButton = document.getElementById('nextPeriod');
     if (nextButton) {
         nextButton.addEventListener('click', function() {
@@ -518,7 +495,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Previous period button event listener
     const prevButton = document.getElementById('prevPeriod');
     if (prevButton) {
         prevButton.addEventListener('click', function() {
@@ -552,41 +528,34 @@ document.addEventListener('DOMContentLoaded', function() {
     const downloadYearlyReportBtn = document.getElementById('downloadYearlyReportBtn');
     const downloadMonthlyReportBtn = document.getElementById('downloadMonthlyReportBtn');
     
-    // Click outside to close dropdown
     document.addEventListener('click', function(event) {
         if (!reportOptions.contains(event.target) && event.target !== downloadReportBtn) {
             reportOptions.classList.add('hidden');
         }
     });
     
-    // Toggle report options dropdown
     downloadReportBtn.addEventListener('click', function(event) {
         event.stopPropagation();
         reportOptions.classList.toggle('hidden');
-        // Reset sub-options when opening
         yearlyOptions.classList.add('hidden');
         monthlyOptions.classList.add('hidden');
     });
     
-    // Show yearly options
     yearlyReportBtn.addEventListener('click', function() {
         yearlyOptions.classList.remove('hidden');
         monthlyOptions.classList.add('hidden');
     });
     
-    // Show monthly options
     monthlyReportBtn.addEventListener('click', function() {
         monthlyOptions.classList.remove('hidden');
         yearlyOptions.classList.add('hidden');
     });
     
-    // Download yearly report
     downloadYearlyReportBtn.addEventListener('click', function() {
         const selectedYear = document.getElementById('yearSelect').value;
         window.location.href = `{{ route('report.pdf') }}?type=yearly&year=${selectedYear}`;
     });
     
-    // Download monthly report
     downloadMonthlyReportBtn.addEventListener('click', function() {
         const selectedYear = document.getElementById('monthlyYearSelect').value;
         const selectedMonth = document.getElementById('monthSelect').value;

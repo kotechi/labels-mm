@@ -456,7 +456,6 @@
                         </a>
                     </li>
 
-                    <!-- Updated Model link with proper tooltip implementation -->
                     <li class="mb-4 flex items-center relative">
                         <a href="{{ route('karyawan.gallery.index') }}" class="flex items-center text-gray-900 hover:text-gray-700">
                             <i class="w-7 h-7" data-lucide="image"></i>
@@ -504,41 +503,34 @@
     </div>
 
     <script>
-        // Initialize Lucide icons
         lucide.createIcons();
 
-        // Sidebar toggle functionality
         document.addEventListener('DOMContentLoaded', function() {
             const sidebar = document.querySelector('aside');
             const mainContent = document.querySelector('main');
             const toggleButton = document.getElementById('sidebar-toggle');
             
-            // Check local storage for sidebar state
             const isSidebarCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
-            
-            // Apply saved state on page load
+
             if (isSidebarCollapsed) {
                 sidebar.classList.add('collapsed');
                 mainContent.classList.add('sidebar-collapsed');
-                
-                // Update toggle button icon
+
                 toggleButton.innerHTML = `
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <polyline points="9 18 15 12 9 6"></polyline>
                         </svg>
                 `;
             }
-            
-            // Toggle sidebar on button click
+
             toggleButton.addEventListener('click', function() {
                 sidebar.classList.toggle('collapsed');
                 mainContent.classList.toggle('sidebar-collapsed');
                 
-                // Save state to local storage
+
                 const isNowCollapsed = sidebar.classList.contains('collapsed');
                 localStorage.setItem('sidebarCollapsed', isNowCollapsed);
                 
-                // Update toggle button icon based on state
                 if (isNowCollapsed) {
                     toggleButton.innerHTML = `
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -560,10 +552,10 @@
                 responsive: true,
                 ordering: true,
                 language: {
-                    search: "" // Menghilangkan label "Search:"
+                    search: "" 
                 },
                 "createdRow": function(row, data, dataIndex, cells) {
-                    // Ambil kategori dari data attribute
+                 
                     const kategori = $(row).data('kategori');
                     if (kategori === 'pemasukan') {
                         $(row).addClass('bg-green-100-important');
@@ -577,7 +569,6 @@
             });
         });
 
-        // SweetAlert for delete confirmation
         $('.delete-button').on('click', function() {
             var form = $(this).closest('form');
             Swal.fire({
@@ -622,21 +613,17 @@
 
     <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Sembunyikan loading screen saat halaman selesai dimuat
         const loadingScreen = document.getElementById('loading-screen');
         
-        // Tambahkan delay kecil untuk memastikan semua aset dimuat
         setTimeout(function() {
             loadingScreen.style.opacity = '0';
             setTimeout(function() {
                 loadingScreen.style.display = 'none';
-            }, 500); // Waktu sesuai dengan durasi transisi CSS
+            }, 500); 
         }, 300);
     });
     
-    // Tampilkan loading saat navigasi halaman
     document.addEventListener('click', function(e) {
-        // Periksa jika yang diklik adalah link halaman internal
         const target = e.target.closest('a');
         if (target && target.href && target.href.startsWith(window.location.origin) && !target.hasAttribute('data-no-loading')) {
             const loadingScreen = document.getElementById('loading-screen');

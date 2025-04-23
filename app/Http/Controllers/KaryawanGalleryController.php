@@ -31,13 +31,9 @@ class KaryawanGalleryController extends Controller
 
         try {
             if ($request->hasFile('image') && $request->file('image')->isValid()) {
-                // Generate nama file yang unik
                 $imageName = time() . '_' . Str::random(10) . '.' . $request->image->extension();
-                
-                // Simpan file ke storage dan dapatkan pathnya
                 $request->image->move(public_path('storage/images/products'), $imageName);
                 
-                // Buat product baru dengan path gambar
                 Product::create($request->except('image') + [
                     'image' => 'images/products/' . $imageName
                 ]);
@@ -69,15 +65,34 @@ class KaryawanGalleryController extends Controller
             'stock_product' => 'required|integer',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
-
-        if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('products', 'public');
-            $product->update(['image' => $imagePath]);
+    
+        try {
+            if ($request->hasFile('image') && $request->file('image')->isValid()) {
+                if ($product->image) {
+                    $oldPath = public_path('storage/' . $product->image);
+                    if (file_exists($oldPath)) {
+                        unlink($oldPath);
+                    }
+                }
+    
+                $imageName = time() . '_' . Str::random(10) . '.' . $request->image->extension();
+                
+                $request->image->move(public_path('storage/images/products'), $imageName);
+                
+                $product->update($request->except('image') + [
+                    'image' => 'images/products/' . $imageName
+                ]);
+            } else {
+                $product->update($request->except('image'));
+            }
+    
+            return redirect()->route('karyawan.gallery.index')->with('success', 'Gallery item updated successfully.');
+            
+        } catch (\Exception $e) {
+            return back()
+                ->withErrors(['image' => $e->getMessage()])
+                ->withInput();
         }
-
-        $product->update($request->except('image'));
-
-        return redirect()->route('karyawan.gallery.index')->with('success', 'Gallery item updated successfully.');
     }
 
     public function destroy(Product $product)

@@ -51,62 +51,89 @@
                 <!-- Row 1 -->
                 <div class="space-y-2">
                     <label for="nama_pemesan" class="block text-gray-700">Nama</label>
-                    <input type="text" name="nama_pemesan" value="{{ old('nama_pemesan') }}" id="nama_pemesan" 
-                        class="w-full p-2 border rounded-md" 
-                        placeholder="masukan nama" >
+                    <input type="text" name="nama_pemesan" id="nama_pemesan" 
+                        class="w-full p-2 border rounded-md @error('nama_pemesan') border-red-500 @enderror" 
+                        placeholder="masukan nama"  value="{{ old('nama_pemesan') }}">
+                    @error('nama_pemesan')
+                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                    @enderror
                 </div>
                 <div class="space-y-2">
                     <label for="product_id" class="block text-gray-700">Model</label>
-                    <select name="product_id" id="product_id" 
-                        class="w-full p-2 border rounded-md" >
-                        <option value="">Pilih Model</option>
+                        <select name="product_id" id="product_id" 
+                        class="w-full p-2 border rounded-md @error('product_id') border-red-500 @enderror">
                         @foreach($products as $product)
-                            <option value="{{ $product->id_product }}" 
-                                data-price="{{ $product->harga_jual }}"
-                                data-name="{{ $product->nama_produk }}"
-                                data-stock="{{ $product->stock_product }}"
-                                {{ old('product_id') == $product->id_product ? 'selected' : '' }}>
-                                {{ $product->nama_produk }} (Stok: {{ $product->stock_product }})
-                            </option>
+                            @if($loop->first)
+                                <option value="{{ $product->id_product }}" 
+                                    data-price="{{ $product->harga_jual }}"
+                                    data-name="{{ $product->nama_produk }}"
+                                    data-stock="{{ $product->stock_product }}"
+                                    selected>
+                                    {{ $product->nama_produk }} (Stok: {{ $product->stock_product }})
+                                </option>
+                            @else
+                                <option value="{{ $product->id_product }}" 
+                                    data-price="{{ $product->harga_jual }}"
+                                    data-name="{{ $product->nama_produk }}"
+                                    data-stock="{{ $product->stock_product }}"
+                                    {{ old('product_id') == $product->id_product ? 'selected' : '' }}>
+                                    {{ $product->nama_produk }} (Stok: {{ $product->stock_product }})
+                                </option>
+                            @endif
                         @endforeach
                     </select>
                     <input type="hidden" name="nama_produk" id="nama_produk" value="{{ old('nama_produk') }}">
                     <div id="stock-message" class="text-sm text-red-600 hidden"></div>
+                    @error('product_id')
+                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <div class="space-y-2">
                     <label for="payment_method" class="block text-gray-700">Metode Pembayaran</label>
-                    <select name="payment_method" id="payment_method" class="w-full p-2 border rounded-md" >
+                    <select name="payment_method" id="payment_method" 
+                        class="w-full p-2 border rounded-md @error('payment_method') border-red-500 @enderror" >
                         <option value="">Pilih metode pembayaran</option>
                         <option value="cash" {{ old('payment_method') == 'cash' ? 'selected' : '' }}>Cash</option>
                         <option value="midtrans" {{ old('payment_method') == 'midtrans' ? 'selected' : '' }}>Online Payment (Midtrans)</option>
                     </select>
+                    @error('payment_method')
+                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <div class="space-y-2">
                     <label for="status_pesanan" class="block text-gray-700">Status Pesanan</label>
                     <select name="status_pesanan" id="status_pesanan" 
-                        class="w-full p-2 border rounded-md" >
+                        class="w-full p-2 border rounded-md @error('status_pesanan') border-red-500 @enderror" >
                         <option value="proses" {{ old('status_pesanan', 'proses') == 'proses' ? 'selected' : '' }}>Proses</option>
                         <option value="paid" {{ old('status_pesanan') == 'paid' ? 'selected' : '' }}>Paid</option>
                         <option value="completed" {{ old('status_pesanan') == 'completed' ? 'selected' : '' }}>Completed</option>
                     </select>
+                    @error('status_pesanan')
+                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                    @enderror
                 </div>
-
+                
                 <!-- Row 2 -->
                 <div class="space-y-2">
                     <label for="total_harga" class="block text-gray-700">Total harga</label>
                     <input type="text" id="total_harga_display" 
                         class="w-full p-2 border rounded-md" 
-                        readonly>
+                        readonly value="{{ old('total_harga') ? 'Rp ' . number_format(old('total_harga'), 0, ',', '.') : '' }}">
                     <input type="hidden" name="total_harga" id="total_harga" value="{{ old('total_harga') }}">
+                    @error('total_harga')
+                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                    @enderror
                 </div>
                 <div class="space-y-2">
                     <label for="no_telp_pemesan" class="block text-gray-700">Nomor telepon</label>
-                    <input type="text" name="no_telp_pemesan" id="no_telp_pemesan" 
-                        value="{{ old('no_telp_pemesan') }}"
-                        class="w-full p-2 border rounded-md" 
-                        placeholder="masukan nomor telepon" >
+                    <input type="number" name="no_telp_pemesan" id="no_telp_pemesan" 
+                        class="w-full p-2 border rounded-md @error('no_telp_pemesan') border-red-500 @enderror" 
+                        placeholder="masukan nomor telepon"  value="{{ old('no_telp_pemesan') }}">
+                    @error('no_telp_pemesan')
+                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <!-- Row 3 -->
@@ -115,13 +142,15 @@
                     <div class="flex items-center space-x-2">
                         <button type="button" class="px-3 py-1 border rounded" onclick="decrementQuantity()">-</button>
                         <input type="number" name="jumlah_produk" id="jumlah_produk" 
-                            class="w-20 p-2 border rounded-md text-center" 
+                            class="w-20 p-2 border rounded-md text-center @error('jumlah_produk') border-red-500 @enderror" 
                             value="{{ old('jumlah_produk', 1) }}" min="1" >
                         <button type="button" class="px-3 py-1 border rounded" onclick="incrementQuantity()">+</button>
                     </div>
+                    @error('jumlah_produk')
+                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                    @enderror
                 </div>
                 
-                <!-- Size Selection -->
                 <div class="space-y-2">
                     <label for="size_option" class="block text-gray-700">Pilihan Ukuran</label>
                     <select name="size_option" id="size_option" class="w-full p-2 border rounded-md">
@@ -136,108 +165,130 @@
                     </select>
                 </div>
 
-                <!-- Measurement Fields section -->
                 <div class="col-span-2">
                     <div class="border-t pt-4 mb-2">
                         <h3 class="font-semibold text-lg">Ukuran</h3>
                     </div>
                 </div>
 
-                <!-- Measurement fields in pairs -->
                 <div class="space-y-2">
                     <label for="lingkar_badan" class="block text-gray-700">Lingkar Badan (cm)</label>
                     <input type="number" step="0.01" name="lingkar_badan" id="lingkar_badan" 
-                        value="{{ old('lingkar_badan') }}"
-                        class="w-full p-2 border rounded-md" 
-                        placeholder="Contoh: 96" >
+                        class="w-full p-2 border rounded-md @error('lingkar_badan') border-red-500 @enderror" 
+                        placeholder="Contoh: 96"  value="{{ old('lingkar_badan') }}">
+                    @error('lingkar_badan')
+                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                    @enderror
                 </div>
                 <div class="space-y-2">
                     <label for="lingkar_pinggang" class="block text-gray-700">Lingkar pinggang (cm)</label>
                     <input type="number" step="0.01" name="lingkar_pinggang" id="lingkar_pinggang" 
-                        value="{{ old('lingkar_pinggang') }}"
-                        class="w-full p-2 border rounded-md" 
-                        placeholder="Contoh: 80" >
+                        class="w-full p-2 border rounded-md @error('lingkar_pinggang') border-red-500 @enderror" 
+                        placeholder="Contoh: 80"  value="{{ old('lingkar_pinggang') }}">
+                    @error('lingkar_pinggang')
+                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <div class="space-y-2">
                     <label for="lingkar_panggul" class="block text-gray-700">Lingkar pinggul (cm)</label>
                     <input type="number" step="0.01" name="lingkar_panggul" id="lingkar_panggul" 
-                        value="{{ old('lingkar_panggul') }}"
-                        class="w-full p-2 border rounded-md" 
-                        placeholder="Contoh: 100" >
+                        class="w-full p-2 border rounded-md @error('lingkar_panggul') border-red-500 @enderror" 
+                        placeholder="Contoh: 100"  value="{{ old('lingkar_panggul') }}">
+                    @error('lingkar_panggul')
+                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                    @enderror
                 </div>
                 <div class="space-y-2">
                     <label for="lebar_pundak" class="block text-gray-700">Lebar pundak (cm)</label>
                     <input type="number" step="0.01" name="lebar_pundak" id="lebar_pundak" 
-                        value="{{ old('lebar_pundak') }}"
-                        class="w-full p-2 border rounded-md" 
-                        placeholder="Contoh: 42" >
+                        class="w-full p-2 border rounded-md @error('lebar_pundak') border-red-500 @enderror" 
+                        placeholder="Contoh: 42"  value="{{ old('lebar_pundak') }}">
+                    @error('lebar_pundak')
+                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <div class="space-y-2">
                     <label for="panjang_lengan" class="block text-gray-700">Panjang lengan (cm)</label>
                     <input type="number" step="0.01" name="panjang_lengan" id="panjang_lengan" 
-                        value="{{ old('panjang_lengan') }}"
-                        class="w-full p-2 border rounded-md" 
-                        placeholder="Contoh: 60" >
+                        class="w-full p-2 border rounded-md @error('panjang_lengan') border-red-500 @enderror" 
+                        placeholder="Contoh: 60"  value="{{ old('panjang_lengan') }}">
+                    @error('panjang_lengan')
+                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                    @enderror
                 </div>
                 <div class="space-y-2">
                     <label for="lingkar_kerung_lengan" class="block text-gray-700">Lingkar kerung lengan (cm)</label>
                     <input type="number" step="0.01" name="lingkar_kerung_lengan" id="lingkar_kerung_lengan" 
-                        value="{{ old('lingkar_kerung_lengan') }}"
-                        class="w-full p-2 border rounded-md" 
-                        placeholder="Contoh: 45" >
+                        class="w-full p-2 border rounded-md @error('lingkar_kerung_lengan') border-red-500 @enderror" 
+                        placeholder="Contoh: 45"  value="{{ old('lingkar_kerung_lengan') }}">
+                    @error('lingkar_kerung_lengan')
+                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <div class="space-y-2">
                     <label for="lingkar_pergelangan_lengan" class="block text-gray-700">Lingkar pergelangan lengan (cm)</label>
                     <input type="number" step="0.01" name="lingkar_pergelangan_lengan" id="lingkar_pergelangan_lengan" 
-                        value="{{ old('lingkar_pergelangan_lengan') }}"
-                        class="w-full p-2 border rounded-md" 
-                        placeholder="Contoh: 20" >
+                        class="w-full p-2 border rounded-md @error('lingkar_pergelangan_lengan') border-red-500 @enderror" 
+                        placeholder="Contoh: 20"  value="{{ old('lingkar_pergelangan_lengan') }}">
+                    @error('lingkar_pergelangan_lengan')
+                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                    @enderror
                 </div>
                 <div class="space-y-2">
                     <label for="panjang_punggung" class="block text-gray-700">Panjang punggung (cm)</label>
                     <input type="number" step="0.01" name="panjang_punggung" id="panjang_punggung" 
-                        value="{{ old('panjang_punggung') }}"
-                        class="w-full p-2 border rounded-md" 
-                        placeholder="Contoh: 40" >
+                        class="w-full p-2 border rounded-md @error('panjang_punggung') border-red-500 @enderror" 
+                        placeholder="Contoh: 40"  value="{{ old('panjang_punggung') }}">
+                    @error('panjang_punggung')
+                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <div class="space-y-2">
                     <label for="lebar_punggung" class="block text-gray-700">Lebar punggung (cm)</label>
                     <input type="number" step="0.01" name="lebar_punggung" id="lebar_punggung" 
-                        value="{{ old('lebar_punggung') }}"
-                        class="w-full p-2 border rounded-md" 
-                        placeholder="Contoh: 43" >
+                        class="w-full p-2 border rounded-md @error('lebar_punggung') border-red-500 @enderror" 
+                        placeholder="Contoh: 43"  value="{{ old('lebar_punggung') }}">
+                    @error('lebar_punggung')
+                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                    @enderror
                 </div>
                 <div class="space-y-2">
                     <label for="lebar_muka" class="block text-gray-700">Lebar muka (cm)</label>
                     <input type="number" step="0.01" name="lebar_muka" id="lebar_muka" 
-                        value="{{ old('lebar_muka') }}"
-                        class="w-full p-2 border rounded-md" 
-                        placeholder="Contoh: 33" >
+                        class="w-full p-2 border rounded-md @error('lebar_muka') border-red-500 @enderror" 
+                        placeholder="Contoh: 33"  value="{{ old('lebar_muka') }}">
+                    @error('lebar_muka')
+                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                    @enderror
                 </div>
                 <div class="space-y-2">
                     <label for="panjang_baju" class="block text-gray-700">Panjang Baju (cm)</label>
                     <input type="number" step="0.01" name="panjang_baju" id="panjang_baju" 
-                        value="{{ old('panjang_baju') }}"
-                        class="w-full p-2 border rounded-md" 
-                        placeholder="Contoh: 70" >
+                        class="w-full p-2 border rounded-md @error('panjang_baju') border-red-500 @enderror" 
+                        placeholder="Contoh: 70"  value="{{ old('panjang_baju') }}">
+                    @error('panjang_baju')
+                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                    @enderror
                 </div>
                 
-                <input type="hidden" name="status_pesanan" value="{{ old('status_pesanan', 'proses') }}">
             </div>
 
             <div class="mt-6 flex justify-end space-x-2">
-                <button type="submit" id="submit-button" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                    Simpan
+                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700" id="submit-button">
+                    Submit
                 </button>
             </div>
+            
         </form>
     </div>
 </div>
+@endsection
 
+@push('scripts')
 <script>
     // Standard size measurements (in cm)
     const standardSizes = {
@@ -336,6 +387,24 @@
 
     let currentStock = 0;
 
+    @if(session('error') || isset($error))
+        Swal.fire({
+            title: 'Error!',
+            text: "{{ session('error') }}",
+            icon: 'error',
+            confirmButtonText: 'OK'
+        });
+    @endif
+
+    @if(session('success') || isset($success))
+        Swal.fire({
+            title: 'Success!',
+            text: "{{ session('success') }}",
+            icon: 'success',
+            confirmButtonText: 'OK'
+        });
+    @endif
+
     document.getElementById('product_id').addEventListener('change', function() {
         const selectedOption = this.options[this.selectedIndex];
         document.getElementById('nama_produk').value = selectedOption.dataset.name;
@@ -344,12 +413,10 @@
         updateTotal();
     });
 
-    // Size selection handler
     document.getElementById('size_option').addEventListener('change', function() {
         const selectedSize = this.value;
         
         if (selectedSize !== 'custom') {
-            // Fill in the form with standard measurements
             const measurements = standardSizes[selectedSize];
             
             for (const [field, value] of Object.entries(measurements)) {
@@ -359,7 +426,6 @@
                 }
             }
         } else {
-            // Clear all measurement fields for custom input
             const measurementFields = [
                 'lingkar_badan', 'lingkar_pinggang', 'lingkar_panggul', 
                 'lebar_pundak', 'panjang_lengan', 'lingkar_kerung_lengan',
@@ -435,15 +501,43 @@
     }
 
     document.addEventListener('DOMContentLoaded', function() {
+        const requiredFields = [
+            'product_id', 'nama_pemesan', 'payment_method', 'status_pesanan',
+            'lingkar_badan', 'lingkar_pinggang', 'lingkar_panggul', 'lebar_pundak',
+            'panjang_lengan', 'lingkar_kerung_lengan', 'lingkar_pergelangan_lengan',
+            'panjang_punggung', 'lebar_punggung', 'lebar_muka', 'panjang_baju'
+        ];
+
+        const errorMessages = document.querySelectorAll('.text-red-500');
+        errorMessages.forEach(error => {
+            setTimeout(() => {
+                error.style.display = 'none';
+            }, 10000); 
+        });
+
+        requiredFields.forEach(fieldId => {
+            const field = document.getElementById(fieldId);
+            if (field) {
+                field.addEventListener('input', function() {
+                    if (this.value) {
+                        this.classList.remove('border-red-500');
+                        const errorElement = this.nextElementSibling;
+                        if (errorElement && errorElement.classList.contains('text-red-500')) {
+                            errorElement.style.display = 'none';
+                        }
+                    }
+                });
+            }
+        });
         const productSelect = document.getElementById('product_id');
-        const quantityInput = document.getElementById('jumlah_produk');
-        
-        // Initialize current stock from selected product (if any)
-        if (productSelect.selectedIndex > 0) {
-            const selectedOption = productSelect.options[productSelect.selectedIndex];
-            currentStock = parseInt(selectedOption.dataset.stock) || 0;
-            document.getElementById('nama_produk').value = selectedOption.dataset.name;
+        if (productSelect.options.length > 0) {
+            const firstOption = productSelect.options[0];
+            document.getElementById('nama_produk').value = firstOption.dataset.name;
+            currentStock = parseInt(firstOption.dataset.stock) || 0;
+            updateStockMessage();
+            updateTotal();
         }
+        const quantityInput = document.getElementById('jumlah_produk');
         
         productSelect.addEventListener('change', function() {
             updateTotal();
@@ -455,9 +549,54 @@
             updateStockMessage();
         });
         
-        // Initial calculation
+        document.querySelector('form').addEventListener('submit', function(e) {
+            let hasError = false;
+            
+            requiredFields.forEach(fieldId => {
+                const field = document.getElementById(fieldId);
+                if (!field.value) {
+                    hasError = true;
+                    field.classList.add('border-red-500');
+                    if (!field.nextElementSibling || !field.nextElementSibling.classList.contains('text-red-500')) {
+                        const errorElement = document.createElement('p');
+                        errorElement.className = 'text-red-500 text-xs mt-1';
+                        errorElement.textContent = 'Field ini wajib diisi';
+                        field.parentNode.insertBefore(errorElement, field.nextSibling);
+                        
+                        setTimeout(() => {
+                            errorElement.style.display = 'none';
+                        }, 5000);
+                    }
+                }
+            });
+
+            if (hasError) {
+                e.preventDefault();
+                Swal.fire({
+                    title: 'Form tidak lengkap!',
+                    text: 'Mohon lengkapi semua field yang diperlukan',
+                    icon: 'warning',
+                    confirmButtonText: 'OK'
+                });
+                
+                const firstError = document.querySelector('.border-red-500');
+                if (firstError) {
+                    firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }
+        });
+        
+        @if(old('product_id'))
+            const productOption = document.querySelector(`option[value="{{ old('product_id') }}"]`);
+            if (productOption) {
+                currentStock = parseInt(productOption.dataset.stock) || 0;
+                updateStockMessage();
+                updateTotal();
+            }
+        @endif
+        
         updateTotal();
         updateStockMessage();
     });
 </script>
-@endsection
+@endpush

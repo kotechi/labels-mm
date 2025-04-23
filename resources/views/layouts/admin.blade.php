@@ -527,9 +527,7 @@
             </div>
         </aside>
 
-        <!-- Main Content -->
         <main class="flex-1 h-full pl-48 mt-2 lg:pl-[220px]">
-            <!-- Content Area -->
             <div class="px-5 pb-5 h-full">
                 @yield('content')
             </div>
@@ -537,19 +535,15 @@
     </div>
 
     <script>
-        // Initialize Lucide icons
         lucide.createIcons();
 
-        // Sidebar toggle functionality
         document.addEventListener('DOMContentLoaded', function() {
             const sidebar = document.querySelector('aside');
             const mainContent = document.querySelector('main');
             const toggleButton = document.getElementById('sidebar-toggle');
             
-            // Check local storage for sidebar state
             const isSidebarCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
             
-            // Apply saved state on page load
             if (isSidebarCollapsed) {
                 sidebar.classList.add('collapsed');
                 mainContent.classList.add('sidebar-collapsed');
@@ -562,7 +556,6 @@
                 `;
             }
             
-            // Toggle sidebar on button click
             toggleButton.addEventListener('click', function() {
                 sidebar.classList.toggle('collapsed');
                 mainContent.classList.toggle('sidebar-collapsed');
@@ -593,10 +586,9 @@
                 responsive: true,
                 ordering: true,
                 language: {
-                    search: "" // Menghilangkan label "Search:"
+                    search: "" 
                 },
                 "createdRow": function(row, data, dataIndex, cells) {
-                    // Ambil kategori dari data attribute
                     const kategori = $(row).data('kategori');
                     if (kategori === 'pemasukan') {
                         $(row).addClass('bg-green-100-important');
@@ -610,7 +602,6 @@
             });
         });
 
-        // SweetAlert for delete confirmation
         $('.delete-button').on('click', function() {
             var form = $(this).closest('form');
             Swal.fire({
@@ -627,48 +618,61 @@
                 }
             });
         });
+
+        
     </script>
 
-    @if(session('success'))
-    <script>
-        window.onload = function() {
-            Swal.fire({
-                icon: 'success',
-                title: 'Success!',
-                text: "{{ session('success') }}"
-            });
-        }
-    </script>
-    @endif
-
-    @if(session('error'))
-    <script>
-        window.onload = function() {
-            Swal.fire({
-                icon: 'error',
-                title: 'error!',
-                text: "{{ session('error') }}"
-            });
-        }
-    </script>
-    @endif
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Sembunyikan loading screen saat halaman selesai dimuat
+            const successMessage = "{{ session('success') }}";
+            const errorMessage = "{{ session('error') }}";
+            
+            const shownSuccessAlert = localStorage.getItem('shownSuccessAlert');
+            const shownErrorAlert = localStorage.getItem('shownErrorAlert');
+            
+            if (successMessage && successMessage !== shownSuccessAlert) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: successMessage
+                });
+                
+                localStorage.setItem('shownSuccessAlert', successMessage);
+                
+                setTimeout(() => {
+                    localStorage.removeItem('shownSuccessAlert');
+                }, 10000);
+            }
+            
+            if (errorMessage && errorMessage !== shownErrorAlert) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: errorMessage
+                });
+                
+                localStorage.setItem('shownErrorAlert', errorMessage);
+                
+                setTimeout(() => {
+                    localStorage.removeItem('shownErrorAlert');
+                }, 10000);
+            }
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
             const loadingScreen = document.getElementById('loading-screen');
             
-            // Tambahkan delay kecil untuk memastikan semua aset dimuat
             setTimeout(function() {
                 loadingScreen.style.opacity = '0';
                 setTimeout(function() {
                     loadingScreen.style.display = 'none';
-                }, 500); // Waktu sesuai dengan durasi transisi CSS
+                }, 500); 
             }, 300);
         });
         
-        // Tampilkan loading saat navigasi halaman
         document.addEventListener('click', function(e) {
-            // Periksa jika yang diklik adalah link halaman internal
             const target = e.target.closest('a');
             if (target && target.href && target.href.startsWith(window.location.origin) && !target.hasAttribute('data-no-loading')) {
                 const loadingScreen = document.getElementById('loading-screen');

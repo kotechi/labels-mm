@@ -7,7 +7,7 @@ use App\Models\Product;
 
 class Pesanan extends Model
 {
-    protected $primaryKey = 'id_pesanan'; // Set primary key to id_pesanan
+    protected $primaryKey = 'id_pesanan'; 
 
     protected $fillable = [
         'product_id',

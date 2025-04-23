@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('password');
             $table->string('usertype')->default('karyawan');
             $table->string('no_telp');
+            $table->rememberToken();
             $table->timestamps();
         });
     }

@@ -59,20 +59,16 @@
 
 <script>
     document.getElementById('productForm').addEventListener('submit', function() {
-        // Format harga jual sebelum submit
         const hargaJualDisplay = document.getElementById('harga_jual_display');
         const hargaJual = document.getElementById('harga_jual');
         hargaJual.value = hargaJualDisplay.value.replace(/[^0-9]/g, '');
     });
 
     function formatRupiah(element, hiddenId) {
-        // Hapus semua karakter selain angka
         let value = element.value.replace(/[^0-9]/g, '');
         
-        // Simpan nilai asli ke hidden input
         document.getElementById(hiddenId).value = value;
         
-        // Format tampilan dengan "Rp" dan titik sebagai pemisah ribuan
         if(value.length > 0) {
             element.value =  new Intl.NumberFormat('id-ID').format(value);
         } else {
@@ -80,7 +76,6 @@
         }
     }
 
-    // Format awal saat halaman dimuat
     window.onload = function() {
         const hargaJualDisplay = document.getElementById('harga_jual_display');
         if(hargaJualDisplay.value) {

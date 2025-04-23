@@ -60,32 +60,22 @@
 
 <script>
     document.getElementById('productForm').addEventListener('submit', function(e) {
-        // Format harga jual sebelum submit
         const hargaJualDisplay = document.getElementById('harga_jual_display');
         const hargaJual = document.getElementById('harga_jual');
         
-        // Bersihkan format dan simpan nilai numerik
         let numericValue = parseInt(hargaJualDisplay.value.replace(/[^0-9]/g, ''));
         
-        // Validasi minimal 4 juta di client side
-        if (numericValue < 4000000) {
-            e.preventDefault();
-            alert('Harga harus minimal Rp 4.000.000');
-            return false;
-        }
+
         
         hargaJual.value = numericValue;
         return true;
     });
 
     function formatRupiah(element, hiddenId) {
-        // Hapus semua karakter selain angka
         let value = element.value.replace(/[^0-9]/g, '');
         
-        // Simpan nilai asli ke hidden input
         document.getElementById(hiddenId).value = value;
         
-        // Format tampilan dengan "Rp" dan titik sebagai pemisah ribuan
         if(value.length > 0) {
             element.value = new Intl.NumberFormat('id-ID').format(value);
         } else {

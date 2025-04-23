@@ -5,7 +5,7 @@
 @section('content')
 <div class="p-5 rounded-lg shadow-md bg-white">
     <div class="flex justify-between items-center">
-        <u class="font-extrabold text-3xl">Karyawan | Detail Pesanan</u>
+        <u class="font-extrabold text-3xl">Admin | Detail Pesanan</u>
     </div>
 </div>
 <div class="max-w-6xl bg-white rounded-lg shadow-lg p-6 mx-auto  mt-4">
@@ -238,9 +238,7 @@
 @endsection
 
 @push('scripts')
-<!-- Script untuk download resi sebagai gambar dan handling modal -->
 <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
-<!-- Add this style section to your existing styles or adjust your current @media print section -->
 <style>
     @media print {
         body * {
@@ -285,10 +283,15 @@
     }
 </style>
 
-<!-- Update the print button script to ensure cleaner printing -->
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Set current date and time
+        @if(session('success') || isset($success))
+            Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: "{{ session('success') ?? $success }}"
+            });
+        @endif
         const now = new Date();
         const options = { 
             year: 'numeric', 
@@ -300,7 +303,6 @@
         };
         document.getElementById('current-datetime').textContent = now.toLocaleDateString('id-ID', options) + ' WIB';
         
-        // Modal functionality
         const modal = document.getElementById('resiModal');
         const openModalBtn = document.getElementById('printResiBtn');
         const closeModalBtn = document.getElementById('closeModal');
@@ -313,25 +315,20 @@
             modal.classList.add('hidden');
         });
         
-        // Print functionality with enhanced cleanup
         document.getElementById('printBtn').addEventListener('click', function() {
             const printButtons = document.querySelectorAll('#closeModal, #printBtn, #downloadResiBtn');
             
-            // Hide buttons before printing
             printButtons.forEach(button => {
                 button.style.display = 'none';
             });
             
-            // Create a clone of just the receipt content for printing
             const receiptContent = document.querySelector('.w-full.max-w-md .bg-white');
             
-            // Print with clean settings
             const originalTitle = document.title;
             document.title = "Resi Pesanan";
             window.print();
             document.title = originalTitle;
             
-            // Show buttons again after print dialog closes
             setTimeout(function() {
                 printButtons.forEach(button => {
                     button.style.display = 'flex';
@@ -339,7 +336,6 @@
             }, 500);
         });
         
-        // Download as image functionality
         document.getElementById('downloadResiBtn').addEventListener('click', function() {
             const element = document.querySelector('.w-full.max-w-md .bg-white');
             const printButtons = document.querySelectorAll('#closeModal, #printBtn, #downloadResiBtn');

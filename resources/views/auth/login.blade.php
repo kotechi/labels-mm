@@ -88,6 +88,17 @@
                         @enderror
                     </div>
 
+                    <!-- Remember Me Checkbox -->
+                    <div class="flex items-center">
+                        <input 
+                            type="checkbox" 
+                            id="remember" 
+                            name="remember" 
+                            class="h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                            {{ old('remember') ? 'checked' : '' }}
+                        >
+                        <label for="remember" class="ml-2 block text-sm text-gray-700">Remember Me</label>
+                    </div>
 
                     <!-- Submit Button -->
                     <button 
@@ -105,7 +116,6 @@
     </div>
 
     <script>
-        // Show/Hide Password Toggle
         document.getElementById('togglePassword').addEventListener('click', function() {
             const passwordInput = document.getElementById('password');
             const eyeIcon = document.getElementById('eyeIcon');

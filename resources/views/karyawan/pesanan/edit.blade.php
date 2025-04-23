@@ -15,7 +15,7 @@
         </div>
     </div>
     <div class="p-6 mt-2">
-        <form action="{{ route('karyawan.pesanans.update', $pesanan->id_pesanan) }}" method="POST">
+    <form action="{{ route('karyawan.pesanans.update', $pesanan->id_pesanan) }}" method="POST">
             @csrf
             @method('PATCH')
             <div class="grid grid-cols-2 gap-6">
@@ -24,11 +24,12 @@
                     <label for="nama_pemesan" class="block text-gray-700">Nama</label>
                     <input type="text" name="nama_pemesan" id="nama_pemesan" 
                         class="w-full p-2 border rounded-md" 
-                        value="{{ $pesanan->nama_pemesan }}" required>
+                        value="{{ $pesanan->nama_pemesan }}" >
                 </div>
                 <div class="space-y-2">
+                    <label for="product_id" class="block text-gray-700">Model</label>
                     <select name="product_id" id="product_id" 
-                    class="w-full p-2 border rounded-md" required>
+                    class="w-full p-2 border rounded-md" >
                     @foreach($products as $product)
                         <option value="{{ $product->id_product }}" 
                             data-price="{{ $product->harga_jual }}"
@@ -38,24 +39,24 @@
                             {{ $product->nama_produk }} (Stok: {{ $product->stock_product }})
                         </option>
                     @endforeach
-                </select>
-                <input type="hidden" name="nama_produk" id="nama_produk" value="{{ $pesanan->nama_produk }}">
-                <div id="stock-message" class="text-sm text-red-600 hidden"></div>
+                    </select>
+                    <input type="hidden" name="nama_produk" id="nama_produk" value="{{ $pesanan->nama_produk }}">
+                    <div id="stock-message" class="text-sm text-red-600 hidden"></div>
                 </div>
 
                 <div class="space-y-2">
                     <label for="payment_method" class="block text-gray-700">Metode Pembayaran</label>
                     <select name="payment_method" id="payment_method" 
-                        class="w-full p-2 border rounded-md" required>
+                        class="w-full p-2 border rounded-md" >
                         <option value="cash" {{ $pesanan->payment_method == 'cash' ? 'selected' : '' }}>Cash</option>
-                        <option value="midtrans" disabled {{ $pesanan->payment_method == 'midtrans' ? 'selected' : '' }}>Online Payment (Midtrans)</option>
+                        <option value="midtrans" {{ $pesanan->payment_method == 'midtrans' ? 'selected' : '' }}>Online Payment (Midtrans)</option>
                     </select>
                 </div>
 
                 <div class="space-y-2">
                     <label for="status_pesanan" class="block text-gray-700">Status Pesanan</label>
                     <select name="status_pesanan" id="status_pesanan" 
-                        class="w-full p-2 border rounded-md" required>
+                        class="w-full p-2 border rounded-md" >
                         <option value="proses" {{ $pesanan->status_pesanan == 'proses' ? 'selected' : '' }}>Proses</option>
                         <option value="paid" {{ $pesanan->status_pesanan == 'paid' ? 'selected' : '' }}>Paid</option>
                         <option value="completed" {{ $pesanan->status_pesanan == 'completed' ? 'selected' : '' }}>Completed</option>
@@ -74,7 +75,7 @@
                     <label for="no_telp_pemesan" class="block text-gray-700">Nomor telepon</label>
                     <input type="text" name="no_telp_pemesan" id="no_telp_pemesan" 
                         class="w-full p-2 border rounded-md" 
-                        value="{{ $pesanan->no_telp_pemesan }}" required>
+                        value="{{ $pesanan->no_telp_pemesan }}" >
                 </div>
 
                 <!-- Row 3 -->
@@ -84,94 +85,214 @@
                         <button type="button" class="px-3 py-1 border rounded" onclick="decrementQuantity()">-</button>
                         <input type="number" name="jumlah_produk" id="jumlah_produk" 
                             class="w-20 p-2 border rounded-md text-center" 
-                            value="{{ $pesanan->jumlah_produk }}" min="1" required>
+                            value="{{ $pesanan->jumlah_produk }}" min="1" >
                         <button type="button" class="px-3 py-1 border rounded" onclick="incrementQuantity()">+</button>
                     </div>
                 </div>
+                
+                <!-- Size Selection - Added to match create form -->
                 <div class="space-y-2">
-                    <label for="lingkar_pinggang" class="block text-gray-700">Lingkar pinggang</label>
-                    <input type="number" step="0.01" name="lingkar_pinggang" id="lingkar_pinggang" 
-                        class="w-full p-2 border rounded-md" 
-                        value="{{ $pesanan->lingkar_pinggang }}" required>
+                    <label for="size_option" class="block text-gray-700">Pilihan Ukuran</label>
+                    <select name="size_option" id="size_option" class="w-full p-2 border rounded-md">
+                        <option value="custom" selected>Ukuran Kustom</option>
+                        <option value="S">Small (S)</option>
+                        <option value="M">Medium (M)</option>
+                        <option value="L">Large (L)</option>
+                        <option value="XL">Extra Large (XL)</option>
+                        <option value="2XL">2XL</option>
+                        <option value="3XL">3XL</option>
+                        <option value="4XL">4XL</option>
+                    </select>
                 </div>
 
-                <!-- Measurement fields -->
-                <div class="space-y-2">
-                    <label for="lingkar_panggul" class="block text-gray-700">Lingkar pinggul</label>
-                    <input type="number" step="0.01" name="lingkar_panggul" id="lingkar_panggul" 
-                        class="w-full p-2 border rounded-md" 
-                        value="{{ $pesanan->lingkar_panggul }}" required>
-                </div>
-                <div class="space-y-2">
-                    <label for="lebar_pundak" class="block text-gray-700">Lebar pundak</label>
-                    <input type="number" step="0.01" name="lebar_pundak" id="lebar_pundak" 
-                        class="w-full p-2 border rounded-md" 
-                        value="{{ $pesanan->lebar_pundak }}" required>
+                <!-- Measurement Fields section -->
+                <div class="col-span-2">
+                    <div class="border-t pt-4 mb-2">
+                        <h3 class="font-semibold text-lg">Ukuran</h3>
+                    </div>
                 </div>
 
+                <!-- Measurement fields in pairs -->
                 <div class="space-y-2">
-                    <label for="panjang_lengan" class="block text-gray-700">Panjang lengan</label>
-                    <input type="number" step="0.01" name="panjang_lengan" id="panjang_lengan" 
-                        class="w-full p-2 border rounded-md" 
-                        value="{{ $pesanan->panjang_lengan }}" required>
-                </div>
-                <div class="space-y-2">
-                    <label for="lingkar_kerung_lengan" class="block text-gray-700">Lingkar kerung lengan</label>
-                    <input type="number" step="0.01" name="lingkar_kerung_lengan" id="lingkar_kerung_lengan" 
-                        class="w-full p-2 border rounded-md" 
-                        value="{{ $pesanan->lingkar_kerung_lengan }}" required>
-                </div>
-
-                <div class="space-y-2">
-                    <label for="lingkar_pergelangan_lengan" class="block text-gray-700">Lingkar pergelangan lengan</label>
-                    <input type="number" step="0.01" name="lingkar_pergelangan_lengan" id="lingkar_pergelangan_lengan" 
-                        class="w-full p-2 border rounded-md" 
-                        value="{{ $pesanan->lingkar_pergelangan_lengan }}" required>
-                </div>
-                <div class="space-y-2">
-                    <label for="panjang_punggung" class="block text-gray-700">Panjang punggung</label>
-                    <input type="number" step="0.01" name="panjang_punggung" id="panjang_punggung" 
-                        class="w-full p-2 border rounded-md" 
-                        value="{{ $pesanan->panjang_punggung }}" required>
-                </div>
-
-                <div class="space-y-2">
-                    <label for="lebar_punggung" class="block text-gray-700">Lebar punggung</label>
-                    <input type="number" step="0.01" name="lebar_punggung" id="lebar_punggung" 
-                        class="w-full p-2 border rounded-md" 
-                        value="{{ $pesanan->lebar_punggung }}" required>
-                </div>
-                <div class="space-y-2">
-                    <label for="lebar_muka" class="block text-gray-700">Lebar muka</label>
-                    <input type="number" step="0.01" name="lebar_muka" id="lebar_muka" 
-                        class="w-full p-2 border rounded-md" 
-                        value="{{ $pesanan->lebar_muka }}" required>
-                </div>
-                <div class="space-y-2">
-                    <label for="panjang_baju" class="block text-gray-700">Panjang Baju</label>
-                    <input type="number" step="0.01" name="panjang_baju" id="panjang_baju" 
-                        class="w-full p-2 border rounded-md" 
-                        value="{{ $pesanan->panjang_baju }}" required>
-                </div>
-                <div class="space-y-2">
-                    <label for="lingkar_badan" class="block text-gray-700">Lingkar Badan</label>
+                    <label for="lingkar_badan" class="block text-gray-700">Lingkar Badan (cm)</label>
                     <input type="number" step="0.01" name="lingkar_badan" id="lingkar_badan" 
                         class="w-full p-2 border rounded-md" 
-                        value="{{ $pesanan->lingkar_badan }}" required>
+                        value="{{ $pesanan->lingkar_badan }}" >
+                </div>
+                <div class="space-y-2">
+                    <label for="lingkar_pinggang" class="block text-gray-700">Lingkar pinggang (cm)</label>
+                    <input type="number" step="0.01" name="lingkar_pinggang" id="lingkar_pinggang" 
+                        class="w-full p-2 border rounded-md" 
+                        value="{{ $pesanan->lingkar_pinggang }}" >
+                </div>
+
+                <div class="space-y-2">
+                    <label for="lingkar_panggul" class="block text-gray-700">Lingkar pinggul (cm)</label>
+                    <input type="number" step="0.01" name="lingkar_panggul" id="lingkar_panggul" 
+                        class="w-full p-2 border rounded-md" 
+                        value="{{ $pesanan->lingkar_panggul }}" >
+                </div>
+                <div class="space-y-2">
+                    <label for="lebar_pundak" class="block text-gray-700">Lebar pundak (cm)</label>
+                    <input type="number" step="0.01" name="lebar_pundak" id="lebar_pundak" 
+                        class="w-full p-2 border rounded-md" 
+                        value="{{ $pesanan->lebar_pundak }}" >
+                </div>
+
+                <div class="space-y-2">
+                    <label for="panjang_lengan" class="block text-gray-700">Panjang lengan (cm)</label>
+                    <input type="number" step="0.01" name="panjang_lengan" id="panjang_lengan" 
+                        class="w-full p-2 border rounded-md" 
+                        value="{{ $pesanan->panjang_lengan }}" >
+                </div>
+                <div class="space-y-2">
+                    <label for="lingkar_kerung_lengan" class="block text-gray-700">Lingkar kerung lengan (cm)</label>
+                    <input type="number" step="0.01" name="lingkar_kerung_lengan" id="lingkar_kerung_lengan" 
+                        class="w-full p-2 border rounded-md" 
+                        value="{{ $pesanan->lingkar_kerung_lengan }}" >
+                </div>
+
+                <div class="space-y-2">
+                    <label for="lingkar_pergelangan_lengan" class="block text-gray-700">Lingkar pergelangan lengan (cm)</label>
+                    <input type="number" step="0.01" name="lingkar_pergelangan_lengan" id="lingkar_pergelangan_lengan" 
+                        class="w-full p-2 border rounded-md" 
+                        value="{{ $pesanan->lingkar_pergelangan_lengan }}" >
+                </div>
+                <div class="space-y-2">
+                    <label for="panjang_punggung" class="block text-gray-700">Panjang punggung (cm)</label>
+                    <input type="number" step="0.01" name="panjang_punggung" id="panjang_punggung" 
+                        class="w-full p-2 border rounded-md" 
+                        value="{{ $pesanan->panjang_punggung }}" >
+                </div>
+
+                <div class="space-y-2">
+                    <label for="lebar_punggung" class="block text-gray-700">Lebar punggung (cm)</label>
+                    <input type="number" step="0.01" name="lebar_punggung" id="lebar_punggung" 
+                        class="w-full p-2 border rounded-md" 
+                        value="{{ $pesanan->lebar_punggung }}" >
+                </div>
+                <div class="space-y-2">
+                    <label for="lebar_muka" class="block text-gray-700">Lebar muka (cm)</label>
+                    <input type="number" step="0.01" name="lebar_muka" id="lebar_muka" 
+                        class="w-full p-2 border rounded-md" 
+                        value="{{ $pesanan->lebar_muka }}" >
+                </div>
+                <div class="space-y-2">
+                    <label for="panjang_baju" class="block text-gray-700">Panjang Baju (cm)</label>
+                    <input type="number" step="0.01" name="panjang_baju" id="panjang_baju" 
+                        class="w-full p-2 border rounded-md" 
+                        value="{{ $pesanan->panjang_baju }}" >
                 </div>
             </div>
 
             <div class="mt-6 flex justify-end space-x-2">
-                <a onclick="history.back()" class="mr-3 px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-700">Kembali</a>
-                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                <a onclick="history.back()" class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-700">Kembali</a>
+                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700" id="submit-button">
                     Update
                 </button>
             </div>
+            
         </form>
     </div>
 </div>
-
+@endsection
+@push('scripts')
 <script>
+    // Standard size measurements (in cm)
+    const standardSizes = {
+        'S': {
+            lingkar_badan: 90,
+            lingkar_pinggang: 76,
+            lingkar_panggul: 96,
+            lebar_pundak: 40,
+            panjang_lengan: 58,
+            lingkar_kerung_lengan: 42,
+            lingkar_pergelangan_lengan: 18,
+            panjang_punggung: 38,
+            lebar_punggung: 40,
+            lebar_muka: 31,
+            panjang_baju: 68
+        },
+        'M': {
+            lingkar_badan: 96,
+            lingkar_pinggang: 80,
+            lingkar_panggul: 100,
+            lebar_pundak: 42,
+            panjang_lengan: 60,
+            lingkar_kerung_lengan: 45,
+            lingkar_pergelangan_lengan: 20,
+            panjang_punggung: 40,
+            lebar_punggung: 43,
+            lebar_muka: 33,
+            panjang_baju: 70
+        },
+        'L': {
+            lingkar_badan: 102,
+            lingkar_pinggang: 86,
+            lingkar_panggul: 106,
+            lebar_pundak: 44,
+            panjang_lengan: 61,
+            lingkar_kerung_lengan: 48,
+            lingkar_pergelangan_lengan: 22,
+            panjang_punggung: 42,
+            lebar_punggung: 46,
+            lebar_muka: 35,
+            panjang_baju: 72
+        },
+        'XL': {
+            lingkar_badan: 108,
+            lingkar_pinggang: 92,
+            lingkar_panggul: 112,
+            lebar_pundak: 46,
+            panjang_lengan: 62,
+            lingkar_kerung_lengan: 51,
+            lingkar_pergelangan_lengan: 24,
+            panjang_punggung: 44,
+            lebar_punggung: 49,
+            lebar_muka: 37,
+            panjang_baju: 74
+        },
+        '2XL': {
+            lingkar_badan: 116,
+            lingkar_pinggang: 100,
+            lingkar_panggul: 120,
+            lebar_pundak: 48,
+            panjang_lengan: 63,
+            lingkar_kerung_lengan: 54,
+            lingkar_pergelangan_lengan: 26,
+            panjang_punggung: 46,
+            lebar_punggung: 52,
+            lebar_muka: 39,
+            panjang_baju: 76
+        },
+        '3XL': {
+            lingkar_badan: 124,
+            lingkar_pinggang: 108,
+            lingkar_panggul: 128,
+            lebar_pundak: 50,
+            panjang_lengan: 64,
+            lingkar_kerung_lengan: 57,
+            lingkar_pergelangan_lengan: 28,
+            panjang_punggung: 48,
+            lebar_punggung: 55,
+            lebar_muka: 41,
+            panjang_baju: 78
+        },
+        '4XL': {
+            lingkar_badan: 132,
+            lingkar_pinggang: 116,
+            lingkar_panggul: 136,
+            lebar_pundak: 52,
+            panjang_lengan: 65,
+            lingkar_kerung_lengan: 60,
+            lingkar_pergelangan_lengan: 30,
+            panjang_punggung: 50,
+            lebar_punggung: 58,
+            lebar_muka: 43,
+            panjang_baju: 80
+        }
+    };
+
     let currentStock = 0;
     let originalQuantity = parseInt(document.getElementById('jumlah_produk').value) || 0;
     let originalProductId = document.getElementById('product_id').value;
@@ -218,7 +339,7 @@
     function updateStockMessage() {
         const quantityInput = document.getElementById('jumlah_produk');
         const stockMessage = document.getElementById('stock-message');
-        const submitButton = document.querySelector('button[type="submit"]');
+        const submitButton = document.getElementById('submit-button');
         const productSelect = document.getElementById('product_id');
         const selectedId = productSelect.value;
         const quantity = parseInt(quantityInput.value) || 0;
@@ -283,6 +404,23 @@
         totalPriceInput.value = total;
         updateStockMessage();
     }
+    
+    // Size selection handler
+    document.getElementById('size_option').addEventListener('change', function() {
+        const selectedSize = this.value;
+        
+        if (selectedSize !== 'custom') {
+            // Fill in the form with standard measurements
+            const measurements = standardSizes[selectedSize];
+            
+            for (const [field, value] of Object.entries(measurements)) {
+                const input = document.getElementById(field);
+                if (input) {
+                    input.value = value;
+                }
+            }
+        }
+    });
 
     document.addEventListener('DOMContentLoaded', function() {
         const productSelect = document.getElementById('product_id');
@@ -307,4 +445,4 @@
         updateTotal();
     });
 </script>
-@endsection
+@endpush

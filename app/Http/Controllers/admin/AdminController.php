@@ -23,13 +23,11 @@ class AdminController extends Controller
         $currentMonth = date('m');
         $currentYear = date('Y');
         
-        // Get 6 years of data (current + 5 previous years)
         $startYear = $currentYear - 5;
         
         // ======== DATA BULANAN UNTUK SEMUA TAHUN =========
         $allMonthlyData = [];
         
-        // Loop through each year we want to track
         for ($year = $startYear; $year <= $currentYear; $year++) {
             $monthlyEarnings = [];
             $monthlyModal = [];

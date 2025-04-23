@@ -133,17 +133,17 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/karyawan/profile', [KaryawanController::class, 'profile_update'])
     ->name('karyawan.profile.update');
 
-    Route::get('/pesanan', [KaryawanPesananController::class, 'index'])->name('karyawan.pesanans.index');
-    Route::get('/pesanan/create', [KaryawanPesananController::class, 'create'])->name('karyawan.pesanans.create');
-    Route::post('/pesanan', [KaryawanPesananController::class, 'store'])->name('karyawan.pesanans.store');
-    Route::get('/pesanan/{pesanan}/edit', [KaryawanPesananController::class, 'edit'])->name('karyawan.pesanans.edit');
-    Route::get('/pesanan/{pesanan}/detail', [KaryawanPesananController::class, 'detail'])->name('karyawan.pesanans.detail');
-    Route::get('/pesanan/{pesanan}/resi', [KaryawanPesananController::class, 'resi'])->name('karyawan.pesanans.resi');
-    Route::patch('/pesanan/{pesanan}', [KaryawanPesananController::class, 'update'])->name('karyawan.pesanans.update');
-    Route::delete('/pesanan/{pesanan}', [KaryawanPesananController::class, 'destroy'])->name('karyawan.pesanans.destroy');
-    Route::post('/pesanan/{pesanan}/markAsPaid', [KaryawanPesananController::class, 'markAsPaid'])->name('karyawan.pesanans.markAsPaid');
-    Route::post('/pesanan/{pesanan}/markAsCompleted', [KaryawanPesananController::class, 'markAsCompleted'])->name('karyawan.pesanans.markAsCompleted');
-    Route::delete('/pesanan/{pesanan}/deleteWithPemasukan', [KaryawanPesananController::class, 'destroyWithPemasukan'])->name('karyawan.pesanans.destroyWithPemasukan');
+    Route::get('/karyawan/pesanan', [KaryawanPesananController::class, 'index'])->name('karyawan.pesanans.index');
+    Route::get('/karyawan/pesanan/create', [KaryawanPesananController::class, 'create'])->name('karyawan.pesanans.create');
+    Route::post('/karyawan/pesanan', [KaryawanPesananController::class, 'store'])->name('karyawan.pesanans.store');
+    Route::get('/karyawan/pesanan/{pesanan}/edit', [KaryawanPesananController::class, 'edit'])->name('karyawan.pesanans.edit');
+    Route::get('/karyawan/pesanan/{pesanan}/detail', [KaryawanPesananController::class, 'detail'])->name('karyawan.pesanans.detail');
+    Route::get('/karyawan/pesanan/{pesanan}/resi', [KaryawanPesananController::class, 'resi'])->name('karyawan.pesanans.resi');
+    Route::patch('/karyawan/pesanan/{pesanan}', [KaryawanPesananController::class, 'update'])->name('karyawan.pesanans.update');
+    Route::delete('/karyawan/pesanan/{pesanan}', [KaryawanPesananController::class, 'destroy'])->name('karyawan.pesanans.destroy');
+    Route::post('/karyawan/pesanan/{pesanan}/markAsPaid', [KaryawanPesananController::class, 'markAsPaid'])->name('karyawan.pesanans.markAsPaid');
+    Route::post('/karyawan/pesanan/{pesanan}/markAsCompleted', [KaryawanPesananController::class, 'markAsCompleted'])->name('karyawan.pesanans.markAsCompleted');
+    Route::delete('/karyawan/pesanan/{pesanan}/deleteWithPemasukan', [KaryawanPesananController::class, 'destroyWithPemasukan'])->name('karyawan.pesanans.destroyWithPemasukan');
 });
 
 require __DIR__ . '/auth.php';

@@ -26,11 +26,10 @@ class AdminBahanController extends Controller
         $request->validate([
             'nama_bahan' => 'required',
             'jumlah_bahan' => 'required|integer',
-            'harga_satuan' => 'required|integer',  // Changed to match form
-            'total_harga' => 'required|integer',   // Changed to match form
+            'harga_satuan' => 'required|integer',  
+            'total_harga' => 'required|integer',   
             'periode_hari' => 'required|integer|min:1',
         ]);
-        // Create the bahan record with periode_hari
         $bahan = tbl_bahan::create([
             'nama_bahan' => $request->nama_bahan,
             'jumlah_bahan' => $request->jumlah_bahan,
@@ -40,20 +39,16 @@ class AdminBahanController extends Controller
             'id_user' => auth()->user()->id
         ]);
 
-        // Calculate the amount per day
         $periodeHari = $request->periode_hari;
         $totalHarga = $request->total_harga;
         $nominalPerHari = floor($totalHarga / $periodeHari);
         
-        // Calculate the remainder to add to the first day if division isn't even
         $remainder = $totalHarga - ($nominalPerHari * $periodeHari);
         
-        // Create multiple pengeluaran entries based on periode_hari
         for ($day = 0; $day < $periodeHari; $day++) {
             $currentDate = Carbon::now()->addDays($day);
             $nominalToday = $nominalPerHari;
             
-            // Add remainder to the first day
             if ($day === 0 && $remainder > 0) {
                 $nominalToday += $remainder;
             }
@@ -68,7 +63,6 @@ class AdminBahanController extends Controller
             ]);
         }
 
-        // Create transaction
         tbl_transaksi::create([
             'id_referens' => $bahan->id_bhn,
             'pelaku_transaksi' => auth()->user()->id_users,
@@ -105,23 +99,18 @@ public function update(Request $request, tbl_bahan $bahan)
         'periode_hari' => $request->periode_hari
     ]);
 
-    // Delete existing pengeluaran entries for this bahan
     Pengeluaran::where('id_modal', $bahan->id_bhn)->delete();
     
-    // Calculate the amount per day
     $periodeHari = $request->periode_hari;
     $totalHarga = $request->total_harga;
     $nominalPerHari = floor($totalHarga / $periodeHari);
     
-    // Calculate the remainder to add to the first day if division isn't even
     $remainder = $totalHarga - ($nominalPerHari * $periodeHari);
     
-    // Create new pengeluaran entries based on periode_hari
     for ($day = 0; $day < $periodeHari; $day++) {
         $currentDate = Carbon::now()->addDays($day);
         $nominalToday = $nominalPerHari;
         
-        // Add remainder to the first day
         if ($day === 0 && $remainder > 0) {
             $nominalToday += $remainder;
         }
@@ -136,7 +125,6 @@ public function update(Request $request, tbl_bahan $bahan)
         ]);
     }
 
-    // Create transaction for update
     tbl_transaksi::create([
         'id_referens' => $bahan->id_bhn,
         'pelaku_transaksi' => auth()->user()->id_users,
@@ -151,7 +139,6 @@ public function update(Request $request, tbl_bahan $bahan)
 
     public function destroy(tbl_bahan $bahan)
     {
-        // Delete all pengeluaran entries related to this bahan
         Pengeluaran::where('id_modal', $bahan->id_bhn)->delete();
         $bahan->delete();
         
