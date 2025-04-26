@@ -36,7 +36,7 @@
         <div class="container mx-auto px-4">
             <div class="flex flex-col md:flex-row items-center">
                 <div class="md:w-1/2 flex justify-center">
-                    <img src="{{ asset('storage/' . $headers->image) }}" alt="Fashion Display" class="rounded-lg shadow-lg w-40">
+                    <img src="{{ asset('storage/' . $headers->image) }}" alt="Fashion Display" class="rounded-lg shadow-lg w-80">
                 </div>
                 <div class="md:w-1/2 mb-8 md:mb-0">
                     <h2 class="text-purple-800 font-bold text-xl mb-2">WELCOME TO</h2>

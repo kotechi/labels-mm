@@ -15,7 +15,7 @@ class UserSeeder extends Seeder
         DB::table('users')->insert([
             'nama_lengkap' => 'Administrator',
             'username' => 'admin',
-            'password' => Hash::make('12345678'),
+            'password' => Hash::make('aditiya53op'),
             'usertype' => 'admin',
             'no_telp' => '08123456789',
             'created_at' => now(),
