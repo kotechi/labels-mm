@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="icon" type="image/svg+xml" href="{{ asset('storage/images/icon/logo.jpg') }}">
     <title>Admin | @yield('title')</title>
@@ -433,6 +433,72 @@
     aside.collapsed:hover li .tooltip {
         left: 100%;
     }
+
+
+    @media screen and (max-width: 768px) {
+        .datatable td, .datatable th {
+            font-size: 0.85rem;
+            padding: 0.5rem 0.3rem;
+        }
+        
+        .datatable thead th {
+            font-size: 0.9rem;
+        }
+        
+        .datatable td {
+            white-space: normal;
+            word-break: break-word;
+            max-width: none;
+        }
+    }
+
+    @media screen and (max-width: 640px) {
+    
+        input, select, textarea {
+            font-size: 16px !important;
+        }
+        
+        .card, .shadow-lg, .bg-white {
+            padding: 1rem !important;
+        }
+        
+        button, .btn, [type="button"], [type="submit"] {
+            padding: 0.5rem 1rem !important;
+            font-size: 0.9rem !important;
+        }
+        
+        .dataTables_paginate .paginate_button {
+            padding: 3px 8px !important;
+            font-size: 0.8rem !important;
+        }
+        
+        .dataTables_filter input {
+            width: 100% !important;
+            max-width: 150px;
+            margin-left: 0 !important;
+            margin-top: 5px;
+        }
+        
+        .dataTables_filter label {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+    }
+
+    @media screen and (max-width: 375px) {
+        .dataTables_length, .dataTables_filter {
+            width: 100%;
+            text-align: left !important;
+            margin-bottom: 10px;
+        }
+        
+        .dataTables_info, .dataTables_paginate {
+            width: 100%;
+            text-align: center !important;
+            margin-top: 10px;
+        }
+    }
 </style>
 <body class="min-h-screen font-sans bg-gray-100">
     <!-- Loading Screen -->
@@ -598,7 +664,38 @@
                 },
                 "initComplete": function() {
                     $('.dataTables_filter input').attr('placeholder', 'Search here...');
-                }
+                },
+                // Add these new options for better mobile responsiveness
+                responsive: {
+                    details: {
+                        display: $.fn.dataTable.Responsive.display.childRowImmediate,
+                        type: 'column',
+                        renderer: function(api, rowIdx, columns) {
+                            var data = $.map(columns, function(col, i) {
+                                return col.hidden ?
+                                    '<tr data-dt-row="'+col.rowIndex+'" data-dt-column="'+col.columnIndex+'">' +
+                                        '<td class="font-semibold pr-2">' + col.title + ':</td> ' +
+                                        '<td>' + col.data + '</td>' +
+                                    '</tr>' :
+                                    '';
+                            }).join('');
+                            
+                            return data ?
+                                $('<table class="w-full text-sm"/>').append(data) :
+                                false;
+                        }
+                    }
+                },
+                columnDefs: [
+                    { 
+                        responsivePriority: 1, 
+                        targets: 0 
+                    },
+                    { 
+                        responsivePriority: 2, 
+                        targets: -1 
+                    }
+                ]
             });
         });
 

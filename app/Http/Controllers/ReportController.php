@@ -13,14 +13,58 @@ use App\Models\tbl_transaksi;
 
 class ReportController extends Controller
 {
-
+    // Generate separate chart for either pemasukan or pengeluaran
+    private function generateSingleChartBase64(array $labels, array $data, string $type, string $title = '')
+    {
+        $totalAmount = array_sum($data);
+        $color = ($type === 'pemasukan') ? '#003cff' : '#ff0000';
+        $label = ($type === 'pemasukan') ? 'Pemasukan' : 'Pengeluaran';
+        
+        $chartConfig = [
+            'type' => 'line',
+            'data' => [
+                'labels' => $labels,
+                'datasets' => [
+                    [
+                        'label' => $label . ' (Rp ' . number_format($totalAmount, 0, ',', '.') . ')',
+                        'data' => $data,
+                        'borderColor' => $color,
+                        'backgroundColor' => ($type === 'pemasukan') ? 'rgba(0, 60, 255, 0.1)' : 'rgba(255, 0, 0, 0.1)',
+                        'fill' => true,
+                        'tension' => 0.3,
+                        'pointRadius' => 4,
+                    ]
+                ]
+            ],
+            'options' => [
+                'responsive' => true,
+                'title' => [
+                    'display' => true,
+                    'text' => $title
+                ],
+                'scales' => [
+                    'y' => [
+                        'beginAtZero' => true,
+                        'ticks' => [
+                            'callback' => "function(value) { return 'Rp ' + value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.'); }"
+                        ]
+                    ]
+                ]
+            ]
+        ];
+    
+        $url = 'https://quickchart.io/chart?c=' . urlencode(json_encode($chartConfig));
+        $imageData = file_get_contents($url);
+        return 'data:image/png;base64,' . base64_encode($imageData);
+    }
+    
+    // Combined chart function (pemasukan, pengeluaran, and keuntungan)
     private function generateChartBase64(array $labels, array $pemasukan, array $pengeluaran, string $title = '')
     {
         $keuntungan = array_map(function ($in, $out) {
             return $in - $out;
         }, $pemasukan, $pengeluaran);
     
-        // Hitung total
         $totalPemasukan = array_sum($pemasukan);
         $totalPengeluaran = array_sum($pengeluaran);
         $totalKeuntungan = array_sum($keuntungan);
@@ -56,6 +100,13 @@ class ReportController extends Controller
                     ],
                 ]
             ],
+            'options' => [
+                'responsive' => true,
+                'title' => [
+                    'display' => true,
+                    'text' => $title
+                ]
+            ]
         ];
     
         $url = 'https://quickchart.io/chart?c=' . urlencode(json_encode($chartConfig));
@@ -63,26 +114,28 @@ class ReportController extends Controller
         return 'data:image/png;base64,' . base64_encode($imageData);
     }
     
-    
-    
-
-
     public function generatePDF(Request $request)
     {
-        // Get report type from request
         $reportType = $request->input('type', 'current');
         $selectedYear = $request->input('year', Carbon::now()->year);
         $selectedMonth = $request->input('month', Carbon::now()->month);
         
-        // Create date objects for filtering
         $reportDate = Carbon::create($selectedYear, $reportType === 'yearly' ? 1 : $selectedMonth);
         
-        // Generate appropriate chart image based on report type
+        // Generate combined chart
         $chartImage = $reportType === 'yearly' 
             ? $this->generateYearlyChartImage($selectedYear)
             : $this->generateMonthlyChartImage($selectedYear, $selectedMonth);
+            
+        // Generate separate charts for income and expenses
+        $chartImagePemasukan = $reportType === 'yearly' 
+            ? $this->generateYearlyChartImageSingle($selectedYear, 'pemasukan')
+            : $this->generateMonthlyChartImageSingle($selectedYear, $selectedMonth, 'pemasukan');
+            
+        $chartImagePengeluaran = $reportType === 'yearly' 
+            ? $this->generateYearlyChartImageSingle($selectedYear, 'pengeluaran')
+            : $this->generateMonthlyChartImageSingle($selectedYear, $selectedMonth, 'pengeluaran');
         
-        // Get the data based on the report type
         $data = [
             'totalPengeluaran' => $this->getTotalPengeluaran($reportType, $selectedYear, $selectedMonth),
             'totalPemasukan' => $this->getTotalPemasukan($reportType, $selectedYear, $selectedMonth),
@@ -90,14 +143,21 @@ class ReportController extends Controller
             'pesanans' => $this->getPesananData($reportType, $selectedYear, $selectedMonth),
             'transaksis' => $this->getTransaksiData($reportType, $selectedYear, $selectedMonth),
             'chartImage' => $chartImage,
+            'chartImagePemasukan' => $chartImagePemasukan,
+            'chartImagePengeluaran' => $chartImagePengeluaran,
             'reportType' => $reportType,
             'reportTitle' => $this->getReportTitle($reportType, $reportDate)
         ];
         
-        // Add specific data based on report type
         if ($reportType === 'yearly') {
             $data['monthlyData'] = $this->getMonthlyDataForYear($selectedYear);
+            
+            // Combined monthly charts
             $data['yearlyCharts'] = $this->getMonthlyCharts($selectedYear);
+            
+            // Separate monthly charts
+            $data['yearlyChartsPemasukan'] = $this->getMonthlyChartsSingle($selectedYear, 'pemasukan');
+            $data['yearlyChartsPengeluaran'] = $this->getMonthlyChartsSingle($selectedYear, 'pengeluaran');
         } else {
             $data['dailyData'] = $this->getDailyDataForMonth($selectedYear, $selectedMonth);
         }
@@ -123,6 +183,7 @@ class ReportController extends Controller
         }
     }
 
+    // Combined yearly chart
     private function generateYearlyChartImage($year)
     {
         $monthlyData = $this->getMonthlyDataForYear($year);
@@ -137,7 +198,22 @@ class ReportController extends Controller
         return $this->generateChartBase64($labels, $pemasukan, $pengeluaran, "Grafik Tahunan {$year}");
     }
     
+    // Separate yearly chart for a specific type
+    private function generateYearlyChartImageSingle($year, $type)
+    {
+        $monthlyData = $this->getMonthlyDataForYear($year);
     
+        $labels = $monthlyData->pluck('month')->map(function($m) {
+            return Carbon::create()->month($m)->format('M');
+        })->toArray();
+    
+        $data = $monthlyData->pluck($type)->toArray();
+        $title = "Grafik $type Tahunan {$year}";
+    
+        return $this->generateSingleChartBase64($labels, $data, $type, $title);
+    }
+    
+    // Combined monthly chart
     private function generateMonthlyChartImage($year, $month)
     {
         $dailyData = $this->getDailyDataForMonth($year, $month);
@@ -148,18 +224,47 @@ class ReportController extends Controller
     
         return $this->generateChartBase64($labels, $pemasukan, $pengeluaran, "Grafik Harian {$year}-" . str_pad($month, 2, '0', STR_PAD_LEFT));
     }
-
     
+    // Separate monthly chart for a specific type
+    private function generateMonthlyChartImageSingle($year, $month, $type)
+    {
+        $dailyData = $this->getDailyDataForMonth($year, $month);
+    
+        $labels = $dailyData->pluck('day')->toArray();
+        $data = $dailyData->pluck($type)->toArray();
+        
+        $monthName = Carbon::create($year, $month)->format('F');
+        $title = "Grafik $type $monthName {$year}";
+    
+        return $this->generateSingleChartBase64($labels, $data, $type, $title);
+    }
+    
+    // Combined monthly charts for the whole year
     private function getMonthlyCharts($year)
     {
         $charts = [];
         
-        // For each month, generate a daily chart
         for ($month = 1; $month <= 12; $month++) {
             $monthName = Carbon::create($year, $month)->format('F');
             $charts[$month] = [
                 'name' => $monthName,
                 'chart' => $this->generateMonthlyChartImage($year, $month)
+            ];
+        }
+        
+        return $charts;
+    }
+    
+    // Separate monthly charts for the whole year for a specific type
+    private function getMonthlyChartsSingle($year, $type)
+    {
+        $charts = [];
+        
+        for ($month = 1; $month <= 12; $month++) {
+            $monthName = Carbon::create($year, $month)->format('F');
+            $charts[$month] = [
+                'name' => $monthName,
+                'chart' => $this->generateMonthlyChartImageSingle($year, $month, $type)
             ];
         }
         

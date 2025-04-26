@@ -32,6 +32,19 @@ class ContactController extends Controller
                          ->with('success', 'Contact created successfully.');
     }
 
+    public function landingpage(Request $request)
+    {
+        $request->validate([
+            'nama' => 'required',
+            'email' => 'required|email',
+            'message' => 'required',
+        ]);
+
+        Contact::create($request->all());
+
+        return redirect()->route('home')->with('success', 'Terima kasih atas masukannya.');
+    }
+
     public function show(Contact $contact)
     {
         return view('admin.contacts.show', compact('contact'));

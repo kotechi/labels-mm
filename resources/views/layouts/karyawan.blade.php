@@ -481,7 +481,7 @@
 
             <!-- Logout -->
             <div class="mt-auto">
-                <form action="{{ route('logout') }}" method="POST" class="flex space-x-2">
+                <form action="{{ route('logout') }}" method="POST" class="flex space-x-2" >
                     @csrf
                     <button type="submit" class="flex items-center">
                         <div class="w-9 h-9 p-2 flex items-center justify-center bg-black rounded-lg hover:bg-gray-800 cursor-pointer" id="logout_icon">

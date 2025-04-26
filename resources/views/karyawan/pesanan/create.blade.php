@@ -15,7 +15,7 @@
         </div>
     </div>
     <div class="p-6 mt-2">
-        <form action="{{ route('karyawan.pesanans.store') }}" method="POST">
+        <form action="{{ route('karyawan.pesanans.store') }}" method="POST" id="pesananForm">
             @csrf
             <div class="grid grid-cols-2 gap-6">
                 <!-- Row 1 -->
@@ -522,7 +522,7 @@
             updateStockMessage();
         });
         
-        document.querySelector('form').addEventListener('submit', function(e) {
+        document.getElementById('pesananForm').addEventListener('submit', function(e) {
             let hasError = false;
             
             requiredFields.forEach(fieldId => {

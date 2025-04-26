@@ -95,6 +95,21 @@
         .page-break {
             page-break-after: always;
         }
+        .chart-pemasukan {
+            margin-bottom: 30px;
+        }
+        .chart-pengeluaran {
+            margin-bottom: 30px;
+        }
+        .section-title {
+            color: #7D0066;
+            margin-top: 30px;
+            margin-bottom: 20px;
+            font-size: 20px;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+        }
     </style>
 </head>
 <body>
@@ -121,32 +136,101 @@
     @if($reportType === 'yearly')
         <div class="chart-container">
             <h2>Grafik Pendapatan Tahunan</h2>
-            <img src="{{ $chartImage }}" alt="Yearly Chart" style="max-width: 100%;">
-            
-            <div class="page-break"></div>
-            
-            <h2>Grafik Pendapatan Bulanan (Daily)</h2>
-            
-            <div class="monthly-charts">
-                @foreach($yearlyCharts as $index => $monthChart)
-                    <div class="monthly-chart">
-                        <h3>{{ $monthChart['name'] }}</h3>
-                        <img src="{{ $monthChart['chart'] }}" alt="{{ $monthChart['name'] }} Chart" style="max-width: 100%;">
+            <img src="{{ $chartImage }}" alt="Combined Yearly Chart" style="max-width: 100%;">
+        </div>
+        
+        <div class="page-break"></div>
+        
+        <!-- Separate Charts -->
+        <div class="section-title">Grafik Terpisah</div>
+        
+        <!-- Pemasukan Chart -->
+        <div class="chart-container chart-pemasukan">
+            <h2>Grafik Pemasukan Tahunan</h2>
+            <img src="{{ $chartImagePemasukan }}" alt="Yearly Income Chart" style="max-width: 100%;">
+        </div>
+        
+        <!-- Pengeluaran Chart -->
+        <div class="chart-container chart-pengeluaran">
+            <h2>Grafik Pengeluaran Tahunan</h2>
+            <img src="{{ $chartImagePengeluaran }}" alt="Yearly Expense Chart" style="max-width: 100%;">
+        </div>
+        
+        <div class="page-break"></div>
+        
+        <!-- Monthly Combined Charts -->
+        <div class="section-title">Grafik Bulanan Gabungan</div>
+        <div class="monthly-charts">
+            @foreach($yearlyCharts as $index => $monthChart)
+                <div class="monthly-chart">
+                    <h3>{{ $monthChart['name'] }}</h3>
+                    <img src="{{ $monthChart['chart'] }}" alt="{{ $monthChart['name'] }} Chart" style="max-width: 100%;">
+                </div>
+
+                @if(($index + 1) % 6 == 0 && !$loop->last)
                     </div>
+                    <div class="page-break"></div>
+                    <div class="monthly-charts">
+                @endif
+            @endforeach
+        </div>
+        
+        <div class="page-break"></div>
+        
+        <!-- Monthly Pemasukan Charts -->
+        <div class="section-title">Grafik Bulanan Pemasukan</div>
+        <div class="monthly-charts">
+            @foreach($yearlyChartsPemasukan as $index => $monthChart)
+                <div class="monthly-chart">
+                    <h3>{{ $monthChart['name'] }}</h3>
+                    <img src="{{ $monthChart['chart'] }}" alt="{{ $monthChart['name'] }} Chart" style="max-width: 100%;">
+                </div>
 
-                    @if(($index + 1) % 9 == 0 && !$loop->last)
-                        </div>
-                        <div class="page-break"></div>
-                        <div class="monthly-charts">
-                    @endif
-                @endforeach
-            </div>
+                @if(($index + 1) % 6 == 0 && !$loop->last)
+                    </div>
+                    <div class="page-break"></div>
+                    <div class="monthly-charts">
+                @endif
+            @endforeach
+        </div>
+        
+        <div class="page-break"></div>
+        
+        <!-- Monthly Pengeluaran Charts -->
+        <div class="section-title">Grafik Bulanan Pengeluaran</div>
+        <div class="monthly-charts">
+            @foreach($yearlyChartsPengeluaran as $index => $monthChart)
+                <div class="monthly-chart">
+                    <h3>{{ $monthChart['name'] }}</h3>
+                    <img src="{{ $monthChart['chart'] }}" alt="{{ $monthChart['name'] }} Chart" style="max-width: 100%;">
+                </div>
 
+                @if(($index + 1) % 6 == 0 && !$loop->last)
+                    </div>
+                    <div class="page-break"></div>
+                    <div class="monthly-charts">
+                @endif
+            @endforeach
         </div>
     @else
         <div class="chart-container">
             <h2>Grafik Pendapatan Harian</h2>
-            <img src="{{ $chartImage }}" alt="Monthly Chart" style="max-width: 100%;">
+            <img src="{{ $chartImage }}" alt="Combined Monthly Chart" style="max-width: 100%;">
+        </div>
+        
+        <div class="page-break"></div>
+        
+        <!-- Separate Monthly Charts -->
+        <div class="section-title">Grafik Terpisah</div>
+        
+        <!-- Monthly Pemasukan Chart -->
+        <div class="chart-container chart-pemasukan">
+            <img src="{{ $chartImagePemasukan }}" alt="Monthly Income Chart" style="max-width: 100%;">
+        </div>
+        
+        <!-- Monthly Pengeluaran Chart -->
+        <div class="chart-container chart-pengeluaran">
+            <img src="{{ $chartImagePengeluaran }}" alt="Monthly Expense Chart" style="max-width: 100%;">
         </div>
     @endif
 

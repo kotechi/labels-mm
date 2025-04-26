@@ -23,7 +23,7 @@ use App\Http\Controllers\KaryawanGalleryController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\CompanyProfileController;
 
-
+Route::post('/contact', [ContactController::class, 'landingpage'])->name('contact.lp.store');
 Route::get('/',[RouteController::class, 'index'])->name('home');
 Route::middleware('auth')->group(function () {
     Route::post('payments/midtrans-callback', [PesananController::class, 'handleCallback'])->name('midtrans.callback');
