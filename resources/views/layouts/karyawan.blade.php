@@ -459,7 +459,7 @@
                     <li class="mb-4 flex items-center relative">
                         <a href="{{ route('karyawan.gallery.index') }}" class="flex items-center text-gray-900 hover:text-gray-700">
                             <i class="w-7 h-7" data-lucide="image"></i>
-                            <span class="ml-2 text-lg font-semibold sidebar-text">Model</span>
+                            <span class="ml-2 text-lg font-semibold sidebar-text">Gallery</span>
                             @if(isset($outOfStockCount) && $outOfStockCount > 0)
                                 <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center sidebar-notification">
                                     {{ $outOfStockCount }}

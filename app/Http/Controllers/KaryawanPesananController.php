@@ -185,9 +185,11 @@ class KaryawanPesananController extends Controller
     {
         $pesanan = Pesanan::findOrFail($id);
         $users = User::all();
-        $product = Product::findOrFail($pesanan->product_id);
+        $product = Product::find($pesanan->product_id); 
+        
         return view('karyawan.pesanan.detail', compact('pesanan', 'users', 'product'));
     }
+    
 
     public function resi($id) {
         $pesanan = Pesanan::findOrFail($id);
@@ -198,7 +200,7 @@ class KaryawanPesananController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'product_id' => 'required|exists:products,id_product',
+            'product_id' => 'required',
             'nama_produk' => 'required|string|max:255',
             'nama_pemesan' => 'required|string|max:255',
             'status_pesanan' => 'required|string|in:proses,paid,completed',
@@ -221,64 +223,70 @@ class KaryawanPesananController extends Controller
 
         $pesanan = Pesanan::findOrFail($id);
         
-        // Get the currently authenticated user (who is performing the update)
         $currentUser = auth()->user()->id_users;
-        
-        // Begin transaction
         DB::beginTransaction();
         
         try {
-            // Check stock if product changes or quantity increases
-            if ($pesanan->product_id != $request->product_id || 
+            $productExists = Product::where('id_product', $request->product_id)->exists();
+            if (!$productExists && $request->product_id == $pesanan->product_id) {
+                // Keep using original product, don't change quantity
+                $request->merge(['jumlah_produk' => $pesanan->jumlah_produk]);
+            }
+            else if ($productExists) {
+                // Your existing stock check logic...
+                if ($pesanan->product_id != $request->product_id || 
                 ($pesanan->product_id == $request->product_id && $pesanan->jumlah_produk < $request->jumlah_produk)) {
                 
-                $product = Product::find($request->product_id);
-                if (!$product) {
-                    DB::rollBack();
-                    return redirect()->back()->with('error', 'Produk tidak ditemukan');
-                }
-                
-                $additionalQuantity = 0;
-                
-                if ($pesanan->product_id == $request->product_id) {
-                    // Same product, calculate additional quantity
-                    $additionalQuantity = $request->jumlah_produk - $pesanan->jumlah_produk;
-                } else {
-                    // Different product, need full quantity
-                    $additionalQuantity = $request->jumlah_produk;
-                }
-                
-                // Check if enough stock is available
-                if ($product->stock_product < $additionalQuantity) {
-                    DB::rollBack();
-                    return redirect()->back()->with('error', 'Stok produk tidak mencukupi');
-                }
-                
-                // If changing product, return original quantity to old product if it exists
-                if ($pesanan->product_id != $request->product_id) {
-                    $oldProduct = Product::find($pesanan->product_id);
-                    if ($oldProduct) {
-                        $oldProduct->stock_product += $pesanan->jumlah_produk;
-                        $oldProduct->save();
+                    $product = Product::find($request->product_id);
+                    if (!$product) {
+                        DB::rollBack();
+                        return redirect()->back()->with('error', 'Produk tidak ditemukan');
                     }
                     
-                    // Reduce stock from new product
-                    $product->stock_product -= $request->jumlah_produk;
-                    $product->save();
-                } else {
-                    // Same product, just adjust the difference
-                    $product->stock_product -= $additionalQuantity;
-                    $product->save();
+                    $additionalQuantity = 0;
+                    
+                    if ($pesanan->product_id == $request->product_id) {
+                        // Same product, calculate additional quantity
+                        $additionalQuantity = $request->jumlah_produk - $pesanan->jumlah_produk;
+                    } else {
+                        // Different product, need full quantity
+                        $additionalQuantity = $request->jumlah_produk;
+                    }
+                    
+                    // Check if enough stock is available
+                    if ($product->stock_product < $additionalQuantity) {
+                        DB::rollBack();
+                        return redirect()->back()->with('error', 'Stok produk tidak mencukupi');
+                    }
+                    
+                    // If changing product, return original quantity to old product if it exists
+                    if ($pesanan->product_id != $request->product_id) {
+                        $oldProduct = Product::find($pesanan->product_id);
+                        if ($oldProduct) {
+                            $oldProduct->stock_product += $pesanan->jumlah_produk;
+                            $oldProduct->save();
+                        }
+                        
+                        // Reduce stock from new product
+                        $product->stock_product -= $request->jumlah_produk;
+                        $product->save();
+                    } else {
+                        // Same product, just adjust the difference
+                        $product->stock_product -= $additionalQuantity;
+                        $product->save();
+                    }
+                } elseif ($pesanan->product_id == $request->product_id && $pesanan->jumlah_produk > $request->jumlah_produk) {
+                    // Returning some items to stock if product still exists
+                    $product = Product::find($request->product_id);
+                    if ($product) {
+                        $returnedQuantity = $pesanan->jumlah_produk - $request->jumlah_produk;
+                        $product->stock_product += $returnedQuantity;
+                        $product->save();
+                    }
                 }
-            } elseif ($pesanan->product_id == $request->product_id && $pesanan->jumlah_produk > $request->jumlah_produk) {
-                // Returning some items to stock if product still exists
-                $product = Product::find($request->product_id);
-                if ($product) {
-                    $returnedQuantity = $pesanan->jumlah_produk - $request->jumlah_produk;
-                    $product->stock_product += $returnedQuantity;
-                    $product->save();
-                }
+                // Rest of your existing logic...
             }
+
             
             // Mengabaikan created_by dari request
             $input = $request->except('created_by');

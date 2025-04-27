@@ -127,11 +127,10 @@
             </div>
         </div>
         <div class="mt-9 w-full items-center justify-center d-flex flex">
-            @if ($product)
             <button id="printResiBtn" class="rounded-md bg-[#AF0893] text-white p-2 mx-5 flex">
                 cetak resi <i class="w-5 h-5" data-lucide="notepad-text"></i>
             </button>
-            @endif
+              
             <a href="{{ route('karyawan.pesanans.index')}}">kembali</a>
         </div>
     </div>
@@ -173,21 +172,26 @@
             
             <hr class="border-t border-gray-300">
             
-            <!-- Item Pesanan (Single Item) -->
             <div class="p-4">
-                <div class="flex justify-between font-medium">
-                    <span>{{ $pesanan->nama_produk }}</span>
-                    <span>Rp {{ number_format($product->harga_jual, 0, ',', '.') }}</span>
-                </div>
-                <div class="text-sm text-gray-600">
-                    {{ $pesanan->jumlah_produk }}×{{ number_format($product->harga_jual, 0, ',', '.') }}
+                <span>{{ $pesanan->nama_produk }}</span>
+                <span>
+                    @if ($product)
+                        Rp {{ number_format($product->harga_jual, 0, ',', '.') }}
+                    @else
+                        Rp {{ number_format($pesanan->total_harga / max($pesanan->jumlah_produk, 1), 0, ',', '.') }}
+                    @endif
+                </span>
+                <div class="text-sm text-gray-600 ">
+                    @if($product)
+                        {{ $pesanan->jumlah_produk }}×{{ number_format($product->harga_jual, 0, ',', '.') }}
+                    @else
+                        {{ $pesanan->jumlah_produk }}× Rp {{ number_format($pesanan->total_harga / max($pesanan->jumlah_produk, 1), 0, ',', '.') }}
+                    @endif
                 </div>
             </div>
             
-            <!-- Divider -->
             <hr class="border-t border-gray-300">
             
-            <!-- Total -->
             <div class="p-4">
                 <div class="flex justify-between mb-2">
                     <span class="font-medium">Subtotal</span>
@@ -207,7 +211,6 @@
                 @endif
             </div>
             
-            <!-- Tombol Print dan Download dan Tutup -->
             <div class="p-4 flex justify-between">
                 <button id="closeModal" class="px-4 py-2 bg-gray-500 text-white rounded-md flex items-center shadow-lg">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
@@ -234,9 +237,7 @@
     </div>
 </div>
 
-<!-- Script untuk download resi sebagai gambar dan handling modal -->
 <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
-<!-- Add this style section to your existing styles or adjust your current @media print section -->
 <style>
     @media print {
         body * {

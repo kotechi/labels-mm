@@ -1,12 +1,11 @@
-{{-- resources/views/admin/products/index.blade.php --}}
 @extends('layouts.karyawan')
 
-@section('title', 'Model')
+@section('title', 'Gallery')
 
 @section('content')
 <div class="p-5 rounded-lg shadow bg-white">
     <div class="flex justify-between items-center">
-        <u class="font-extrabold text-3xl" >karyawan | model</u>
+        <u class="font-extrabold text-3xl" >karyawan | Gallery</u>
     </div>
 </div>
 

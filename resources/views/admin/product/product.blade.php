@@ -1,12 +1,12 @@
-{{-- resources/views/admin/products/index.blade.php --}}
+
 @extends('layouts.admin')
 
-@section('title', 'Model')
+@section('title', 'Gallery')
 
 @section('content')
 <div class="p-5 rounded-lg shadow bg-white">
     <div class="flex justify-between items-center">
-        <u class="font-extrabold text-3xl" >Admin | Model</u>
+        <u class="font-extrabold text-3xl" >Admin | Gallery</u>
     </div>
 </div>
 

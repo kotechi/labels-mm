@@ -16,18 +16,13 @@
             Welcome to LabelsMM
         </h2>
         <div class="flex w-full max-w-4xl bg-white rounded-lg shadow-lg">
-            <!-- Logo Section -->
             <div class="w-1/2 flex items-center justify-center bg-white shadow-lg mt-1 p-16">
                 <img src="{{ asset('storage/images/icon/LAblesMM.png') }}" alt="Logo" class="p-3 max-w-full rounded-xl border-2 border-pink-200 shadow-[0_6px_15px_rgba(0,0,0,0.6)]">
             </div>
-
-            <!-- Form Section -->
-            <div class="w-1/2 p-8 bg-white">
+            <div class="w-1/2 p-8 bg-white rounded-md">
                 <h2 class="text-3xl font-bold text-center text-[#00000] mb-8"><u>Agent Login</u></h2>
                 <form method="POST" action="{{ route('login') }}" onsubmit="this.querySelector('button[type=submit]').disabled = true;" class="mt-4 space-y-6">
                     @csrf
-                    
-                    <!-- Username Input -->
                     <div class="relative">
                         <div class="flex items-center border rounded-md border-[#6A1E55] px-3 py-3 bg-[#FFF0F0] focus-within:ring-2 focus-within:ring-purple-500">
                             <span class="text-gray-500">

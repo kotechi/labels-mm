@@ -148,147 +148,147 @@ class PesananController extends Controller
         }
     }
 
-    public function update(Request $request, $id)
-    {
-        $request->validate([
-            'product_id' => 'required|exists:products,id_product',
-            'nama_produk' => 'required|string|max:255',
-            'nama_pemesan' => 'required|string|max:255',
-            'status_pesanan' => 'required|string|in:proses,paid,completed',
-            'total_harga' => 'required|numeric',
-            'jumlah_produk' => 'required|numeric|min:1',
-            'no_telp_pemesan' => 'required|string|max:15',
-            'payment_method' => 'required|string|max:255',
-            'lebar_muka' => 'required|numeric',
-            'lebar_pundak' => 'required|numeric',
-            'lebar_punggung' => 'required|numeric',
-            'panjang_lengan' => 'required|numeric',
-            'panjang_punggung' => 'required|numeric',
-            'panjang_baju' => 'required|numeric',
-            'lingkar_badan' => 'required|numeric',
-            'lingkar_pinggang' => 'required|numeric',
-            'lingkar_panggul' => 'required|numeric',
-            'lingkar_kerung_lengan' => 'required|numeric',
-            'lingkar_pergelangan_lengan' => 'required|numeric',
-        ]);
+        public function update(Request $request, $id)
+        {
+            $request->validate([
+                'product_id' => 'required',
+                'nama_produk' => 'required|string|max:255',
+                'nama_pemesan' => 'required|string|max:255',
+                'status_pesanan' => 'required|string|in:proses,paid,completed',
+                'total_harga' => 'required|numeric',
+                'jumlah_produk' => 'required|numeric|min:1',
+                'no_telp_pemesan' => 'required|string|max:15',
+                'payment_method' => 'required|string|max:255',
+                'lebar_muka' => 'required|numeric',
+                'lebar_pundak' => 'required|numeric',
+                'lebar_punggung' => 'required|numeric',
+                'panjang_lengan' => 'required|numeric',
+                'panjang_punggung' => 'required|numeric',
+                'panjang_baju' => 'required|numeric',
+                'lingkar_badan' => 'required|numeric',
+                'lingkar_pinggang' => 'required|numeric',
+                'lingkar_panggul' => 'required|numeric',
+                'lingkar_kerung_lengan' => 'required|numeric',
+                'lingkar_pergelangan_lengan' => 'required|numeric',
+            ]);
 
-        $pesanan = Pesanan::findOrFail($id);
-        
-        $currentUser = auth()->user()->id_users;
-        
-        DB::beginTransaction();
-        
-        try {
-            if ($pesanan->product_id != $request->product_id || 
-                ($pesanan->product_id == $request->product_id && $pesanan->jumlah_produk < $request->jumlah_produk)) {
-                
-                $product = Product::find($request->product_id);
-                if (!$product) {
-                    DB::rollBack();
-                    return redirect()->back()->with('error', 'Produk tidak ditemukan');
-                }
-                
-                $additionalQuantity = 0;
-                
-                if ($pesanan->product_id == $request->product_id) {
-                    $additionalQuantity = $request->jumlah_produk - $pesanan->jumlah_produk;
-                } else {
-                    $additionalQuantity = $request->jumlah_produk;
-                }
-                
-                if ($product->stock_product < $additionalQuantity) {
-                    DB::rollBack();
-                    return redirect()->back()->with('error', 'Stok produk tidak mencukupi');
-                }
-                
-                if ($pesanan->product_id != $request->product_id) {
-                    $oldProduct = Product::find($pesanan->product_id);
-                    if ($oldProduct) {
-                        $oldProduct->stock_product += $pesanan->jumlah_produk;
-                        $oldProduct->save();
+            $pesanan = Pesanan::findOrFail($id);
+            
+            $currentUser = auth()->user()->id_users;
+            
+            DB::beginTransaction();
+            
+            try {
+                if ($pesanan->product_id != $request->product_id || 
+                    ($pesanan->product_id == $request->product_id && $pesanan->jumlah_produk < $request->jumlah_produk)) {
+                    
+                    $product = Product::find($request->product_id);
+                    if (!$product) {
+                        DB::rollBack();
+                        return redirect()->back()->with('error', 'Produk tidak ditemukan');
                     }
                     
-                    $product->stock_product -= $request->jumlah_produk;
-                    $product->save();
-                } else {
-                    $product->stock_product -= $additionalQuantity;
-                    $product->save();
+                    $additionalQuantity = 0;
+                    
+                    if ($pesanan->product_id == $request->product_id) {
+                        $additionalQuantity = $request->jumlah_produk - $pesanan->jumlah_produk;
+                    } else {
+                        $additionalQuantity = $request->jumlah_produk;
+                    }
+                    
+                    if ($product->stock_product < $additionalQuantity) {
+                        DB::rollBack();
+                        return redirect()->back()->with('error', 'Stok produk tidak mencukupi');
+                    }
+                    
+                    if ($pesanan->product_id != $request->product_id) {
+                        $oldProduct = Product::find($pesanan->product_id);
+                        if ($oldProduct) {
+                            $oldProduct->stock_product += $pesanan->jumlah_produk;
+                            $oldProduct->save();
+                        }
+                        
+                        $product->stock_product -= $request->jumlah_produk;
+                        $product->save();
+                    } else {
+                        $product->stock_product -= $additionalQuantity;
+                        $product->save();
+                    }
+                } elseif ($pesanan->product_id == $request->product_id && $pesanan->jumlah_produk > $request->jumlah_produk) {
+                    $product = Product::find($request->product_id);
+                    if ($product) {
+                        $returnedQuantity = $pesanan->jumlah_produk - $request->jumlah_produk;
+                        $product->stock_product += $returnedQuantity;
+                        $product->save();
+                    }
                 }
-            } elseif ($pesanan->product_id == $request->product_id && $pesanan->jumlah_produk > $request->jumlah_produk) {
-                $product = Product::find($request->product_id);
-                if ($product) {
-                    $returnedQuantity = $pesanan->jumlah_produk - $request->jumlah_produk;
-                    $product->stock_product += $returnedQuantity;
-                    $product->save();
-                }
-            }
-            
-            $input = $request->except('created_by');
-            
-            if ($pesanan->total_harga != $input['total_harga'] || $pesanan->jumlah_produk != $input['jumlah_produk']) {
-                $transaction = new tbl_transaksi();
-                $transaction->id_referens = $pesanan->id_pesanan;
-                $transaction->pelaku_transaksi = $currentUser; // Menggunakan user yang sedang login
-                $transaction->keterangan = sprintf(
-                    'Order updated for Order #%d - %s (Qty: %d)', 
-                    $pesanan->id_pesanan,
-                    $pesanan->nama_produk,
-                    $input['jumlah_produk']
-                );
-                $transaction->nominal = intval($input['total_harga']); // Convert to integer if stored as string
-                $transaction->kategori = 'pemasukan';
-                $transaction->tanggal = now();
-                $transaction->save();
-
-                $pemasukan = Pemasukan::where('id_referensi', $pesanan->id_pesanan)->first();
-                if ($pemasukan) {
-                    $pemasukan->nominal = intval($input['total_harga']); // Convert to integer if stored as string
-                    $pemasukan->created_by = $currentUser; // Update dengan user yang sedang login
-                    $pemasukan->save();
-                }
-            }
-            
-            $pesanan->update($input);
-
-            if ($pesanan->status_pesanan === 'proses') {
-                Pemasukan::where('id_referensi', $pesanan->id_pesanan)->delete();
-            } else {
-                if (in_array($pesanan->status_pesanan, ['paid', 'completed'])) {
-                    tbl_transaksi::create([
-                        'id_referens' => $pesanan->id_pesanan,
-                        'pelaku_transaksi' => $currentUser, // Menggunakan user yang sedang login
-                        'keterangan' => "Order updated for Order #{$pesanan->id_pesanan} - {$pesanan->nama_produk} (Qty: {$pesanan->jumlah_produk})",
-                        'nominal' => $pesanan->total_harga,
-                        'kategori' => 'pemasukan',
-                        'tanggal' => now(),
-                    ]);
+                
+                $input = $request->except('created_by');
+                
+                if ($pesanan->total_harga != $input['total_harga'] || $pesanan->jumlah_produk != $input['jumlah_produk']) {
+                    $transaction = new tbl_transaksi();
+                    $transaction->id_referens = $pesanan->id_pesanan;
+                    $transaction->pelaku_transaksi = $currentUser; // Menggunakan user yang sedang login
+                    $transaction->keterangan = sprintf(
+                        'Order updated for Order #%d - %s (Qty: %d)', 
+                        $pesanan->id_pesanan,
+                        $pesanan->nama_produk,
+                        $input['jumlah_produk']
+                    );
+                    $transaction->nominal = intval($input['total_harga']); // Convert to integer if stored as string
+                    $transaction->kategori = 'pemasukan';
+                    $transaction->tanggal = now();
+                    $transaction->save();
 
                     $pemasukan = Pemasukan::where('id_referensi', $pesanan->id_pesanan)->first();
                     if ($pemasukan) {
-                        $pemasukan->nominal = $pesanan->total_harga;
+                        $pemasukan->nominal = intval($input['total_harga']); // Convert to integer if stored as string
                         $pemasukan->created_by = $currentUser; // Update dengan user yang sedang login
                         $pemasukan->save();
-                    } else {
-                        Pemasukan::create([
-                            'id_referensi' => $pesanan->id_pesanan,
-                            'keterangan' => "Payment received for Order #{$pesanan->id_pesanan} - {$pesanan->nama_produk} (Qty: {$pesanan->jumlah_produk})",
-                            'nominal' => $pesanan->total_harga,
-                            'created_by' => $currentUser, // Menggunakan user yang sedang login
-                            'created_at' => now(),
-                        ]);
                     }
                 }
-            }
-            
-            DB::commit();
-            return redirect()->route('pemasukan.index')
-                ->with('success', 'Pesanan updated successfully');
                 
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return redirect()->back()->with('error', 'Error updating order: ' . $e->getMessage());
+                $pesanan->update($input);
+
+                if ($pesanan->status_pesanan === 'proses') {
+                    Pemasukan::where('id_referensi', $pesanan->id_pesanan)->delete();
+                } else {
+                    if (in_array($pesanan->status_pesanan, ['paid', 'completed'])) {
+                        tbl_transaksi::create([
+                            'id_referens' => $pesanan->id_pesanan,
+                            'pelaku_transaksi' => $currentUser, // Menggunakan user yang sedang login
+                            'keterangan' => "Order updated for Order #{$pesanan->id_pesanan} - {$pesanan->nama_produk} (Qty: {$pesanan->jumlah_produk})",
+                            'nominal' => $pesanan->total_harga,
+                            'kategori' => 'pemasukan',
+                            'tanggal' => now(),
+                        ]);
+
+                        $pemasukan = Pemasukan::where('id_referensi', $pesanan->id_pesanan)->first();
+                        if ($pemasukan) {
+                            $pemasukan->nominal = $pesanan->total_harga;
+                            $pemasukan->created_by = $currentUser; // Update dengan user yang sedang login
+                            $pemasukan->save();
+                        } else {
+                            Pemasukan::create([
+                                'id_referensi' => $pesanan->id_pesanan,
+                                'keterangan' => "Payment received for Order #{$pesanan->id_pesanan} - {$pesanan->nama_produk} (Qty: {$pesanan->jumlah_produk})",
+                                'nominal' => $pesanan->total_harga,
+                                'created_by' => $currentUser, // Menggunakan user yang sedang login
+                                'created_at' => now(),
+                            ]);
+                        }
+                    }
+                }
+                
+                DB::commit();
+                return redirect()->route('pemasukan.index')
+                    ->with('success', 'Pesanan updated successfully');
+                    
+            } catch (\Exception $e) {
+                DB::rollBack();
+                return redirect()->back()->with('error', 'Error updating order: ' . $e->getMessage());
+            }
         }
-    }
 
     public function generateQRCode(Request $request)
     {
@@ -311,7 +311,7 @@ class PesananController extends Controller
     {
         $pesanan = Pesanan::findOrFail($id);
         $users = User::all();
-        $product = Product::findOrFail($pesanan->product_id);
+        $product = Product::find($pesanan->product_id);
         return view('admin.pesanan.detail', compact('pesanan', 'users', 'product'));
     }
 

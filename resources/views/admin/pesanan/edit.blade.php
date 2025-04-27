@@ -46,16 +46,31 @@
                 <div class="space-y-2">
                     <label for="product_id" class="block text-gray-700">Model</label>
                     <select name="product_id" id="product_id" 
-                    class="w-full p-2 border rounded-md @error('product_id') border-red-500 @enderror" >
-                    @foreach($products as $product)
-                        <option value="{{ $product->id_product }}" 
-                            data-price="{{ $product->harga_jual }}"
-                            data-name="{{ $product->nama_produk }}"
-                            data-stock="{{ $product->stock_product }}"
-                            {{ old('product_id', $pesanan->product_id) == $product->id_product ? 'selected' : '' }}>
-                            {{ $product->nama_produk }} (Stok: {{ $product->stock_product }})
-                        </option>
-                    @endforeach
+                        class="w-full p-2 border rounded-md @error('product_id') border-red-500 @enderror">
+                    
+                        <!-- Add the original product if it's been deleted -->
+                        @if(!$products->contains('id_product', $pesanan->product_id))
+                            <option value="{{ $pesanan->product_id }}" 
+                                    data-price="{{ $pesanan->total_harga / $pesanan->jumlah_produk }}"
+                                    data-name="{{ $pesanan->nama_produk }}"
+                                    data-stock="{{ $pesanan->jumlah_produk }}"
+                                    data-deleted="true"
+                                    {{ old('product_id', $pesanan->product_id) == $pesanan->product_id ? 'selected' : '' }}>
+                                {{ $pesanan->nama_produk }} (Product deleted)
+                            </option>
+                        @endif
+                        
+                        <!-- List all active products -->
+                        @foreach($products as $product)
+                            <option value="{{ $product->id_product }}" 
+                                    data-price="{{ $product->harga_jual }}"
+                                    data-name="{{ $product->nama_produk }}"
+                                    data-stock="{{ $product->stock_product }}"
+                                    data-deleted="false"
+                                    {{ old('product_id', $pesanan->product_id) == $product->id_product ? 'selected' : '' }}>
+                                {{ $product->nama_produk }} (Stok: {{ $product->stock_product }})
+                            </option>
+                        @endforeach
                     </select>
                     <input type="hidden" name="nama_produk" id="nama_produk" value="{{ old('nama_produk', $pesanan->nama_produk) }}">
                     <div id="stock-message" class="text-sm text-red-600 hidden"></div>
@@ -491,26 +506,58 @@
     });
 
     document.addEventListener('DOMContentLoaded', function() {
-        const productSelect = document.getElementById('product_id');
-        const quantityInput = document.getElementById('jumlah_produk');
-        
-        // Initialize with the current selected product's stock
-        const selectedOption = productSelect.options[productSelect.selectedIndex];
+    const productSelect = document.getElementById('product_id');
+    const quantityInput = document.getElementById('jumlah_produk');
+    const quantityIncButton = document.querySelector('button[onclick="incrementQuantity()"]');
+    const quantityDecButton = document.querySelector('button[onclick="decrementQuantity()"]');
+    
+    // Initialize with the current selected product's stock
+    const selectedOption = productSelect.options[productSelect.selectedIndex];
+    currentStock = parseInt(selectedOption.dataset.stock) || 0;
+    const isDeleted = selectedOption.dataset.deleted === 'true';
+    
+    // Handle deleted product initially
+    if (isDeleted) {
+        quantityInput.readOnly = true;
+        quantityIncButton.disabled = true;
+        quantityDecButton.disabled = true;
+        quantityIncButton.classList.add('opacity-50', 'cursor-not-allowed');
+        quantityDecButton.classList.add('opacity-50', 'cursor-not-allowed');
+    }
+    
+    productSelect.addEventListener('change', function() {
+        const selectedOption = this.options[this.selectedIndex];
+        document.getElementById('nama_produk').value = selectedOption.dataset.name;
         currentStock = parseInt(selectedOption.dataset.stock) || 0;
         
-        productSelect.addEventListener('change', function() {
-            const selectedOption = this.options[this.selectedIndex];
-            document.getElementById('nama_produk').value = selectedOption.dataset.name;
-            currentStock = parseInt(selectedOption.dataset.stock) || 0;
-            updateTotal();
-        });
+        // Check if selected product is deleted
+        const isDeleted = selectedOption.dataset.deleted === 'true';
         
-        quantityInput.addEventListener('input', function() {
-            updateTotal();
-        });
+        if (isDeleted) {
+            // Disable quantity controls for deleted product
+            quantityInput.readOnly = true;
+            quantityIncButton.disabled = true;
+            quantityDecButton.disabled = true;
+            quantityIncButton.classList.add('opacity-50', 'cursor-not-allowed');
+            quantityDecButton.classList.add('opacity-50', 'cursor-not-allowed');
+        } else {
+            // Enable quantity controls for active products
+            quantityInput.readOnly = false;
+            quantityIncButton.disabled = false;
+            quantityDecButton.disabled = false;
+            quantityIncButton.classList.remove('opacity-50', 'cursor-not-allowed');
+            quantityDecButton.classList.remove('opacity-50', 'cursor-not-allowed');
+        }
         
-        // Initial calculation
         updateTotal();
     });
+    
+    quantityInput.addEventListener('input', function() {
+        updateTotal();
+    });
+    
+    // Initial calculation
+    updateTotal();
+});
 </script>
 @endpush
