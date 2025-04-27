@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Contact;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 
 class ContactController extends Controller
 {
@@ -32,18 +33,35 @@ class ContactController extends Controller
                          ->with('success', 'Contact created successfully.');
     }
 
-    public function landingpage(Request $request)
-    {
-        $request->validate([
-            'nama' => 'required',
-            'email' => 'required|email',
-            'message' => 'required',
-        ]);
 
-        Contact::create($request->all());
-
-        return redirect()->route('home')->with('success', 'Terima kasih atas masukannya.');
+public function landingpage(Request $request)
+{
+    
+    $ip = $request->ip();
+    
+    $recentSubmission = Contact::where('ip_address', $ip)
+        ->where('created_at', '>', Carbon::now()->subDays(7))
+        ->exists();
+    
+    if ($recentSubmission) {
+        return redirect()->route('home')
+            ->with('error', 'Anda hanya bisa mengirim pesan sekali per minggu.');
     }
+
+    $validated = $request->validate([
+        'nama' => 'required',
+        'email' => 'required|email',
+        'message' => 'required',
+    ]);
+
+    // Tambahkan IP address ke data
+    $validated['ip_address'] = $ip;
+    
+    Contact::create($validated);
+
+    return redirect()->route('home')
+        ->with('success', 'Terima kasih atas masukannya!');
+}
 
     public function show(Contact $contact)
     {
