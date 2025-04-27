@@ -37,7 +37,7 @@ class ContactController extends Controller
 public function landingpage(Request $request)
 {
     
-    $ip = $request->ip();
+    $ip =$request->server->set('REMOTE_ADDR', '123.123.123.123');;
     
     $recentSubmission = Contact::where('ip_address', $ip)
         ->where('created_at', '>', Carbon::now()->subDays(7))
@@ -54,7 +54,6 @@ public function landingpage(Request $request)
         'message' => 'required',
     ]);
 
-    // Tambahkan IP address ke data
     $validated['ip_address'] = $ip;
     
     Contact::create($validated);
