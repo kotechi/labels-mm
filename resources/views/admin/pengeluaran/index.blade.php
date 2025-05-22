@@ -78,7 +78,7 @@
                     <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">ID</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Keterangan</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Nominal</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Pelaku</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">user</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Actions</th>
                 </tr>
             </thead>

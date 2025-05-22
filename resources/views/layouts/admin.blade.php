@@ -5,7 +5,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link rel="icon" type="image/svg+xml" href="{{ asset('storage/images/icon/logo.jpg') }}">
+    <link rel="icon" type="image/svg+xml" href="{{ asset('storage/images/icon/logo_label.png') }}">
     <title>Admin | @yield('title')</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script src="{{ asset('assets/js/chart.min.js') }}"></script>
@@ -119,11 +119,16 @@
     }
 
     .datatable td {
-        max-width: 150px;
+        max-width: 130px;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
         text-align: center !important;
+    }
+
+    #actions-td {
+        max-width: 200px;
+
     }
 
     .datatable thead th {

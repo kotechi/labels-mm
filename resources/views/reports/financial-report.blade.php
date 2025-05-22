@@ -28,7 +28,9 @@
             color: #666;
         }
         .summary {
+            width: 100%;
             display: flex;
+            flex-wrap: wrap;
             justify-content: space-between;
             margin-bottom: 30px;
         }
@@ -61,16 +63,13 @@
         }
 
         .monthly-charts {
+            width: 32%;
             display: flex;
             flex-wrap: wrap;
             justify-content: space-between;
             gap: 10px;
         }
-        .monthly-chart {
-            width: 32%;
-            margin-bottom: 20px;
-            text-align: center;
-        }
+
 
         .monthly-chart h3 {
             margin: 0 0 10px;
@@ -89,7 +88,7 @@
             font-size: 12px;
         }
         table th {
-            background-color: #f5f5f5;
+            background-color: #ffffff;
             font-weight: bold;
         }
         .page-break {
@@ -160,18 +159,19 @@
         
         <!-- Monthly Combined Charts -->
         <div class="section-title">Grafik Bulanan Gabungan</div>
-        <div class="monthly-charts">
+        <div class="monthly-charts ">
             @foreach($yearlyCharts as $index => $monthChart)
                 <div class="monthly-chart">
                     <h3>{{ $monthChart['name'] }}</h3>
                     <img src="{{ $monthChart['chart'] }}" alt="{{ $monthChart['name'] }} Chart" style="max-width: 100%;">
                 </div>
 
-                @if(($index + 1) % 6 == 0 && !$loop->last)
+                {{-- @if(($index + 1) % 3 == 0 && !$loop->last)
+
                     </div>
                     <div class="page-break"></div>
                     <div class="monthly-charts">
-                @endif
+                @endif --}}
             @endforeach
         </div>
         
@@ -186,11 +186,12 @@
                     <img src="{{ $monthChart['chart'] }}" alt="{{ $monthChart['name'] }} Chart" style="max-width: 100%;">
                 </div>
 
-                @if(($index + 1) % 6 == 0 && !$loop->last)
+                {{-- @if(($index + 1) % 3 == 0 && !$loop->last)
+
                     </div>
                     <div class="page-break"></div>
                     <div class="monthly-charts">
-                @endif
+                @endif --}}
             @endforeach
         </div>
         
@@ -205,11 +206,12 @@
                     <img src="{{ $monthChart['chart'] }}" alt="{{ $monthChart['name'] }} Chart" style="max-width: 100%;">
                 </div>
 
-                @if(($index + 1) % 6 == 0 && !$loop->last)
+                {{-- @if(($index + 1) % 3 == 0 && !$loop->last)
+
                     </div>
                     <div class="page-break"></div>
                     <div class="monthly-charts">
-                @endif
+                @endif --}}
             @endforeach
         </div>
     @else
@@ -220,17 +222,23 @@
         
         <div class="page-break"></div>
         
-        <!-- Separate Monthly Charts -->
         <div class="section-title">Grafik Terpisah</div>
-        
-        <!-- Monthly Pemasukan Chart -->
-        <div class="chart-container chart-pemasukan">
-            <img src="{{ $chartImagePemasukan }}" alt="Monthly Income Chart" style="max-width: 100%;">
-        </div>
-        
-        <!-- Monthly Pengeluaran Chart -->
-        <div class="chart-container chart-pengeluaran">
-            <img src="{{ $chartImagePengeluaran }}" alt="Monthly Expense Chart" style="max-width: 100%;">
+
+        <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+            <div class="chart-container chart-pemasukan" style="flex: 1; min-width: 30%;">
+                <h2>Grafik Pemasukan Tahunan</h2>
+                <img src="{{ $chartImagePemasukan }}" alt="Yearly Income Chart" style="width: 100%;">
+            </div>
+
+            <div class="chart-container chart-pengeluaran" style="flex: 1; min-width: 30%;">
+                <h2>Grafik Pengeluaran Tahunan</h2>
+                <img src="{{ $chartImagePengeluaran }}" alt="Yearly Expense Chart" style="width: 100%;">
+            </div>
+
+            <div class="chart-container chart-gabungan" style="flex: 1; min-width: 30%;">
+                <h2>Grafik Gabungan Tahunan</h2>
+                <img src="{{ $chartImage }}" alt="Combined Yearly Chart" style="width: 100%;">
+            </div>
         </div>
     @endif
 
@@ -242,7 +250,7 @@
             <tr>
                 <th>#</th>
                 <th>Kategori</th>
-                <th>Pelaku</th>
+                <th>user</th>
                 <th>Keterangan</th>
                 <th>Nominal</th>
                 <th>Tanggal</th>

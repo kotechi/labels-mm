@@ -4,8 +4,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Labels-MM</title>
-    <link rel="icon" type="image/svg+xml" href="{{ asset('storage/images/icon/logo.jpg') }}" alt="Logo">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" type="image/svg+xml" href="{{ asset('storage/images/icon/logo_label.png') }}" alt="Logo">
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 </head>
 <style>
@@ -56,7 +56,7 @@
                     <p class="text-gray-700 mb-6">
                         {{$headers->description}}
                     </p>
-                    <button class="btn-labels text-white px-6 py-2 rounded-lg transition">SELENGKAPNYA</button>
+                    <a href="#about" class="btn-labels text-white px-6 py-2 rounded-lg transition">SELENGKAPNYA</a>
                 </div>
                 <div class="md:w-1/2 flex justify-center py-20">
                     <img src="{{ asset('storage/' . $headers->image) }}" alt="Fashion Display" class="rounded-lg shadow-lg w-80 h-90">
@@ -71,12 +71,15 @@
         </div>
     </div>
 
-    <div id="about" class="py-16 bg-gradient-to-br from-purple-50 to-fuchsia-400 relative">
+    <div id="about" class="py-16 px-24 bg-gradient-to-br from-purple-50 to-fuchsia-400 relative">
 
         <div class="container mx-auto px-4">
             <h2 class="text-center text-color-labels font-bold text-2xl mb-10">About Us</h2>
             
             <div class="flex flex-col md:flex-row items-center md:items-start">
+                <div class="md:w-1/3 flex justify-center mb-8 md:mb-0 md:order-1">
+                    <img src="{{ asset('storage/' . $abouts->image) }}" alt="Model" class="rounded-full shadow-lg w-64 h-64 object-cover">
+                </div>
                 <div class="md:w-2/3 pr-0 md:pr-8 md:order-0">
                     <h3 class="text-color-labels font-semibold text-xl mb-4">{{$abouts->tittle}}</h3>
                     
@@ -89,9 +92,6 @@
                     </div>
 
                     <a href="#contact" class="btn-labels text-white px-6 py-2 rounded-lg transition mt-4">Hubungi kami</a>
-                </div>
-                <div class="md:w-1/3 flex justify-center mb-8 md:mb-0 md:order-1">
-                    <img src="{{ asset('storage/' . $abouts->image) }}" alt="Model" class="rounded-full shadow-lg w-64 h-64 object-cover">
                 </div>
 
             </div>
@@ -159,16 +159,16 @@
                         
                         <div class="flex justify-between items-center mt-6 pt-4 border-t border-gray-200">
                             <div class="flex items-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-color-labels" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-color-labels" viewBox="0,0,256,256">
+                                    <g fill="#dd1ccf" fill-rule="nonzero" stroke="none" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10" stroke-dasharray="" stroke-dashoffset="0" font-family="none" font-weight="none" font-size="none" text-anchor="none" style="mix-blend-mode: normal"><g transform="scale(5.12,5.12)"><path d="M16,3c-7.17,0 -13,5.83 -13,13v18c0,7.17 5.83,13 13,13h18c7.17,0 13,-5.83 13,-13v-18c0,-7.17 -5.83,-13 -13,-13zM37,11c1.1,0 2,0.9 2,2c0,1.1 -0.9,2 -2,2c-1.1,0 -2,-0.9 -2,-2c0,-1.1 0.9,-2 2,-2zM25,14c6.07,0 11,4.93 11,11c0,6.07 -4.93,11 -11,11c-6.07,0 -11,-4.93 -11,-11c0,-6.07 4.93,-11 11,-11zM25,16c-4.96,0 -9,4.04 -9,9c0,4.96 4.04,9 9,9c4.96,0 9,-4.04 9,-9c0,-4.96 -4.04,-9 -9,-9z"></path></g></g>
                                 </svg>
-                                <span class="text-sm text-gray-600">Office Hours</span>
+                                <span class="text-sm text-gray-600">@labels_mm</span>
                             </div>
                             <div class="flex items-center">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-color-labels" viewBox="0 0 20 20" fill="currentColor">
                                     <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
                                 </svg>
-                                <span class="text-sm text-gray-600">+62 899-5555-3333</span>
+                                <span class="text-sm text-gray-600">+62 882-8906-2984</span>
                             </div>
                         </div>
                     </div>

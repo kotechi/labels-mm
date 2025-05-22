@@ -172,7 +172,21 @@
                     <td class="px-6 py-4 whitespace-nowrap">{{ $pesanan->nama_pemesan }}</td>
                     <td class="px-6 py-4 whitespace-nowrap">{{ $pesanan->product_id }}</td>
                     <td class="px-6 py-4 whitespace-nowrap">{{ $pesanan->nama_produk }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap">{{ $pesanan->status_pesanan }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        @if($pesanan->status_pesanan == 'proses')
+                            <form action="{{ route('pesanans.markAsPaid', $pesanan->id_pesanan) }}" method="POST" class="inline-block">
+                                @csrf
+                                <button type="submit" class="px-3 py-2 bg-yellow-500 hover:bg-yello-600 text-white rounded-md mark-as-paid-button">Belum bayar</button>
+                            </form>
+                        @elseif($pesanan->status_pesanan == 'paid')
+                            <form action="{{ route('pesanans.markAsCompleted', $pesanan->id_pesanan) }}" method="POST" class="inline-block">
+                                @csrf
+                                <button type="submit" class="px-3 py-2 bg-green-500 hover:bg-green-600 text-white rounded-md mark-as-paid-button">Sudah bayar</button>
+                            </form>
+                        @elseif($pesanan->status_pesanan == 'completed')
+                            <button class="px-3 py-2 bg-blue-600 text-white rounded-md">Selesai</button>
+                        @endif
+                    </td>
                     <td class="px-6 py-4 whitespace-nowrap">Rp {{ number_format($pesanan->total_harga, 0, ',', '.') }}</td>
                     <td class="px-6 py-4 whitespace-nowrap">
                         <a href="{{ route('pesanans.edit', $pesanan->id_pesanan) }}" 
@@ -206,11 +220,10 @@
                 <tr>
                     <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">#</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">kategori</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Pelaku</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">User</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Keterangan</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Nominal</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Tanggal</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Actions</th>
                 </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
@@ -226,17 +239,7 @@
                     <td class="px-6 py-4 whitespace-nowrap">{{ $transaksi->keterangan }}</td>
                     <td class="px-6 py-4 whitespace-nowrap">Rp. {{ number_format($transaksi->nominal ?? 0, 0, ',', '.') }}</td>
                     <td class="px-6 py-4 whitespace-nowrap">{{$transaksi->tanggal}}</td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <form action="{{ route('transaksi.destroy', $transaksi->id_transaksi) }}" 
-                              method="POST" class="inline-block delete-form">
-                            @csrf
-                            @method('DELETE')
-                            <button type="button" 
-                                    class="px-3 py-2 bg-red-500 hover:bg-red-600 text-white rounded-md delete-button">
-                                Delete
-                            </button>
-                        </form>
-                    </td>
+
                 </tr>
                 @endforeach
             </tbody>

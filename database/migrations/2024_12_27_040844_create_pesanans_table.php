@@ -19,7 +19,8 @@ return new class extends Migration
             $table->string('nama_produk');
             $table->integer('jumlah_produk');
             $table->decimal('total_harga', 20, 2);
-            $table->string('payment_method');
+            $table->decimal('jumlah_pembayaran', 20, 2)->nullable();
+            $table->string('payment_method')->nullable();
             $table->integer('created_by');
             $table->string('status_pesanan');
             $table->timestamp('order_date')->default(DB::raw('CURRENT_TIMESTAMP'));

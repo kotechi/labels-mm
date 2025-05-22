@@ -369,13 +369,11 @@ class KaryawanPesananController extends Controller
             $pesanan = Pesanan::findOrFail($id);
             $pesanan->update(['status_pesanan' => 'paid']);
     
-            // Use the currently authenticated user instead of the order creator
             $currentUserId = auth()->user()->id_users;
     
-            // Create transaction with the current user as the actor
             $transaction = new tbl_transaksi();
             $transaction->id_referens = $pesanan->id_pesanan;
-            $transaction->pelaku_transaksi = $currentUserId; // Changed from $pesanan->created_by
+            $transaction->pelaku_transaksi = $currentUserId; 
             $transaction->keterangan = sprintf(
                 'Payment received for Order #%d - %s (Qty: %d)', 
                 $pesanan->id_pesanan,
