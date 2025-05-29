@@ -28,7 +28,6 @@ class PesananController extends Controller
 
         if ($hashed == $request->signature_key) {
             if ($request->transaction_status == 'capture' || $request->transaction_status == 'settlement') {
-                // Ambil id_pesanan dari order_id (format: LABELSMM-123)
                 $orderId = $request->order_id;
                 $id_pesanan = preg_replace('/[^0-9]/', '', $orderId);
                 $pesanan = \App\Models\Pesanan::find($id_pesanan);
@@ -278,7 +277,6 @@ class PesananController extends Controller
                         ]);
                     }
                     
-                    // Buat atau perbarui resi jika status paid atau completed
                     $this->createResi($pesanan);
                 }
             }

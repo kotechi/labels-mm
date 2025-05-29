@@ -35,7 +35,6 @@ class KaryawanPesananController extends Controller
                     $pesanan->status_pesanan = 'paid';
                     $pesanan->save();
                     
-                    // Create transaction record
                     $transaction = new tbl_transaksi();
                     $transaction->id_referens = $pesanan->id_pesanan;
                     $transaction->pelaku_transaksi = $pesanan->created_by;
@@ -51,9 +50,6 @@ class KaryawanPesananController extends Controller
         return response()->json(['status' => 'OK']);
     }
 
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         $pesanans = Pesanan::all();

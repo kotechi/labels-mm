@@ -10,6 +10,7 @@ class Pesanan extends Model
     protected $primaryKey = 'id_pesanan'; 
 
     protected $fillable = [
+        'jumlah_pembayaran',
         'product_id',
         'nama_produk',
         'nama_pemesan',
