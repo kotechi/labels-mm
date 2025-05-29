@@ -47,8 +47,8 @@
             </div>
         </div>
     </nav>
-    <div id="home" class="bg-gradient-to-tr from-purple-50 to-fuchsia-400 pt-24 pb-12 relative overflow-hidden">
-        <div class="container mx-auto px-7">
+    <div id="home" class="bg-gradient-to-tr from-purple-50 to-fuchsia-400 py-24 pb-12 relative overflow-hidden">
+        <div class="container mx-auto px-7" >
             <div class="flex flex-col md:flex-row items-center">
                 <div class="md:w-1/2 p-4 mb-8 md:mb-0">
                     <h2 class="text-color-labels font-bold text-xl mb-2">HELLO, SELAMAT DATANG</h2>
@@ -74,13 +74,13 @@
     <div id="about" class="py-16 px-24 bg-gradient-to-br from-purple-50 to-fuchsia-400 relative">
 
         <div class="container mx-auto px-4">
-            <h2 class="text-center text-color-labels font-bold text-2xl mb-10">About Us</h2>
+            <h2 data-aos="zoom-in-down"  class="text-center text-color-labels font-bold text-2xl mb-10">About Us</h2>
             
             <div class="flex flex-col md:flex-row items-center md:items-start">
                 <div class="md:w-1/3 flex justify-center mb-8 md:mb-0 md:order-1">
                     <img src="{{ asset('storage/' . $abouts->image) }}" alt="Model" class="rounded-full shadow-lg w-64 h-64 object-cover">
                 </div>
-                <div class="md:w-2/3 pr-0 md:pr-8 md:order-0">
+                <div data-aos="zoom-in-down" data-aos-delay="500"  class="md:w-2/3 pr-0 md:pr-8 md:order-0">
                     <h3 class="text-color-labels font-semibold text-xl mb-4">{{$abouts->tittle}}</h3>
                     
                     <div class="mb-4">
@@ -91,7 +91,7 @@
                         </div>
                     </div>
 
-                    <a href="#contact" class="btn-labels text-white px-6 py-2 rounded-lg transition mt-4">Hubungi kami</a>
+                    <a data-aos="zoom-in-down" data-aos-delay="400" href="#contact" class="btn-labels text-white px-6 py-2 rounded-lg transition mt-4">Hubungi kami</a>
                 </div>
 
             </div>
@@ -106,13 +106,13 @@
 
     <div id="gallery" class="py-16 bg-white relative">
         <div class="container mx-auto px-4">
-            <h2 class="text-center text-color-labels font-bold text-2xl mb-2">Gallery</h2>
-            <p class="text-center text-gray-600 mb-10">Some of our products</p>
+            <h2 data-aos="zoom-in-down" class="text-center text-color-labels font-bold text-2xl mb-2">Gallery</h2>
+            <p data-aos="zoom-in-down" data-aos-delay="400" class="text-center text-gray-600 mb-10">Some of our products</p>
             
             <div class="relative">
                 <div class="flex overflow-x-auto scrollbar-hide pb-4 space-x-9">
                     @foreach($products as $product)
-                    <div class="bg-white p-4 rounded-lg shadow-lg flex-shrink-0 w-64 border-2 border-[#9A1573]/50">
+                    <div data-aos="zoom-in-down" data-aos-delay="550" class="bg-white p-4 rounded-lg shadow-lg flex-shrink-0 w-64 border-2 border-[#9A1573]/50">
                         <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->nama_produk }}" class="w-full h-64 object-cover rounded-md mb-2">
                         <h4 class="font-medium text-center text-sm">{{$product->nama_produk}}</h4>
                         <p class="text-center text-color-labels font-semibold text-sm">Rp {{ number_format($product->harga_jual, 0, ',', '.') }}</p>
@@ -130,11 +130,12 @@
 
     <div id="contact" class="px-20 pt-9 bg-pink-100">
         <div class="container mx-auto px-4">
-            <h1 class="text-center text-shadow-lg/50 font-bold text-4xl mb-10 ">Contact</h1>
+            <h2 data-aos="zoom-in-down"  class="text-center text-color-labels font-bold text-2xl mb-10">Contact</h2>
+            
             
             <div class="flex flex-col md:flex-row gap-6">
                 <div class="md:w-1/2">
-                    <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="bg-white rounded-lg shadow-md p-6" data-aos="zoom-in-down" data-aos-delay="450">
                         <h3 class="font-semibold mb-4 text-center">Form Contact</h3>
                         
                         <form id="contactForm" action="{{ route('contact.lp.store')}}" method="POST">
@@ -164,18 +165,18 @@
                                 </svg>
                                 <span class="text-sm text-gray-600">@labels_mm</span>
                             </div>
-                            <div class="flex items-center">
+                            <a href="wa.me/+62-895-6671-9076" class="flex items-center">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-color-labels" viewBox="0 0 20 20" fill="currentColor">
                                     <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
                                 </svg>
-                                <span class="text-sm text-gray-600">+62 882-8906-2984</span>
-                            </div>
+                                <span class="text-sm text-gray-600">+62 895 6671 9076</span>
+                            </a>
                         </div>
                     </div>
                 </div>
                 
                 <div class="md:w-1/2">
-                    <div class="bg-white rounded-lg shadow-md h-full">
+                    <div class="bg-white rounded-lg shadow-md h-full" data-aos="zoom-in-down" data-aos-delay="450">
                         <iframe 
                             src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3963.4894669995065!2d106.75623947441504!3d-6.585915564379278!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69c5457e0e3bcf%3A0x58481d58737539c0!2sSMK%20Negeri%201%20Ciomas!5e0!3m2!1sid!2sid!4v1745755529800!5m2!1sid!2sid" 
                             width="100%" 

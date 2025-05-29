@@ -25,31 +25,20 @@ class PesananController extends Controller
     {
         $serverKey = config('midtrans.server_key');
         $hashed = hash("sha512", $request->order_id . $request->status_code . $request->gross_amount . $serverKey);
-        
+
         if ($hashed == $request->signature_key) {
             if ($request->transaction_status == 'capture' || $request->transaction_status == 'settlement') {
-                $orderId = explode('-', $request->order_id)[1];
-                $pesanan = Pesanan::find($orderId);
-                
+                // Ambil id_pesanan dari order_id (format: LABELSMM-123)
+                $orderId = $request->order_id;
+                $id_pesanan = preg_replace('/[^0-9]/', '', $orderId);
+                $pesanan = \App\Models\Pesanan::find($id_pesanan);
                 if ($pesanan) {
                     $pesanan->status_pesanan = 'paid';
                     $pesanan->save();
-                    
-                    $transaction = new tbl_transaksi();
-                    $transaction->id_referens = $pesanan->id_pesanan;
-                    $transaction->pelaku_transaksi = $pesanan->created_by;
-                    $transaction->keterangan = 'Payment received via Midtrans';
-                    $transaction->nominal = $pesanan->total_harga;
-                    $transaction->kategori = 'pemasukan';
-                    $transaction->tanggal = now();
-                    $transaction->save();
-
-                    // Buat resi ketika pembayaran berhasil
-                    $this->createResi($pesanan);
                 }
             }
         }
-        
+        // WAJIB: return response 200 OK
         return response()->json(['status' => 'OK']);
     }
 
@@ -74,7 +63,7 @@ class PesananController extends Controller
             'total_harga' => 'required|numeric',
             'jumlah_produk' => 'required|numeric|min:1',
             'no_telp_pemesan' => 'required|string|max:15',
-            'deposit_percentage' => 'nullable|numeric',
+            'DP_percentage' => 'nullable|numeric',
             'lebar_muka' => 'required|numeric',
             'lebar_pundak' => 'required|numeric',
             'lebar_punggung' => 'required|numeric',
@@ -96,13 +85,13 @@ class PesananController extends Controller
                 'created_by' => auth()->user()->id_users
             ]);
             
-            // Kalkulasi harga berdasarkan persentase deposit jika dipilih
+            // Kalkulasi harga berdasarkan persentase DP jika dipilih
             $total_harga = $request->total_harga;
-            if ($request->has('deposit_percentage') && $request->deposit_percentage > 0) {
-                $total_harga = ($request->total_harga * $request->deposit_percentage) / 100;
-                $request->merge(['is_deposit' => true, 'deposit_amount' => $total_harga]);
+            if ($request->has('DP_percentage') && $request->DP_percentage > 0) {
+                $total_harga = ($request->total_harga * $request->DP_percentage) / 100;
+                $request->merge(['is_DP' => true, 'DP_amount' => $total_harga]);
             } else {
-                $request->merge(['is_deposit' => false, 'deposit_amount' => 0]);
+                $request->merge(['is_DP' => false, 'DP_amount' => 0]);
             }
     
             $pesanan = Pesanan::create($request->all());
@@ -158,7 +147,7 @@ class PesananController extends Controller
             'total_harga' => 'required|numeric',
             'jumlah_produk' => 'required|numeric|min:1',
             'no_telp_pemesan' => 'required|string|max:15',
-            'deposit_percentage' => 'nullable|numeric',
+            'DP_percentage' => 'nullable|numeric',
             'lebar_muka' => 'required|numeric',
             'lebar_pundak' => 'required|numeric',
             'lebar_punggung' => 'required|numeric',
@@ -225,15 +214,15 @@ class PesananController extends Controller
             
             $input = $request->except('created_by');
             
-            // Kalkulasi harga berdasarkan persentase deposit jika dipilih
+            // Kalkulasi harga berdasarkan persentase DP jika dipilih
             $total_harga = $request->total_harga;
-            if ($request->has('deposit_percentage') && $request->deposit_percentage > 0) {
-                $total_harga = ($request->total_harga * $request->deposit_percentage) / 100;
-                $input['is_deposit'] = true;
-                $input['deposit_amount'] = $total_harga;
+            if ($request->has('DP_percentage') && $request->DP_percentage > 0) {
+                $total_harga = ($request->total_harga * $request->DP_percentage) / 100;
+                $input['is_DP'] = true;
+                $input['DP_amount'] = $total_harga;
             } else {
-                $input['is_deposit'] = false;
-                $input['deposit_amount'] = 0;
+                $input['is_DP'] = false;
+                $input['DP_amount'] = 0;
             }
             
             if ($pesanan->total_harga != $input['total_harga'] || $pesanan->jumlah_produk != $input['jumlah_produk']) {
@@ -381,7 +370,7 @@ class PesananController extends Controller
                 $pesanan->status_pesanan = 'paid';
                 $pesanan->jumlah_pembayaran = $totalHarga;
             } else {
-                $pesanan->status_pesanan = 'depo';
+                $pesanan->status_pesanan = 'DP';
                 $pesanan->jumlah_pembayaran = $jumlahPembayaranBaru;
             }
             $pesanan->save();
@@ -462,11 +451,9 @@ class PesananController extends Controller
         $pesanan = Pesanan::findOrFail($id);
         $product = Product::findOrFail($pesanan->product_id);
         $resi = Resi::where('pesanan_id', $id)->first();
-        // Tidak perlu snapToken di sini, akan diambil via AJAX
         return view('admin.pesanan.payment', compact('pesanan', 'product', 'resi'));
     }
 
-    // Endpoint AJAX untuk request snapToken sesuai nominal
     public function getMidtransToken(Request $request, $id)
     {
         $pesanan = Pesanan::findOrFail($id);
@@ -496,7 +483,7 @@ class PesananController extends Controller
             $resi->pesanan_id = $pesanan->id_pesanan;
             $resi->nomor_resi = 'RESI-' . date('Ymd') . '-' . $pesanan->id_pesanan;
             $resi->tanggal = now();
-            $resi->total_pembayaran = $pesanan->is_deposit ? $pesanan->deposit_amount : $pesanan->total_harga;
+            $resi->total_pembayaran = $pesanan->is_DP ? $pesanan->DP_amount : $pesanan->total_harga;
             $resi->jumlah_pembayaran = $pesanan->jumlah_pembayaran ?? $resi->total_pembayaran;
             $resi->kembalian = ($pesanan->jumlah_pembayaran ?? $resi->total_pembayaran) - $resi->total_pembayaran;
             $resi->created_by = auth()->user()->id_users;

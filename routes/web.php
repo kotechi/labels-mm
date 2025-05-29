@@ -83,7 +83,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/admin/pesanan/create', [PesananController::class, 'create'])->name('pesanans.create');
     Route::post('/admin/pesanan', [PesananController::class, 'store'])->name('pesanans.store');
     Route::get('/admin/pesanan/{pesanan}/edit', [PesananController::class, 'edit'])->name('pesanans.edit');
-Route::get('/admin/pesanan/{pesanan}/detail', [PesananController::class, 'detail'])->name('pesanans.detail');
+    Route::get('/admin/pesanan/{pesanan}/detail', [PesananController::class, 'detail'])->name('pesanans.detail');
     Route::get('/admin/pesanan/{pesanan}/resi', [PesananController::class, 'resi'])->name('pesanans.resi');
     Route::patch('/admin/pesanan/{pesanan}', [PesananController::class, 'update'])->name('pesanans.update');
     Route::delete('/admin/pesanan/{pesanan}', [PesananController::class, 'destroy'])->name('pesanans.destroy');

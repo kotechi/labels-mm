@@ -106,7 +106,7 @@
                                 </div>
                             </div>
                             
-                            <!-- Deposit Options -->
+                            <!-- DP Options -->
                             <div class="mt-6">
                                 <p class="text-gray-700 mb-4">Pilih opsi pembayaran:</p>
                                 @php
@@ -115,9 +115,9 @@
                                     $sisaTagihan = max(0, $totalHarga - $dibayar);
                                 @endphp
                                 <div class="grid grid-cols-2 gap-4">
-                                    <div id="depositOption" class="col-span-2 bg-gray-50 rounded-lg p-4 border">
+                                    <div id="DPOption" class="col-span-2 bg-gray-50 rounded-lg p-4 border">
                                         <div class="flex items-center">
-                                            <input type="radio" id="full-payment" name="deposit_option" value="full" checked class="mr-2">
+                                            <input type="radio" id="full-payment" name="DP_option" value="full" checked class="mr-2">
                                             <label for="full-payment" class="text-gray-800">
                                                 Bayar Penuh (Rp {{ number_format($sisaTagihan, 0, ',', '.') }})
                                             </label>
@@ -128,8 +128,8 @@
                                             @endphp
                                             @if($dpNominal >= 1)
                                             <div class="flex items-center mt-2">
-                                                <input type="radio" id="deposit-{{ $dp }}" name="deposit_option" value="{{ $dp }}" class="mr-2">
-                                                <label for="deposit-{{ $dp }}" class="text-gray-800">
+                                                <input type="radio" id="DP-{{ $dp }}" name="DP_option" value="{{ $dp }}" class="mr-2">
+                                                <label for="DP-{{ $dp }}" class="text-gray-800">
                                                     Bayar DP {{ $dp }}% (Rp {{ number_format($dpNominal, 0, ',', '.') }})
                                                 </label>
                                             </div>
@@ -169,7 +169,7 @@
                             </div>
                             
                             <input type="hidden" name="payment_method" id="payment_method" value="cash">
-                            <input type="hidden" name="deposit_percentage" id="deposit_percentage" value="0">
+                            <input type="hidden" name="DP_percentage" id="DP_percentage" value="0">
                             <input type="hidden" name="snap_token" id="snap_token" value="">
 
                             <!-- Pay button -->
@@ -207,130 +207,134 @@
 
 <div id="snap-container" style="display:none;"></div>
 
-<!-- Modal for receipt  -->
-<div id="resiModal" class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center hidden z-50">
-    <div class="w-full max-w-md">
-        <div class="bg-white overflow-hidden shadow-lg rounded-lg">
-            <!-- Header Resi -->
-            <div class="p-4 text-center border-b border-gray-200">
-                <h1 class="text-2xl font-bold">Labels MM</h1>
-                <p class="text-sm">
-                    Jln. Cibanteng Proyek, Cihideung Udik,<br>
-                    Kec. Ciampea, Kabupaten Bogor,<br>
-                    Jawa Barat 16620
-                </p>
-            </div>
-            <hr class="border-t border-gray-300">
-            
-            <!-- Detail Pesanan -->
-            <div class="p-4">
-                <div class="flex justify-between mb-2">
-                    <span class="font-medium">Tanggal</span>
-                    <span id="current-datetime"></span>
+    <!-- Modal for receipt - GANTI BAGIAN TOMBOL DI BAWAH DENGAN INI -->
+    <div id="resiModal" class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center hidden z-50">
+        <div class="w-full max-w-md">
+            <div class="bg-white overflow-hidden shadow-lg rounded-lg">
+                <!-- Header Resi -->
+                <div class="p-4 text-center border-b border-gray-200">
+                    <h1 class="text-2xl font-bold">Labels MM</h1>
+                    <p class="text-sm">
+                        Jln. Cibanteng Proyek, Cihideung Udik,<br>
+                        Kec. Ciampea, Kabupaten Bogor,<br>
+                        Jawa Barat 16620
+                    </p>
+                </div>
+                <hr class="border-t border-gray-300">
+                
+                <!-- Detail Pesanan -->
+                <div class="p-4">
+                    <div class="flex justify-between mb-2">
+                        <span class="font-medium">Tanggal</span>
+                        <span id="current-datetime"></span>
+                    </div>
+                    
+                    <div class="flex justify-between mb-2">
+                        <span class="font-medium">Nomor Resi</span>
+                        <span id="nomor-resi">{{ $resi->nomor_resi ?? '-' }}</span>
+                    </div>
+                    
+                    <div class="flex justify-between mb-2">
+                        <span class="font-medium">Nama</span>
+                        <span>{{ $pesanan->nama_pemesan }}</span>
+                    </div>
+                    
+                    <div class="flex justify-between mb-2">
+                        <span class="font-medium">No telp</span>
+                        <span>{{ $pesanan->no_telp_pemesan }}</span>
+                    </div>
                 </div>
                 
-                <div class="flex justify-between mb-2">
-                    <span class="font-medium">Nomor Resi</span>
-                    <span id="nomor-resi">{{ $resi->nomor_resi ?? '-' }}</span>
+                <hr class="border-t border-gray-300">
+                
+                <div class="p-4">
+                    <div class="flex justify-between font-medium">
+                        <span>{{ $pesanan->nama_produk }}</span>
+                        <span>Rp {{ number_format($pesanan->total_harga / $pesanan->jumlah_produk, 0, ',', '.') }}</span>
+                    </div>
+                    <div class="text-sm text-gray-600">
+                        {{ $pesanan->jumlah_produk }}×{{ number_format($pesanan->total_harga / $pesanan->jumlah_produk, 0, ',', '.') }}
+                    </div>
                 </div>
                 
-                <div class="flex justify-between mb-2">
-                    <span class="font-medium">Nama</span>
-                    <span>{{ $pesanan->nama_pemesan }}</span>
+                <hr class="border-t border-gray-300">
+                
+                <div class="p-4">
+                    <div class="flex justify-between mb-2">
+                        <span class="font-medium">Subtotal</span>
+                        <span>Rp {{ number_format($pesanan->total_harga, 0, ',', '.') }}</span>
+                    </div>
+                    
+                    <div id="DP-info" class="flex justify-between mb-2 hidden">
+                        <span class="font-medium">DP (%)</span>
+                        <span>Rp 0</span>
+                    </div>
+                    
+                    <div class="flex justify-between mb-2">
+                        <span class="font-medium">Total Bayar</span>
+                        <span id="total-bayar">Rp {{ number_format($pesanan->total_harga, 0, ',', '.') }}</span>
+                    </div>
+                    
+                    <div class="flex justify-between mb-2" id="cash-row">
+                        <span class="font-medium">Cash</span>
+                        <span id="cash-amount">Rp 0</span>
+                    </div>
+                    
+                    <div class="flex justify-between mb-2" id="kembalian-row">
+                        <span class="font-medium">Kembali</span>
+                        <span id="kembalian-amount">Rp 0</span>
+                    </div>
+                    
+                    <div class="flex justify-between mt-4 pt-2 border-t border-gray-300">
+                        <span class="font-medium">Metode Pembayaran</span>
+                        <span id="payment-method-text">Cash</span>
+                    </div>
                 </div>
                 
-                <div class="flex justify-between mb-2">
-                    <span class="font-medium">No telp</span>
-                    <span>{{ $pesanan->no_telp_pemesan }}</span>
-                </div>
-            </div>
-            
-            <hr class="border-t border-gray-300">
-            
-            <div class="p-4">
-                <div class="flex justify-between font-medium">
-                    <span>{{ $pesanan->nama_produk }}</span>
-                    <span>Rp {{ number_format($pesanan->total_harga / $pesanan->jumlah_produk, 0, ',', '.') }}</span>
-                </div>
-                <div class="text-sm text-gray-600">
-                    {{ $pesanan->jumlah_produk }}×{{ number_format($pesanan->total_harga / $pesanan->jumlah_produk, 0, ',', '.') }}
-                </div>
-            </div>
-            
-            <hr class="border-t border-gray-300">
-            
-            <div class="p-4">
-                <div class="flex justify-between mb-2">
-                    <span class="font-medium">Subtotal</span>
-                    <span>Rp {{ number_format($pesanan->total_harga, 0, ',', '.') }}</span>
+                <!-- Tombol Konfirmasi Pembayaran -->
+                <div class="p-4 bg-gray-50 border-t">
+                    <div class="text-center mb-4">
+                        <h3 class="text-lg font-semibold text-gray-800">Konfirmasi Pembayaran</h3>
+                        <p class="text-sm text-gray-600">Silahkan periksa detail pembayaran sebelum melanjutkan</p>
+                    </div>
+                    
+                    <div class="flex gap-3">
+                        <button id="cancelPaymentBtn" class="flex-1 px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition">
+                            Batal
+                        </button>
+                        
+                        <button id="proceedPaymentBtn" class="flex-1 px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition">
+                            Lanjutkan Pembayaran
+                        </button>
+                    </div>
                 </div>
                 
-                <div id="deposit-info" class="flex justify-between mb-2 {{ !isset($deposit_percentage) || $deposit_percentage == 0 ? 'hidden' : '' }}">
-                    <span class="font-medium">DP ({{ $deposit_percentage ?? 0 }}%)</span>
-                    <span>Rp {{ number_format(($pesanan->total_harga * ($deposit_percentage ?? 0)) / 100, 0, ',', '.') }}</span>
+                <!-- Tombol Print dan Download (Hidden saat konfirmasi) -->
+                <div id="printDownloadButtons" class="p-4 flex justify-between hidden">
+                    <button id="closeModal" class="px-4 py-2 bg-gray-500 text-white rounded-md flex items-center shadow-lg">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+                        </svg>
+                        Tutup
+                    </button>
+                    
+                    <button id="printBtn" class="px-4 py-2 bg-green-500 text-white rounded-md flex items-center shadow-lg">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M5 4v3H4a2 2 0 00-2 2v3a2 2 0 002 2h1v2a2 2 0 002 2h6a2 2 0 002-2v-2h1a2 2 0 002-2V9a2 2 0 00-2-2h-1V4a2 2 0 00-2-2H7a2 2 0 00-2 2zm8 0H7v3h6V4zm0 8H7v4h6v-4z" clip-rule="evenodd" />
+                        </svg>
+                        Print
+                    </button>
+                    
+                    <button id="downloadResiBtn" class="px-4 py-2 bg-blue-500 text-white rounded-md flex items-center shadow-lg">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+                        </svg>
+                        Download
+                    </button>
                 </div>
-                
-                <div class="flex justify-between mb-2">
-                    <span class="font-medium">Total Bayar</span>
-                    <span id="total-bayar">
-                        @if(isset($deposit_percentage) && $deposit_percentage > 0)
-                            Rp {{ number_format(($pesanan->total_harga * $deposit_percentage) / 100, 0, ',', '.') }}
-                        @else
-                            Rp {{ number_format($pesanan->total_harga, 0, ',', '.') }}
-                        @endif
-                    </span>
-                </div>
-                
-                @if(isset($pesanan->jumlah_pembayaran) && $pesanan->jumlah_pembayaran > 0)
-                <div class="flex justify-between mb-2">
-                    <span class="font-medium">Cash</span>
-                    <span id="cash-amount">Rp {{ number_format($pesanan->jumlah_pembayaran, 0, ',', '.') }}</span>
-                </div>
-                
-                <div class="flex justify-between mb-2">
-                    <span class="font-medium">Kembali</span>
-                    <span id="kembalian-amount">
-                        @if(isset($deposit_percentage) && $deposit_percentage > 0)
-                            Rp {{ number_format($pesanan->jumlah_pembayaran - (($pesanan->total_harga * $deposit_percentage) / 100), 0, ',', '.') }}
-                        @else
-                            Rp {{ number_format($pesanan->jumlah_pembayaran - $pesanan->total_harga, 0, ',', '.') }}
-                        @endif
-                    </span>
-                </div>
-                @endif
-                
-                <div class="flex justify-between mt-4 pt-2 border-t border-gray-300">
-                    <span class="font-medium">Metode Pembayaran</span>
-                    <span id="payment-method-text">{{ ucfirst($pesanan->payment_method ?? 'Cash') }}</span>
-                </div>
-            </div>
-            
-            <!-- Tombol Print dan Download dan Tutup -->
-            <div class="p-4 flex justify-between">
-                <button id="closeModal" class="px-4 py-2 bg-gray-500 text-white rounded-md flex items-center shadow-lg">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
-                    </svg>
-                    Tutup
-                </button>
-                
-                <button id="printBtn" class="px-4 py-2 bg-green-500 text-white rounded-md flex items-center shadow-lg">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M5 4v3H4a2 2 0 00-2 2v3a2 2 0 002 2h1v2a2 2 0 002 2h6a2 2 0 002-2v-2h1a2 2 0 002-2V9a2 2 0 00-2-2h-1V4a2 2 0 00-2-2H7a2 2 0 00-2 2zm8 0H7v3h6V4zm0 8H7v4h6v-4z" clip-rule="evenodd" />
-                    </svg>
-                    Print
-                </button>
-                
-                <button id="downloadResiBtn" class="px-4 py-2 bg-blue-500 text-white rounded-md flex items-center shadow-lg">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
-                    </svg>
-                    Download
-                </button>
             </div>
         </div>
     </div>
-</div>
 @endsection
 
 @push('scripts')
@@ -461,16 +465,14 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // ========== FIX UNTUK PAYMENT METHOD SELECTION ==========
-    let selectedPayment = 'cash'; // Default payment method
+    let selectedPayment = 'cash'; 
     
-    // Get all payment options
     const paymentOptions = document.querySelectorAll('.payment-option');
     const cashPaymentForm = document.getElementById('cashPaymentForm');
     const paymentMethodInput = document.getElementById('payment_method');
     
     console.log('Payment options found:', paymentOptions.length); // Debug log
     
-    // Function to handle payment method selection
     function selectPaymentMethod(element, paymentType) {
         // Remove selection from all options
         paymentOptions.forEach(opt => {
@@ -539,19 +541,19 @@ document.addEventListener('DOMContentLoaded', function() {
     
     console.log('Calculation values:', { totalHarga, jumlahDibayar, sisaTagihan }); // Debug log
     
-    // Handle deposit option selection
-    const depositOptions = document.querySelectorAll('input[name="deposit_option"]');
-    const depositPercentageInput = document.getElementById('deposit_percentage');
+    // Handle DP option selection
+    const DPOptions = document.querySelectorAll('input[name="DP_option"]');
+    const DPPercentageInput = document.getElementById('DP_percentage');
     const jumlahPembayaranField = document.getElementById('jumlah_pembayaran');
     
-    depositOptions.forEach(option => {
+    DPOptions.forEach(option => {
         option.addEventListener('change', function() {
             let dp = this.value === 'full' ? 0 : parseInt(this.value);
             let nominal = dp === 0 ? sisaTagihan : Math.floor(sisaTagihan * dp / 100);
             
-            // Update deposit percentage hidden input
-            if (depositPercentageInput) {
-                depositPercentageInput.value = dp;
+            // Update DP percentage hidden input
+            if (DPPercentageInput) {
+                DPPercentageInput.value = dp;
             }
             
             // Update payment amount field
@@ -560,7 +562,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 jumlahPembayaranField.dispatchEvent(new Event('input'));
             }
             
-            console.log('Deposit option changed:', { dp, nominal }); // Debug log
+            console.log('DP option changed:', { dp, nominal }); // Debug log
         });
     });
     
@@ -620,7 +622,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Function to get selected nominal for Midtrans
     function getSelectedNominal() {
-        let dp = document.querySelector('input[name="deposit_option"]:checked');
+        let dp = document.querySelector('input[name="DP_option"]:checked');
         let dpVal = dp ? dp.value : 'full';
         let nominal = sisaTagihan;
         if (dpVal !== 'full') {
@@ -660,7 +662,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Update Midtrans token when payment method or deposit option changes
+    // Update Midtrans token when payment method or DP option changes
     function updateMidtransToken() {
         if (selectedPayment === 'midtrans') {
             let nominal = getSelectedNominal();
@@ -669,7 +671,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Add event listeners for Midtrans token updates
-    depositOptions.forEach(opt => {
+    DPOptions.forEach(opt => {
         opt.addEventListener('change', updateMidtransToken);
     });
 
@@ -677,48 +679,223 @@ document.addEventListener('DOMContentLoaded', function() {
     const paymentForm = document.getElementById('paymentForm');
     if (paymentForm) {
         paymentForm.addEventListener('submit', function(e) {
-            console.log('Form submitted with payment method:', selectedPayment); // Debug log
+            e.preventDefault(); // Selalu prevent default dulu
             
-            if (selectedPayment === 'midtrans') {
-                e.preventDefault();
-                
-                let nominal = getSelectedNominal();
-                fetchMidtransToken(nominal).then(function(token) {
-                    if (token && typeof snap !== 'undefined') {
-                        snap.pay(token, {
-                            onSuccess: function(result) {
-                                console.log('Midtrans payment success:', result);
-                                paymentForm.submit();
-                            },
-                            onPending: function(result) {
-                                console.log('Midtrans payment pending:', result);
-                                alert('Pembayaran dalam status pending, silahkan selesaikan pembayaran');
-                            },
-                            onError: function(result) {
-                                console.error('Midtrans payment error:', result);
-                                alert('Pembayaran gagal!');
-                            },
-                            onClose: function() {
-                                alert('Anda menutup popup tanpa menyelesaikan pembayaran');
-                            }
-                        });
-                    } else {
-                        alert('Token pembayaran tidak tersedia atau Midtrans belum dimuat.');
-                    }
-                });
-            }
-            // For cash payment, form submits normally
+            console.log('Form submitted with payment method:', selectedPayment);
+            
+            // Tampilkan resi modal terlebih dahulu
+            showResiPreview();
         });
+    }
+    function showResiPreview() {
+        // Update data resi berdasarkan input yang dipilih
+        updateResiData();
+        
+        // Tampilkan modal
+        const modal = document.getElementById('resiModal');
+        if (modal) {
+            modal.classList.remove('hidden');
+        }
+    }
+
+    function updateResiData() {
+        // Ambil nilai DP yang dipilih
+        const selectedDP = document.querySelector('input[name="DP_option"]:checked');
+        const dpValue = selectedDP ? selectedDP.value : 'full';
+        const dpPercentage = dpValue === 'full' ? 0 : parseInt(dpValue);
+        
+        // Hitung nominal yang akan dibayar
+        let nominalBayar = sisaTagihan;
+        if (dpPercentage > 0) {
+            nominalBayar = Math.floor(sisaTagihan * dpPercentage / 100);
+        }
+        
+        // Update DP info di resi
+        const dpInfo = document.getElementById('DP-info');
+        const dpInfoText = dpInfo.querySelector('span:first-child');
+        const dpInfoAmount = dpInfo.querySelector('span:last-child');
+        
+        if (dpPercentage > 0) {
+            dpInfo.classList.remove('hidden');
+            dpInfoText.textContent = `DP (${dpPercentage}%)`;
+            dpInfoAmount.textContent = `Rp ${formatRupiah(String(nominalBayar))}`;
+        } else {
+            dpInfo.classList.add('hidden');
+        }
+        
+        // Update total bayar
+        const totalBayarElement = document.getElementById('total-bayar');
+        if (totalBayarElement) {
+            totalBayarElement.textContent = `Rp ${formatRupiah(String(nominalBayar))}`;
+        }
+        
+        // Update informasi cash dan kembalian untuk cash payment
+        const cashAmountElement = document.getElementById('cash-amount');
+        const kembalianAmountElement = document.getElementById('kembalian-amount');
+        
+        if (selectedPayment === 'cash') {
+            const jumlahCash = document.getElementById('jumlah_pembayaran').value.replace(/[^,\d]/g, '');
+            const cashValue = parseInt(jumlahCash) || nominalBayar;
+            const kembalianValue = Math.max(0, cashValue - nominalBayar);
+            
+            if (cashAmountElement) {
+                cashAmountElement.textContent = `Rp ${formatRupiah(String(cashValue))}`;
+            }
+            if (kembalianAmountElement) {
+                kembalianAmountElement.textContent = `Rp ${formatRupiah(String(kembalianValue))}`;
+            }
+            
+            // Show cash and kembalian rows
+            if (cashAmountElement) cashAmountElement.parentElement.style.display = 'flex';
+            if (kembalianAmountElement) kembalianAmountElement.parentElement.style.display = 'flex';
+        } else {
+            // Hide cash and kembalian rows for non-cash payment
+            if (cashAmountElement) cashAmountElement.parentElement.style.display = 'none';
+            if (kembalianAmountElement) kembalianAmountElement.parentElement.style.display = 'none';
+        }
+        
+        // Update payment method text
+        const paymentMethodText = document.getElementById('payment-method-text');
+        if (paymentMethodText) {
+            paymentMethodText.textContent = selectedPayment === 'cash' ? 'Cash' : 'Midtrans';
+        }
+    }
+
+    function proceedWithPayment() {
+        const modal = document.getElementById('resiModal');
+        if (modal) {
+            modal.classList.add('hidden');
+        }
+        
+        if (selectedPayment === 'midtrans') {
+            // Handle Midtrans payment
+            let nominal = getSelectedNominal();
+            fetchMidtransToken(nominal).then(function(token) {
+                if (token && typeof snap !== 'undefined') {
+                    snap.pay(token, {
+                        onSuccess: function(result) {
+                            console.log('Midtrans payment success:', result);
+                            document.getElementById('paymentForm').submit();
+                        },
+                        onPending: function(result) {
+                            console.log('Midtrans payment pending:', result);
+                            alert('Pembayaran dalam status pending, silahkan selesaikan pembayaran');
+                        },
+                        onError: function(result) {
+                            console.error('Midtrans payment error:', result);
+                            alert('Pembayaran gagal!');
+                        },
+                        onClose: function() {
+                            alert('Anda menutup popup tanpa menyelesaikan pembayaran');
+                        }
+                    });
+                } else {
+                    alert('Token pembayaran tidak tersedia atau Midtrans belum dimuat.');
+                }
+            });
+        } else {
+            // For cash payment, submit form directly
+            document.getElementById('paymentForm').submit();
+        }
+    }
+
+    function cancelPayment() {
+        const modal = document.getElementById('resiModal');
+        if (modal) {
+            modal.classList.add('hidden');
+        }
     }
 
     // Initialize default values
-    const defaultDepositOption = document.querySelector('input[name="deposit_option"]:checked');
-    if (defaultDepositOption && depositPercentageInput) {
-        const depositPercentage = defaultDepositOption.value === 'full' ? 0 : parseInt(defaultDepositOption.value);
-        depositPercentageInput.value = depositPercentage;
+    const defaultDPOption = document.querySelector('input[name="DP_option"]:checked');
+    if (defaultDPOption && DPPercentageInput) {
+        const DPPercentage = defaultDPOption.value === 'full' ? 0 : parseInt(defaultDPOption.value);
+        DPPercentageInput.value = DPPercentage;
+    }
+
+    const proceedPaymentBtn = document.getElementById('proceedPaymentBtn');
+    const cancelPaymentBtn = document.getElementById('cancelPaymentBtn');
+
+    if (proceedPaymentBtn) {
+        proceedPaymentBtn.addEventListener('click', function() {
+            proceedWithPayment();
+        });
+    }
+
+    if (cancelPaymentBtn) {
+        cancelPaymentBtn.addEventListener('click', function() {
+            cancelPayment();
+        });
+    }
+
+    // Update modal handling untuk tombol print resi (bukan dari form)
+    if (openModalBtn && modal) {
+        openModalBtn.addEventListener('click', function() {
+            // Ketika membuka modal dari tombol "cetak resi", 
+            // tampilkan tombol print/download dan sembunyikan tombol konfirmasi
+            showPrintDownloadButtons();
+            updateResiData(); // Update data resi
+            modal.classList.remove('hidden');
+        });
+    }
+
+    // Function untuk menampilkan tombol print/download dan menyembunyikan tombol konfirmasi
+    function showPrintDownloadButtons() {
+        const confirmationSection = document.querySelector('#resiModal .bg-gray-50.border-t');
+        const printDownloadButtons = document.getElementById('printDownloadButtons');
+        
+        if (confirmationSection) {
+            confirmationSection.style.display = 'none';
+        }
+        
+        if (printDownloadButtons) {
+            printDownloadButtons.classList.remove('hidden');
+            printDownloadButtons.style.display = 'flex';
+        }
+    }
+
+    // Function untuk menampilkan tombol konfirmasi dan menyembunyikan tombol print/download  
+    function showConfirmationButtons() {
+        const confirmationSection = document.querySelector('#resiModal .bg-gray-50.border-t');
+        const printDownloadButtons = document.getElementById('printDownloadButtons');
+        
+        if (confirmationSection) {
+            confirmationSection.style.display = 'block';
+        }
+        
+        if (printDownloadButtons) {
+            printDownloadButtons.classList.add('hidden');
+            printDownloadButtons.style.display = 'none';
+        }
+    }
+
+    // Update function showResiPreview untuk menampilkan tombol konfirmasi
+    function showResiPreview() {
+        // Update data resi berdasarkan input yang dipilih
+        updateResiData();
+        
+        // Tampilkan tombol konfirmasi dan sembunyikan tombol print/download
+        showConfirmationButtons();
+        
+        // Tampilkan modal
+        const modal = document.getElementById('resiModal');
+        if (modal) {
+            modal.classList.remove('hidden');
+        }
     }
 
     console.log('Payment method selection initialized'); // Debug log
 });
+
+// Tambahkan di payment.blade.php
+setInterval(function() {
+    fetch("{{ route('pesanans.detail', $pesanan->id_pesanan) }}")
+        .then(res => res.text())
+        .then(html => {
+            if (html.includes('Sudah Lunas') || html.includes('Pesanan sudah dibayar')) {
+                location.reload();
+            }
+        });
+}, 5000); // cek setiap 5 detik
 </script>
 @endpush

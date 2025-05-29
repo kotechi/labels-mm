@@ -16,11 +16,11 @@ class MidtransService
         Config::$is3ds = config('midtrans.is_3ds');
     }
 
-    public function createTransaction($order)
+    public function createTransaction($order, $nominal) // TAMBAHKAN $nominal di sini
     {
         $transaction_details = [
             'order_id' => 'ORDER-' . $order->id_pesanan . '-' . time(),
-            'gross_amount' => $order->total_harga
+            'gross_amount' => intval($nominal) // PASTIKAN pakai $nominal dari parameter
         ];
 
         $customer_details = [
@@ -34,7 +34,7 @@ class MidtransService
         ];
 
         try {
-            $snapToken = Snap::getSnapToken($transaction_data);
+            $snapToken = \Midtrans\Snap::getSnapToken($transaction_data);
             return $snapToken;
         } catch (\Exception $e) {
             return null;

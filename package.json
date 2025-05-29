@@ -17,6 +17,7 @@
         "vite": "^6.0"
     },
     "dependencies": {
+        "aos": "^2.3.4",
         "chart.js": "^4.4.8",
         "jquery": "^3.7.1",
         "puppeteer": "^24.2.1",

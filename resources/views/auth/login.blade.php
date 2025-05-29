@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login Page</title>
+    <link rel="icon" type="image/svg+xml" href="{{ asset('storage/images/icon/logo_label.png') }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         body { font-family: 'Poppins', serif; }
@@ -19,7 +20,7 @@
     </style>
 </head>
 
-<body class="flex items-center justify-center min-h-screen bg-gradient-to-b from-[#ebc0e1] via-[#6b0d55] to-[#6A1E55]">
+<body class="flex items-center justify-center min-h-screen bg-gradient-to-b from-[#6A1E55] via-[#6b0d55] to-[#ebc0e1]">
     <img src="{{ asset('storage/images/group_7.png') }}" class="hiasan w-5 h-5" alt="">
     
     <div class="container flex flex-col items-center justify-center min-h-screen -mt-5">
