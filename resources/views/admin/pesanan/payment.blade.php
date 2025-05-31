@@ -197,9 +197,6 @@
         
         <!-- Bottom buttons -->
         <div class="mt-9 w-full items-center justify-center d-flex flex">
-            <button id="printResiBtn" class="rounded-md bg-[#AF0893] text-white p-2 mx-5 flex">
-                cetak resi <i class="w-5 h-5" data-lucide="notepad-text"></i>
-            </button>
             
             <a href="{{ route('pemasukan.index') }}" class="rounded-md bg-gray-500 text-white px-4 py-2 flex items-center shadow-lg">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
@@ -239,7 +236,7 @@
                         
                         <div class="flex justify-between mb-2">
                             <span class="font-medium">Nomor Resi</span>
-                            <span id="nomor-resi">{{ $resi->nomor_resi ?? '-' }}</span>
+                            <span id="nomor-resi"></span>
                         </div>
                         
                         <div class="flex justify-between mb-2">
@@ -277,15 +274,15 @@
                         
                         <!-- TAMBAHAN: Informasi pembayaran yang sudah dilakukan -->
                         @if($dibayar > 0)
-                        <div class="flex justify-between mb-2 text-green-600">
+                        <div class="flex justify-between mb-2 ">
                             <span class="font-medium">Sudah Dibayar</span>
                             <span id="sudah-dibayar">Rp {{ number_format($dibayar, 0, ',', '.') }}</span>
                         </div>
                         @endif
                         
                         <div id="DP-info" class="flex justify-between mb-2 hidden">
-                            <span class="font-medium text-blue-600">DP (%)</span>
-                            <span class="text-blue-600">Rp 0</span>
+                            <span class="font-medium ">DP (%)</span>
+                            <span >Rp 0</span>
                         </div>
                         
                         <div class="flex justify-between mb-2">
@@ -294,7 +291,7 @@
                         </div>
                         
                         <!-- TAMBAHAN: Sisa tagihan setelah pembayaran ini -->
-                        <div class="flex justify-between mb-2 text-orange-600">
+                        <div class="flex justify-between mb-2 ">
                             <span class="font-medium">Sisa Tagihan</span>
                             <span id="sisa-tagihan">Rp 0</span>
                         </div>
@@ -307,10 +304,10 @@
                             <span id="cash-amount">Rp 0</span>
                         </div>
                         
-                        <div class="flex justify-between mb-2" id="kembalian-row">
-                            <span class="font-medium">Kembali</span>
-                            <span id="kembalian-amount" class="font-bold text-green-600">Rp 0</span>
-                        </div>
+    <div class="flex justify-between mb-2" id="kembalian-row" style="display:none;">
+        <span class="font-medium">Kembalian</span>
+        <span id="kembalian-amount" class="font-bold">Rp 0</span>
+    </div>
                         
                         <div class="flex justify-between mt-4 pt-2 border-t border-gray-300">
                             <span class="font-medium">Metode Pembayaran</span>
@@ -318,18 +315,6 @@
                         </div>
                     </div>
                     
-                    <!-- Status Pembayaran -->
-                    <div class="p-4 bg-gray-50">
-                        <div class="text-center">
-                            <div class="inline-flex px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800">
-                                @if($pesanan->status_pesanan === 'paid')
-                                    Sudah Lunas
-                                @else
-                                    Pembayaran {{ $pesanan->jumlah_pembayaran ? 'Sebagian' : 'Baru' }}
-                                @endif
-                            </div>
-                        </div>
-                    </div>
                 </div>
                 
                 <!-- Tombol Konfirmasi Pembayaran - Fixed at bottom -->
@@ -573,14 +558,12 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // ========== FIX UNTUK PAYMENT METHOD SELECTION ==========
     let selectedPayment = 'cash'; 
     
     const paymentOptions = document.querySelectorAll('.payment-option');
     const cashPaymentForm = document.getElementById('cashPaymentForm');
     const paymentMethodInput = document.getElementById('payment_method');
     
-    console.log('Payment options found:', paymentOptions.length); // Debug log
     
     function selectPaymentMethod(element, paymentType) {
         // Remove selection from all options
@@ -601,9 +584,6 @@ document.addEventListener('DOMContentLoaded', function() {
             paymentMethodInput.value = selectedPayment;
         }
         
-        console.log('Selected payment method:', selectedPayment); // Debug log
-        
-        // Show/hide cash payment form
         if (cashPaymentForm) {
             if (selectedPayment === 'cash') {
                 cashPaymentForm.classList.remove('hidden');
@@ -622,8 +602,7 @@ document.addEventListener('DOMContentLoaded', function() {
             e.stopPropagation();
             
             const paymentType = this.getAttribute('data-payment') || this.dataset.payment;
-            console.log('Payment option clicked:', paymentType); // Debug log
-            
+
             selectPaymentMethod(this, paymentType);
         });
         
@@ -647,8 +626,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const totalHarga = {{ $totalHarga ?? 0 }};
     const jumlahDibayar = {{ $dibayar ?? 0 }};
     const sisaTagihan = {{ $sisaTagihan ?? 0 }};
-    
-    console.log('Calculation values:', { totalHarga, jumlahDibayar, sisaTagihan }); // Debug log
     
     // Handle DP option selection
     const DPOptions = document.querySelectorAll('input[name="DP_option"]');
@@ -889,14 +866,19 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function showResiPreview() {
-        // Update data resi berdasarkan input yang dipilih
+
         updateResiData();
-        
-        // Tampilkan modal
+
+        const pesananId = {{ $pesanan->id_pesanan }};
+        const now = new Date();
+        const pad = n => n.toString().padStart(2, '0');
+        const resiSementara = `RESI-${now.getFullYear()}${pad(now.getMonth()+1)}${pad(now.getDate())}-${pesananId}`;
+
+        document.getElementById('nomor-resi').textContent = resiSementara;
+
+        showConfirmationButtons();
         const modal = document.getElementById('resiModal');
-        if (modal) {
-            modal.classList.remove('hidden');
-        }
+        if (modal) modal.classList.remove('hidden');
     }
 
     function updateResiData() {
@@ -904,6 +886,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const selectedDP = document.querySelector('input[name="DP_option"]:checked');
         const dpValue = selectedDP ? selectedDP.value : 'full';
         const dpPercentage = dpValue === 'full' ? 0 : parseInt(dpValue);
+        const kembalianRow = document.getElementById('kembalian-row');
         
         // Hitung nominal yang akan dibayar
         let nominalBayar = sisaTagihan;
@@ -950,10 +933,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (selectedPayment === 'cash') {
             const jumlahCash = document.getElementById('jumlah_pembayaran').value.replace(/[^,\d]/g, '');
             const cashValue = parseInt(jumlahCash) || nominalBayar;
-            
-            // Hitung kembalian berdasarkan nominal yang dipilih
-            const kembalianValue = Math.max(0, cashValue - nominalBayar);
-            
+            const kembalianValue = Math.max(0, cashValue - nominalBayar);            
             if (cashAmountElement) {
                 cashAmountElement.textContent = `Rp ${formatRupiah(String(cashValue))}`;
             }
@@ -1159,10 +1139,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Update modal handling untuk tombol print resi (bukan dari form)
     if (openModalBtn && modal) {
         openModalBtn.addEventListener('click', function() {
-            // Ketika membuka modal dari tombol "cetak resi", 
-            // tampilkan tombol print/download dan sembunyikan tombol konfirmasi
             showPrintDownloadButtons();
-            updateResiData(); // Update data resi
+            updateResiData(); 
             modal.classList.remove('hidden');
         });
     }
@@ -1284,25 +1262,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Update function showResiPreview untuk menampilkan tombol konfirmasi
-    function showResiPreview() {
-        // Update data resi berdasarkan input yang dipilih
-        updateResiData();
-        
-        // Tampilkan tombol konfirmasi dan sembunyikan tombol print/download
-        showConfirmationButtons();
-        
-        // Tampilkan modal
-        const modal = document.getElementById('resiModal');
-        if (modal) {
-            modal.classList.remove('hidden');
-        }
-    }
 
-    console.log('Payment method selection initialized'); // Debug log
 });
 
-// Tambahkan di payment.blade.php
 setInterval(function() {
     fetch("{{ route('pesanans.detail', $pesanan->id_pesanan) }}")
         .then(res => res.text())

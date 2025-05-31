@@ -145,8 +145,12 @@ Route::middleware(['auth'])->group(function () {
     Route::patch('/karyawan/pesanan/{pesanan}', [KaryawanPesananController::class, 'update'])->name('karyawan.pesanans.update');
     Route::delete('/karyawan/pesanan/{pesanan}', [KaryawanPesananController::class, 'destroy'])->name('karyawan.pesanans.destroy');
     Route::post('/karyawan/pesanan/{pesanan}/markAsPaid', [KaryawanPesananController::class, 'markAsPaid'])->name('karyawan.pesanans.markAsPaid');
+    Route::post('/karyawan/pesanan/{pesanan}/midtrans', [KaryawanPesananController::class, 'getMidtransToken'])->name('karyawan.pesanans.midTransToken');
     Route::post('/karyawan/pesanan/{pesanan}/markAsCompleted', [KaryawanPesananController::class, 'markAsCompleted'])->name('karyawan.pesanans.markAsCompleted');
+    Route::post('/karyawan/pesanan/{pesanan}/paymentproses', [KaryawanPesananController::class, 'paymentProses'])->name('karyawan.pesanans.paymentProses');
+    Route::get('/karyawan/pesanan/{pesanan}/payment', [KaryawanPesananController::class, 'payment'])->name('karyawan.pesanans.payment');
     Route::delete('/karyawan/pesanan/{pesanan}/deleteWithPemasukan', [KaryawanPesananController::class, 'destroyWithPemasukan'])->name('karyawan.pesanans.destroyWithPemasukan');
+    Route::post('/karyawan/pesanan/{pesanan}/batalkan', [KaryawanPesananController::class, 'batalkanPesanan'])->name('karyawan.pesanans.batalkan');
 });
 
 require __DIR__ . '/auth.php';

@@ -313,7 +313,8 @@ class PesananController extends Controller
         $pesanan = Pesanan::findOrFail($id);
         $users = User::all();
         $product = Product::find($pesanan->product_id);
-        return view('admin.pesanan.detail', compact('pesanan', 'users', 'product'));
+        $resis = Resi::where('pesanan_id', $id)->orderBy('tanggal', 'desc')->get(); // ambil semua resi
+        return view('admin.pesanan.detail', compact('pesanan', 'users', 'product', 'resis'));
     }
 
     public function resi($id) {
@@ -402,17 +403,17 @@ class PesananController extends Controller
             $pemasukan->created_at = now();
             $pemasukan->save();
 
-            $resi = Resi::where('pesanan_id', $pesanan->id_pesanan)->first();
-            if (!$resi) {
-                $resi = new Resi();
-                $resi->pesanan_id = $pesanan->id_pesanan;
-                $resi->nomor_resi = 'RESI-' . date('Ymd') . '-' . $pesanan->id_pesanan;
-                $resi->tanggal = now();
-                $resi->created_by = $currentUserId;
-            }
+            $countResi = Resi::where('pesanan_id', $pesanan->id_pesanan)->count();
+            $nomorResiFinal = 'RESI-' . date('Ymd') . '-' . $pesanan->id_pesanan . '-' . ($countResi + 1);
+
+            $resi = new Resi();
+            $resi->pesanan_id = $pesanan->id_pesanan;
+            $resi->nomor_resi = $nomorResiFinal;
+            $resi->tanggal = now();
             $resi->total_pembayaran = $totalHarga;
             $resi->jumlah_pembayaran = $jumlahPembayaranBaru;
             $resi->kembalian = $kembalian;
+            $resi->created_by = auth()->user()->id_users;
             $resi->save();
 
             DB::commit();

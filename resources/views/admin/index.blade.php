@@ -153,58 +153,71 @@
     </div>
 
     <div class="overflow-x-auto">
-        <table class="datatable min-w-full divide-y divide-gray-200">
-            <thead class="bg-thead">
-                <tr>
-                    <th  h class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">ID Pesanan</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Nama</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">jumlah</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Product</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Status</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Total Harga</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Actions</th>
-                </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
-                @foreach($pesanans as $pesanan)
-                <tr>
-                    <td class="px-6 py-4 whitespace-nowrap">{{ $pesanan->id_pesanan }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap">{{ $pesanan->nama_pemesan }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap">{{ $pesanan->product_id }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap">{{ $pesanan->nama_produk }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        @if($pesanan->status_pesanan == 'proses')
-                            <form action="{{ route('pesanans.markAsPaid', $pesanan->id_pesanan) }}" method="POST" class="inline-block">
-                                @csrf
-                                <button type="submit" class="px-3 py-2 bg-yellow-500 hover:bg-yello-600 text-white rounded-md mark-as-paid-button">Belum bayar</button>
-                            </form>
-                        @elseif($pesanan->status_pesanan == 'paid')
-                            <form action="{{ route('pesanans.markAsCompleted', $pesanan->id_pesanan) }}" method="POST" class="inline-block">
-                                @csrf
-                                <button type="submit" class="px-3 py-2 bg-green-500 hover:bg-green-600 text-white rounded-md mark-as-paid-button">Sudah bayar</button>
-                            </form>
-                        @elseif($pesanan->status_pesanan == 'completed')
-                            <button class="px-3 py-2 bg-blue-600 text-white rounded-md">Selesai</button>
-                        @endif
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">Rp {{ number_format($pesanan->total_harga, 0, ',', '.') }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <a href="{{ route('pesanans.edit', $pesanan->id_pesanan) }}" 
-                           class="px-3 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-md">Edit</a>
-                        <form action="{{ route('pesanans.destroyWithPemasukan', $pesanan->id_pesanan) }}"
-                              method="POST" class="inline-block delete-form">
-                            @csrf
-                            @method('DELETE')
-                            <button type="button" 
-                                    class="px-3 py-2 bg-red-500 hover:bg-red-600 text-white rounded-md delete-button">
-                                Delete
-                            </button>
-                        </form>
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
+            <table class="datatable min-w-full divide-y divide-gray-200">
+                <thead class="bg-thead">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider border-r border-gray-200">#</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider border-r border-gray-200">Nama </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider border-r border-gray-200">Model</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider border-r border-gray-200">Total Harga</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider border-r border-gray-200">Jumlah</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider border-r border-gray-200">No. telp</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider border-r border-gray-200">Status</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    <?php
+                        $no_pesanan = 1;    
+                    ?>
+                    @foreach($pesanans as $pesanan)
+                    <tr class="cursor-pointer hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap">{{ $no_pesanan++ }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">{{ $pesanan->nama_pemesan }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">{{ $pesanan->nama_produk }}</td>    
+                        <td class="px-6 py-4 whitespace-nowrap">Rp {{ number_format($pesanan->total_harga ?? 0, 0, ',', '.') }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">{{ $pesanan->jumlah_produk }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">{{ $pesanan->no_telp_pemesan }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            @if($pesanan->status_pesanan == 'proses')
+                                <form action="{{ route('pesanans.markAsPaid', $pesanan->id_pesanan) }}" method="POST" class="inline-block">
+                                    @csrf
+                                    <button type="submit" class="px-3 py-2 bg-yellow-500 hover:bg-yello-600 text-white rounded-md mark-as-paid-button">Belum bayar</button>
+                                </form>
+                            @elseif($pesanan->status_pesanan == 'DP')
+                                <form action="{{ route('pesanans.markAsPaid', $pesanan->id_pesanan) }}" method="POST" class="inline-block">
+                                    @csrf
+                                    <button type="submit" class="px-3 py-2 bg-yellow-500 hover:bg-yello-600 text-white rounded-md mark-as-paid-button">DP</button>
+                                </form>
+                            @elseif($pesanan->status_pesanan == 'paid')
+                                <form action="{{ route('pesanans.markAsCompleted', $pesanan->id_pesanan) }}" method="POST" class="inline-block">
+                                    @csrf
+                                    <button type="submit" class="px-3 py-2 bg-green-500 hover:bg-green-600 text-white rounded-md mark-as-paid-button">Sudah bayar</button>
+                                </form>
+                            @elseif($pesanan->status_pesanan == 'batal')
+                                <button class="px-3 py-2 bg-red-500 text-white rounded-md">Batal</button>
+                            @elseif($pesanan->status_pesanan == 'completed')
+                                <button class="px-3 py-2 bg-blue-600 text-white rounded-md">Selesai</button>
+                            
+
+                            @endif
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap" id="actions-td">
+                            <a href="{{ route('pesanans.detail', $pesanan->id_pesanan) }}" class="p-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md"><i data-lucide="view" class="w-6 h-6 inline "></i></a>
+                            <a href="{{ route('pesanans.edit', $pesanan->id_pesanan) }}" class="px-3 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-md">Edit</a>
+
+
+                            @if($pesanan->status_pesanan !== 'batal')
+                                <form action="{{ route('pesanans.batalkan', $pesanan->id_pesanan) }}" method="POST" class="inline-block delete-form">
+                                    @csrf
+                                    <button type="button" class="px-3 py-2 bg-red-500 hover:bg-red-600 text-white rounded-md delete-button">Batalkan</button>
+                                </form>
+                            @endif
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
     </div>
 </div>
 

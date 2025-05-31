@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('resis', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('pesanan_id')->unique();
+            $table->unsignedBigInteger('pesanan_id');
             $table->string('nomor_resi');
             $table->timestamp('tanggal');
             $table->decimal('total_pembayaran', 15, 2);

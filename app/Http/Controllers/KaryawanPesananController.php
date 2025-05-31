@@ -8,8 +8,10 @@ use App\Models\tbl_transaksi;
 use App\Models\Pemasukan;
 use App\Models\Product;
 use App\Models\User;
+use App\Models\Resi;
 use Illuminate\Support\Facades\DB;
 use App\Services\MidtransService;
+
 
 class KaryawanPesananController extends Controller
 {
@@ -28,8 +30,9 @@ class KaryawanPesananController extends Controller
         
         if ($hashed == $request->signature_key) {
             if ($request->transaction_status == 'capture' || $request->transaction_status == 'settlement') {
-                $orderId = explode('-', $request->order_id)[1];
-                $pesanan = Pesanan::find($orderId);
+                $orderId = $request->order_id;
+                $id_pesanan = preg_replace('/[^0-9]/', '', $orderId);
+                $pesanan = Pesanan::find($id_pesanan);
                 
                 if ($pesanan) {
                     $pesanan->status_pesanan = 'paid';
@@ -75,7 +78,7 @@ class KaryawanPesananController extends Controller
             'total_harga' => 'required|numeric',
             'jumlah_produk' => 'required|numeric|min:1',
             'no_telp_pemesan' => 'required|string|max:15',
-            'payment_method' => 'required|string|max:255',
+            'DP_percentage' => 'nullable|numeric',
             'lebar_muka' => 'required|numeric',
             'lebar_pundak' => 'required|numeric',
             'lebar_punggung' => 'required|numeric',
@@ -89,77 +92,66 @@ class KaryawanPesananController extends Controller
             'lingkar_pergelangan_lengan' => 'required|numeric',
             'jumlah_pembayaran' => 'nullable|numeric',
         ]);
-
-        // Begin transaction to ensure data consistency
+    
         DB::beginTransaction();
         
         try {
             $request->merge([
                 'created_by' => auth()->user()->id_users
             ]);
-
-            // Create the order
+            
+            // Kalkulasi harga berdasarkan persentase DP jika dipilih
+            $total_harga = $request->total_harga;
+            if ($request->has('DP_percentage') && $request->DP_percentage > 0) {
+                $total_harga = ($request->total_harga * $request->DP_percentage) / 100;
+                $request->merge(['is_DP' => true, 'DP_amount' => $total_harga]);
+            } else {
+                $request->merge(['is_DP' => false, 'DP_amount' => 0]);
+            }
+    
             $pesanan = Pesanan::create($request->all());
-
-            // Update product stock
+    
             $product = Product::findOrFail($request->product_id);
             if ($product->stock_product < $request->jumlah_produk) {
                 DB::rollBack();
                 return redirect()->back()->with('error', 'Stok produk tidak mencukupi');
             }
             
-            // Decrease product stock
             $product->stock_product -= $request->jumlah_produk;
             $product->save();
-
-            // Add to pemasukan and transaksi if status is paid or completed
+    
             if (in_array($pesanan->status_pesanan, ['paid', 'completed'])) {
                 tbl_transaksi::create([
                     'id_referens' => $pesanan->id_pesanan,
                     'pelaku_transaksi' => $pesanan->created_by,
                     'keterangan' => "Order created for Order #{$pesanan->id_pesanan} - {$pesanan->nama_produk} (Qty: {$pesanan->jumlah_produk})",
-                    'nominal' => $pesanan->total_harga,
+                    'nominal' => $total_harga,
                     'kategori' => 'pemasukan',
                     'tanggal' => now(),
                 ]);
-
+    
                 Pemasukan::create([
                     'id_referensi' => $pesanan->id_pesanan,
                     'keterangan' => "Payment received for Order #{$pesanan->id_pesanan} - {$pesanan->nama_produk} (Qty: {$pesanan->jumlah_produk})",
-                    'nominal' => $pesanan->total_harga,
+                    'nominal' => $total_harga,
                     'created_by' => $pesanan->created_by,
                     'created_at' => now(),
                 ]);
+                
+                // Buat resi jika status sudah dibayar
+                $this->createResi($pesanan);
             }
-
+    
             DB::commit();
 
-            if ($request->payment_method === 'midtrans') {
-                $snapToken = $this->midtransService->createTransaction($pesanan);
-                
-                if ($snapToken) {
-                    return view('karyawan.pesanan.payment', compact('snapToken', 'pesanan'))->with('succes', 'Berhasil membuat pesanan');
-                }
-                
-                return redirect()->back()->with('error', 'Gagal membuat transaksi pembayaran');
-            }
-            
-            // For cash payments, fetch the product and show receipt
-            $product = Product::findOrFail($request->product_id);
-            
-            // If this is a cash payment, return receipt view
-            if ($request->payment_method === 'cash') {
-                return view('karyawan.pesanan.detail', compact('pesanan', 'product'))->with('success', 'berhasil membuat pesanan');
-            }
-
-            return redirect()->route('karyawan.pesanans.index')->with('success', 'Pesanan created successfully');
+            // Redirect ke halaman payment setelah create pesanan
+            return redirect()->route('karyawan.pesanans.payment', $pesanan->id_pesanan);
         } catch (\Exception $e) {
             DB::rollBack();
             return redirect()->back()->with('error', 'Error creating order: ' . $e->getMessage());
         }
     }
 
-    // PesananController.php
     public function generateQRCode(Request $request)
     {
         $amount = $request->amount;
@@ -185,12 +177,12 @@ class KaryawanPesananController extends Controller
         
         return view('karyawan.pesanan.detail', compact('pesanan', 'users', 'product'));
     }
-    
 
     public function resi($id) {
         $pesanan = Pesanan::findOrFail($id);
         $product = Product::findOrFail($pesanan->product_id);
-        return view('karyawan.pesanan.resi', compact('pesanan', 'product'));
+        $resi = Resi::where('pesanan_id', $id)->first();
+        return view('karyawan.pesanan.resi', compact('pesanan', 'product', 'resi'));
     }
 
     public function update(Request $request, $id)
@@ -204,6 +196,7 @@ class KaryawanPesananController extends Controller
             'jumlah_produk' => 'required|numeric|min:1',
             'no_telp_pemesan' => 'required|string|max:15',
             'payment_method' => 'required|string|max:255',
+            'DP_percentage' => 'nullable|numeric',
             'lebar_muka' => 'required|numeric',
             'lebar_pundak' => 'required|numeric',
             'lebar_punggung' => 'required|numeric',
@@ -229,7 +222,7 @@ class KaryawanPesananController extends Controller
                 $request->merge(['jumlah_produk' => $pesanan->jumlah_produk]);
             }
             else if ($productExists) {
-                // Your existing stock check logic...
+                // Stock check logic
                 if ($pesanan->product_id != $request->product_id || 
                 ($pesanan->product_id == $request->product_id && $pesanan->jumlah_produk < $request->jumlah_produk)) {
                 
@@ -280,12 +273,21 @@ class KaryawanPesananController extends Controller
                         $product->save();
                     }
                 }
-                // Rest of your existing logic...
             }
-
             
             // Mengabaikan created_by dari request
             $input = $request->except('created_by');
+            
+            // Kalkulasi harga berdasarkan persentase DP jika dipilih
+            $total_harga = $request->total_harga;
+            if ($request->has('DP_percentage') && $request->DP_percentage > 0) {
+                $total_harga = ($request->total_harga * $request->DP_percentage) / 100;
+                $input['is_DP'] = true;
+                $input['DP_amount'] = $total_harga;
+            } else {
+                $input['is_DP'] = false;
+                $input['DP_amount'] = 0;
+            }
             
             // Check if total_harga or jumlah_produk has changed
             if ($pesanan->total_harga != $input['total_harga'] || $pesanan->jumlah_produk != $input['jumlah_produk']) {
@@ -299,7 +301,7 @@ class KaryawanPesananController extends Controller
                     $pesanan->nama_produk,
                     $input['jumlah_produk']
                 );
-                $transaction->nominal = intval($input['total_harga']); // Convert to integer if stored as string
+                $transaction->nominal = intval($total_harga); // Convert to integer if stored as string
                 $transaction->kategori = 'pemasukan';
                 $transaction->tanggal = now();
                 $transaction->save();
@@ -307,7 +309,7 @@ class KaryawanPesananController extends Controller
                 // Update associated pemasukan
                 $pemasukan = Pemasukan::where('id_referensi', $pesanan->id_pesanan)->first();
                 if ($pemasukan) {
-                    $pemasukan->nominal = intval($input['total_harga']); // Convert to integer if stored as string
+                    $pemasukan->nominal = intval($total_harga); // Convert to integer if stored as string
                     $pemasukan->created_by = $currentUser; // Update dengan user yang sedang login
                     $pemasukan->save();
                 }
@@ -325,25 +327,28 @@ class KaryawanPesananController extends Controller
                         'id_referens' => $pesanan->id_pesanan,
                         'pelaku_transaksi' => $currentUser, // Menggunakan user yang sedang login
                         'keterangan' => "Order updated for Order #{$pesanan->id_pesanan} - {$pesanan->nama_produk} (Qty: {$pesanan->jumlah_produk})",
-                        'nominal' => $pesanan->total_harga,
+                        'nominal' => $total_harga,
                         'kategori' => 'pemasukan',
                         'tanggal' => now(),
                     ]);
 
                     $pemasukan = Pemasukan::where('id_referensi', $pesanan->id_pesanan)->first();
                     if ($pemasukan) {
-                        $pemasukan->nominal = $pesanan->total_harga;
+                        $pemasukan->nominal = $total_harga;
                         $pemasukan->created_by = $currentUser; // Update dengan user yang sedang login
                         $pemasukan->save();
                     } else {
                         Pemasukan::create([
                             'id_referensi' => $pesanan->id_pesanan,
                             'keterangan' => "Payment received for Order #{$pesanan->id_pesanan} - {$pesanan->nama_produk} (Qty: {$pesanan->jumlah_produk})",
-                            'nominal' => $pesanan->total_harga,
+                            'nominal' => $total_harga,
                             'created_by' => $currentUser, // Menggunakan user yang sedang login
                             'created_at' => now(),
                         ]);
                     }
+                    
+                    // Buat resi jika status sudah dibayar
+                    $this->createResi($pesanan);
                 }
             }
             
@@ -359,29 +364,78 @@ class KaryawanPesananController extends Controller
 
     public function markAsPaid($id)
     {
+        $pesanan = Pesanan::findOrFail($id);
+        $product = Product::findOrFail($pesanan->product_id);
+        $resi = Resi::where('pesanan_id', $id)->first();
+        return view('karyawan.pesanan.payment', compact('pesanan', 'product', 'resi'));
+    }
+
+    public function payment($id, Request $request)
+    {
+        $pesanan = Pesanan::findOrFail($id);
+        $product = Product::findOrFail($pesanan->product_id);
+        $resi = Resi::where('pesanan_id', $id)->first();
+        return view('karyawan.pesanan.payment', compact('pesanan', 'product', 'resi'));
+    }
+
+    public function paymentProses($id, Request $request)
+    {
         try {
             DB::beginTransaction();
-    
+
             $pesanan = Pesanan::findOrFail($id);
-            $pesanan->update(['status_pesanan' => 'paid']);
-    
+
+            if ($pesanan->status_pesanan === 'paid') {
+                DB::rollBack();
+                return redirect()->route('karyawan.pesanans.index')
+                    ->with('error', 'Pesanan sudah lunas dan tidak bisa dibayar lagi.');
+            }
+
+            $totalHarga = floatval($pesanan->total_harga);
+            $jumlahPembayaranLama = floatval($pesanan->jumlah_pembayaran ?? 0);
+            $sisaTagihan = $totalHarga - $jumlahPembayaranLama;
+
+            // Ambil nominal pembayaran dari hidden input numerik (bukan dari input format rupiah)
+            $bayarBaru = floatval($request->input('jumlah_pembayaran_numeric', 0));
+
+            if ($bayarBaru < 1) {
+                DB::rollBack();
+                return redirect()->back()->with('error', 'Nominal pembayaran tidak valid.');
+            }
+
+            $kembalian = 0;
+            if ($bayarBaru > $sisaTagihan) {
+                $kembalian = $bayarBaru - $sisaTagihan;
+                $bayarBaru = $sisaTagihan;
+            }
+
+            $jumlahPembayaranBaru = $jumlahPembayaranLama + $bayarBaru;
+
+            if ($jumlahPembayaranBaru >= $totalHarga) {
+                $pesanan->status_pesanan = 'paid';
+                $pesanan->jumlah_pembayaran = $totalHarga;
+            } else {
+                $pesanan->status_pesanan = 'DP';
+                $pesanan->jumlah_pembayaran = $jumlahPembayaranBaru;
+            }
+            $pesanan->save();
+
             $currentUserId = auth()->user()->id_users;
-    
+
             $transaction = new tbl_transaksi();
             $transaction->id_referens = $pesanan->id_pesanan;
-            $transaction->pelaku_transaksi = $currentUserId; 
+            $transaction->pelaku_transaksi = $currentUserId;
             $transaction->keterangan = sprintf(
                 'Payment received for Order #%d - %s (Qty: %d)', 
                 $pesanan->id_pesanan,
                 $pesanan->nama_produk,
                 $pesanan->jumlah_produk
             );
-            $transaction->nominal = intval($pesanan->total_harga);
+            $transaction->nominal = intval($bayarBaru);
             $transaction->kategori = 'pemasukan';
             $transaction->tanggal = now();
             $transaction->save();
-    
-            // Insert into pemasukan table with the current user
+
             $pemasukan = new Pemasukan();
             $pemasukan->id_referensi = $pesanan->id_pesanan;
             $pemasukan->keterangan = sprintf(
@@ -390,22 +444,84 @@ class KaryawanPesananController extends Controller
                 $pesanan->nama_produk,
                 $pesanan->jumlah_produk
             );
-            $pemasukan->nominal = intval($pesanan->total_harga);
-            $pemasukan->created_by = $currentUserId; // Changed from $pesanan->created_by
+            $pemasukan->nominal = intval($bayarBaru);
+            $pemasukan->created_by = $currentUserId; 
             $pemasukan->created_at = now();
             $pemasukan->save();
-    
+
+            $resi = Resi::where('pesanan_id', $pesanan->id_pesanan)->first();
+            if (!$resi) {
+                $resi = new Resi();
+                $resi->pesanan_id = $pesanan->id_pesanan;
+                $resi->nomor_resi = 'RESI-' . date('Ymd') . '-' . $pesanan->id_pesanan;
+                $resi->tanggal = now();
+                $resi->created_by = $currentUserId;
+            }
+            $resi->total_pembayaran = $totalHarga;
+            $resi->jumlah_pembayaran = $jumlahPembayaranBaru;
+            $resi->kembalian = $kembalian;
+            $resi->save();
+
             DB::commit();
-    
+
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Pembayaran berhasil diproses.',
+                    'resi_id' => $resi ? $resi->id : null,
+                    'kembalian' => $kembalian
+                ]);
+            }
+
             return redirect()->route('karyawan.pesanans.index')
-                ->with('success', 'Order marked as paid and transaction recorded successfully.');
-    
+                ->with('success', 'Pembayaran berhasil diproses.');
+
         } catch (\Exception $e) {
             DB::rollBack();
-            
+
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Gagal memproses pembayaran: ' . $e->getMessage()
+                ], 500);
+            }
+
             return redirect()->route('karyawan.pesanans.index')
-                ->with('error', 'Failed to process payment: ' . $e->getMessage());
+                ->with('error', 'Gagal memproses pembayaran: ' . $e->getMessage());
         }
+    }
+
+    public function getMidtransToken(Request $request, $id)
+    {
+        $pesanan = Pesanan::findOrFail($id);
+        $nominal = floatval($request->input('nominal', 0));
+        if ($nominal < 1) {
+            return response()->json(['success' => false, 'message' => 'Nominal tidak valid'], 400);
+        }
+        $snapToken = $this->midtransService->createTransaction($pesanan, $nominal);
+        if ($snapToken) {
+            return response()->json(['success' => true, 'snapToken' => $snapToken]);
+        }
+        return response()->json(['success' => false, 'message' => 'Gagal membuat token Midtrans'], 500);
+    }
+
+    protected function createResi($pesanan)
+    {
+        $resi = Resi::where('pesanan_id', $pesanan->id_pesanan)->first();
+        
+        if (!$resi) {
+            $resi = new Resi();
+            $resi->pesanan_id = $pesanan->id_pesanan;
+            $resi->nomor_resi = 'RESI-' . date('Ymd') . '-' . $pesanan->id_pesanan;
+            $resi->tanggal = now();
+            $resi->total_pembayaran = $pesanan->is_DP ? $pesanan->DP_amount : $pesanan->total_harga;
+            $resi->jumlah_pembayaran = $pesanan->jumlah_pembayaran ?? $resi->total_pembayaran;
+            $resi->kembalian = ($pesanan->jumlah_pembayaran ?? $resi->total_pembayaran) - $resi->total_pembayaran;
+            $resi->created_by = auth()->user()->id_users;
+            $resi->save();
+        }
+        
+        return $resi;
     }
 
     public function markAsCompleted($id)
@@ -448,6 +564,9 @@ class KaryawanPesananController extends Controller
             $product->stock_product += $pesanan->jumlah_produk;
             $product->save();
             
+            // Delete related receipt if exists
+            Resi::where('pesanan_id', $id)->delete();
+            
             // Delete the order
             $pesanan->delete();
             
@@ -472,6 +591,9 @@ class KaryawanPesananController extends Controller
                 $product->save();
             }
             
+            // Delete related receipt if exists
+            Resi::where('pesanan_id', $id)->delete();
+            
             // Hapus pemasukan terkait
             Pemasukan::where('id_referensi', $pesanan->id_pesanan)->delete();
             $pesanan->delete();
@@ -487,4 +609,54 @@ class KaryawanPesananController extends Controller
                 ->with('error', 'Gagal menghapus pesanan: ' . $e->getMessage());
         }
     }
+
+    public function batalkanPesanan($id)
+    {
+        DB::beginTransaction();
+
+        try {
+            $pesanan = Pesanan::findOrFail($id);
+            
+            if ($product = Product::find($pesanan->product_id)) {
+                $product->stock_product += $pesanan->jumlah_produk;
+                $product->save();
+            }
+            
+            $currentUserId = auth()->user()->id_users;
+            
+            $transaction = new tbl_transaksi();
+            $transaction->id_referens = $pesanan->id_pesanan;
+            $transaction->pelaku_transaksi = $currentUserId;
+            $transaction->keterangan = sprintf(
+                'Pembatalan pesanan untuk Order #%d - %s (Qty: %d)', 
+                $pesanan->id_pesanan,
+                $pesanan->nama_produk,
+                $pesanan->jumlah_produk
+            );
+            $transaction->nominal = $pesanan->total_harga;
+            $transaction->kategori = 'pembatalan';
+            $transaction->tanggal = now();
+            $transaction->save();
+            
+            Pemasukan::where('id_referensi', $pesanan->id_pesanan)->delete();
+            
+            // Delete related receipt if exists
+            Resi::where('pesanan_id', $id)->delete();
+            
+            $pesanan->status_pesanan = 'batal';
+            $pesanan->save();
+
+            DB::commit();
+
+            return redirect()->route('pemasukan.index')
+                ->with('success', 'Pesanan berhasil dibatalkan');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->route('pemasukan.index')
+                ->with('error', 'Gagal membatalkan pesanan: ' . $e->getMessage());
+        }
+    }
+
 }
+
