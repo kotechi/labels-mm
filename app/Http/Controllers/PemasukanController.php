@@ -14,9 +14,10 @@ class PemasukanController extends Controller
         $pendingCount = Pesanan::where('status_pesanan', 'proses')->count();
         $paidCount = Pesanan::where('status_pesanan', 'paid')->count();
         $completedCount = Pesanan::where('status_pesanan', 'completed')->count();
+        $dp = Pesanan::where('status_pesanan', 'DP')->count();
         $pesanans = Pesanan::all();
         $pemasukans = Pemasukan::with('user')->get();
-        return view('admin.pemasukan.index', compact('pesanans', 'pemasukans', 'pendingCount', 'paidCount', 'completedCount'));
+        return view('admin.pemasukan.index', compact('pesanans', 'pemasukans', 'pendingCount', 'paidCount', 'completedCount', 'dp'));
     }
 
     public function create()

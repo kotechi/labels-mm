@@ -127,8 +127,8 @@
     }
 
     #actions-td {
-        max-width: 200px;
-
+        max-width: 250px;
+        min-width: 175px;
     }
 
     .datatable thead th {
@@ -439,26 +439,52 @@
         left: 100%;
     }
 
+    .card-tittle {
+        font-size: 1.5rem;
+        line-height: 2rem;
+        font-weight: 600;
+        --tw-text-opacity: 1;
+        color: rgb(55 65 81 / var(--tw-text-opacity, 1)) /* #374151 */;
+    }
 
-    @media screen and (max-width: 768px) {
-        .datatable td, .datatable th {
+    .card-tittle-section {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+    }
+    @media screen and (max-width: 1100px) {
+
+        #sidebar-toggle {
+            display: none;
+        }
+
+        .card-tittle-section {
+            flex-direction: column;
+        }
+        .card-tittle {
+            font-size: 1.5rem;
+            margin-bottom: 1rem
+        }
+
+        .datatable th {
             font-size: 0.85rem;
-            padding: 0.5rem 0.3rem;
+            padding: 0.3rem 0.3rem;
         }
         
         .datatable thead th {
             font-size: 0.9rem;
         }
-        
+
         .datatable td {
+            font-size: 0.75rem;
+            padding: 0.3rem 0.3rem;
             white-space: normal;
             word-break: break-word;
             max-width: none;
+            
         }
-    }
 
-    @media screen and (max-width: 640px) {
-    
         input, select, textarea {
             font-size: 16px !important;
         }
@@ -491,7 +517,7 @@
         }
     }
 
-    @media screen and (max-width: 375px) {
+    @media screen and (max-width: 1100px) {
         .dataTables_length, .dataTables_filter {
             width: 100%;
             text-align: left !important;
@@ -513,11 +539,11 @@
         <p>Loading...</p>
     </div>
 </div>
-    <div class="flex min-h-screen">
+    <div class="flex min-h-screen w-full lg:w-auto">
         <!-- Sidebar -->
         <aside class="fixed top-0 left-0 h-screen w-48 lg:w-[220px] p-6 bg-white shadow-lg flex z-50 flex-col">
             <!-- Toggle Button -->
-            <button id="sidebar-toggle" aria-label="Toggle Sidebar" class="w-2 h-2">
+            <button id="sidebar-toggle" aria-label="Toggle Sidebar" class="w-2 h-2 ">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <polyline points="15 18 9 12 15 6"></polyline>
                 </svg>
@@ -598,7 +624,7 @@
             </div>
         </aside>
 
-        <main class="flex-1 h-full pl-48 mt-2 lg:pl-[220px]">
+        <main class="flex-1 h-full w-full lg:w-full pl-48 mt-2 lg:pl-[220px]">
             <div class="px-5 pb-5 h-full">
                 @yield('content')
             </div>
@@ -654,8 +680,10 @@
 
         $(document).ready(function() {
             $('table.datatable').DataTable({
-                responsive: true,
-                ordering: true,
+            responsive: true,
+            rowReorder: {
+                selector: 'td:nth-child(2)'
+            },
                 language: {
                     search: "" 
                 },
@@ -673,7 +701,6 @@
                 // Add these new options for better mobile responsiveness
                 responsive: {
                     details: {
-                        display: $.fn.dataTable.Responsive.display.childRowImmediate,
                         type: 'column',
                         renderer: function(api, rowIdx, columns) {
                             var data = $.map(columns, function(col, i) {
@@ -729,37 +756,22 @@
             const successMessage = "{{ session('success') }}";
             const errorMessage = "{{ session('error') }}";
             
-            const shownSuccessAlert = localStorage.getItem('shownSuccessAlert');
-            const shownErrorAlert = localStorage.getItem('shownErrorAlert');
-            
-            if (successMessage && successMessage !== shownSuccessAlert) {
+            if (successMessage) {
                 Swal.fire({
                     icon: 'success',
                     title: 'Success!',
                     text: successMessage
                 });
-                
-                localStorage.setItem('shownSuccessAlert', successMessage);
-                
-                setTimeout(() => {
-                    localStorage.removeItem('shownSuccessAlert');
-                }, 10000);
             }
             
-            if (errorMessage && errorMessage !== shownErrorAlert) {
+            if (errorMessage) {
                 Swal.fire({
                     icon: 'error',
                     title: 'Error!',
                     text: errorMessage
                 });
-                
-                localStorage.setItem('shownErrorAlert', errorMessage);
-                
-                setTimeout(() => {
-                    localStorage.removeItem('shownErrorAlert');
-                }, 10000);
             }
-        });
+        }); 
     </script>
 
     <script>

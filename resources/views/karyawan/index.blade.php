@@ -6,39 +6,120 @@
 <div class="p-6 rounded-lg shadow bg-white ">
     <h1 class="block font-extrabold text-center text-4xl" style="color: #7D0066;">Dashboard Karyawan</h1>
 </div>
-<div class="p-6 mt-6 rounded-lg shadow-md bg-white ">
-    <h3 class="text-lg font-semibold text-gray-700 mb-4">Overview</h3>
-    <div class="grid grid-cols-3 gap-6">
-        <!-- Pengeluaran -->
-        <div class="relative p-4 bg-gray-50 border border-black rounded-lg ">
-            <div class="flex items-center justify-between text-center">
-                <span class="font-semibold text-gray-800 text-xl">{{ $pendingCount }}</span>
-                <i data-lucide="arrow-left" class="h-6 w-6 text-gray-600"></i>
-            </div>
-            <span class=" block mt-2 text-xl">pending</span>
-        </div>
+    <div class="bg-white rounded-lg shadow-md p-6 mt-6">
+        <div class="grid grid-cols-2  gap-6 mb-6">
 
-        <!-- Pemasukan -->
-        <div class="relative p-4 bg-gray-50 border border-black rounded-lg ">
-            <div class="flex items-center justify-between text-center">
-                <span class="font-semibold text-gray-800 text-xl">{{ $paidCount+$completedCount }}</span>
-                <i data-lucide="wallet" class="h-6 w-6 text-gray-600"></i>
+            <!-- belum lunas -->
+            <div class="relative p-4 shadow-lg border border-black rounded-lg ">
+                <div class="flex items-center justify-between text-center">
+                    <span class="font-semibold text-gray-800 text-xl">{{$pendingCount}}</span>
+                    <i data-lucide="arrow-left" class="h-6 w-6 text-gray-600"></i>
+                </div>
+                <span class=" block mt-2 text-xl">Belum Lunas</span>
             </div>
-            <span class="block mt-2 text-xl">Sudah dibayar</span>
-        </div>
+    
+            <!-- Sudah lunas -->
+            <div class="relative p-4 shadow-lg border border-black rounded-lg ">
+                <div class="flex items-center justify-between text-center">
+                    <span class="font-semibold text-gray-800 text-xl">{{$paidCount+$completedCount}}</span>
+                    <i data-lucide="wallet" class="h-6 w-6 text-gray-600"></i>
+                </div>
+                <span class="block mt-2 text-xl">Sudah Lunas</span>
+            </div>
+            
+            <!-- Dalama Proses -->
+            <div class="relative p-4 shadow-lg border border-black rounded-lg ">
+                <div class="flex items-center justify-between text-center">
+                    <span class="font-semibold text-gray-800 text-xl">{{$dp}}</span>
+                    <i data-lucide="arrow-left" class="h-6 w-6 text-gray-600"></i>
+                </div>
+                <span class=" block mt-2 text-xl">Dalam Proses</span>
+            </div>
 
-        <!-- Penghasilan -->
-        <div class="relative p-4 bg-gray-50 border border-black rounded-lg ">
-            <div class="flex items-center justify-between text-center">
-                <span class="font-semibold text-gray-800 text-xl">{{ $completedCount }}</span>
-                <i data-lucide="dollar-sign" class="h-6 w-6 text-gray-600"></i>
+
+    
+            <!-- Dibatalkan -->
+            <div class="relative p-4 shadow-lg border border-black rounded-lg ">
+                <div class="flex items-center justify-between text-center">
+                    <span class="font-semibold text-gray-800 text-xl">{{$completedCount}}</span>
+                    <i data-lucide="dollar-sign" class="h-6 w-6 text-gray-600"></i>
+                </div>
+                <span class="block mt-2 text-xl">Selesai</span>
             </div>
-            <span class="block mt-2 text-xl">Selesai</span>
+        </div>
+        <div class="card-tittle-section mt-20">
+            <h2 class="card-tittle">Pesanan</h2>
+        </div>
+        <div class="overflow-x-auto table-responsive">
+            <table class="datatable table table-stripped min-w-full divide-y divide-gray-200">
+                <thead class="bg-thead">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider border-r border-gray-200">#</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider border-r border-gray-200">Nama </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider border-r border-gray-200">Model</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider border-r border-gray-200">Total Harga</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider border-r border-gray-200">Jumlah</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider border-r border-gray-200">No. telp</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider border-r border-gray-200">Status</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    <?php
+                        $no_pesanan = 1;    
+                    ?>
+                    @foreach($pesanans as $pesanan)
+                    <tr class="cursor-pointer hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap">{{ $no_pesanan++ }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">{{ $pesanan->nama_pemesan }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">{{ $pesanan->nama_produk }}</td>    
+                        <td class="px-6 py-4 whitespace-nowrap">Rp {{ number_format($pesanan->total_harga ?? 0, 0, ',', '.') }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">{{ $pesanan->jumlah_produk }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">{{ $pesanan->no_telp_pemesan }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            @if($pesanan->status_pesanan == 'proses')
+                                <form action="{{ route('pesanans.markAsPaid', $pesanan->id_pesanan) }}" method="POST" class="inline-block">
+                                    @csrf
+                                    <button type="submit" class="px-3 py-2 bg-yellow-500 hover:bg-yello-600 text-white rounded-md mark-as-paid-button">Belum bayar</button>
+                                </form>
+                            @elseif($pesanan->status_pesanan == 'DP')
+                                <form action="{{ route('pesanans.markAsPaid', $pesanan->id_pesanan) }}" method="POST" class="inline-block">
+                                    @csrf
+                                    <button type="submit" class="px-3 py-2 bg-yellow-500 hover:bg-yello-600 text-white rounded-md mark-as-paid-button">DP</button>
+                                </form>
+                            @elseif($pesanan->status_pesanan == 'paid')
+                                <form action="{{ route('pesanans.markAsCompleted', $pesanan->id_pesanan) }}" method="POST" class="inline-block">
+                                    @csrf
+                                    <button type="submit" class="px-3 py-2 bg-green-500 hover:bg-green-600 text-white rounded-md mark-as-paid-button">Sudah bayar</button>
+                                </form>
+                            @elseif($pesanan->status_pesanan == 'batal')
+                                <button class="px-3 py-2 bg-red-500 text-white rounded-md">Batal</button>
+                            @elseif($pesanan->status_pesanan == 'completed')
+                                <button class="px-3 py-2 bg-blue-600 text-white rounded-md">Selesai</button>
+                            
+
+                            @endif
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap" id="actions-td">
+                            <a href="{{ route('pesanans.detail', $pesanan->id_pesanan) }}" class="p-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md"><i data-lucide="view" class="w-6 h-6 inline "></i></a>
+                            <a href="{{ route('pesanans.edit', $pesanan->id_pesanan) }}" class="px-3 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-md">Edit</a>
+
+
+                            @if($pesanan->status_pesanan !== 'batal')
+                                <form action="{{ route('pesanans.batalkan', $pesanan->id_pesanan) }}" method="POST" class="inline-block delete-form">
+                                    @csrf
+                                    <button type="button" class="mt-3 sm:mt-0 px-3 py-2 bg-red-500 hover:bg-red-600 text-white rounded-md delete-button">Batalkan</button>
+                                </form>
+                            @endif
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
         </div>
     </div>
-</div>
 
-<div class="bg-white shadow-md border mt-6">
+<div class="bg-white shadow-md border mt-6" id="form-pesanan-dashboard">
     <div class="bg-labels shadow-lg rounded-sm">
         <div class="p-4 w-auto">
             <h3 class="text-lg text-white font-semibold">Tambah Data Pesanan</h3>
@@ -60,26 +141,16 @@
                 </div>
                 <div class="space-y-2">
                     <label for="product_id" class="block text-gray-700">Model</label>
-                        <select name="product_id" id="product_id" 
+                    <select name="product_id" id="product_id" 
                         class="w-full p-2 border rounded-md @error('product_id') border-red-500 @enderror">
                         @foreach($products as $product)
-                            @if($loop->first)
-                                <option value="{{ $product->id_product }}" 
-                                    data-price="{{ $product->harga_jual }}"
-                                    data-name="{{ $product->nama_produk }}"
-                                    data-stock="{{ $product->stock_product }}"
-                                    selected>
-                                    {{ $product->nama_produk }} (Stok: {{ $product->stock_product }})
-                                </option>
-                            @else
-                                <option value="{{ $product->id_product }}" 
-                                    data-price="{{ $product->harga_jual }}"
-                                    data-name="{{ $product->nama_produk }}"
-                                    data-stock="{{ $product->stock_product }}"
-                                    {{ old('product_id') == $product->id_product ? 'selected' : '' }}>
-                                    {{ $product->nama_produk }} (Stok: {{ $product->stock_product }})
-                                </option>
-                            @endif
+                            <option value="{{ $product->id_product }}" 
+                                data-price="{{ $product->harga_jual }}"
+                                data-name="{{ $product->nama_produk }}"
+                                data-stock="{{ $product->stock_product }}"
+                                {{ old('product_id') == $product->id_product ? 'selected' : '' }}>
+                                {{ $product->nama_produk }} (Stok: {{ $product->stock_product }})
+                            </option>
                         @endforeach
                     </select>
                     <input type="hidden" name="nama_produk" id="nama_produk" value="{{ old('nama_produk') }}">
@@ -89,32 +160,6 @@
                     @enderror
                 </div>
 
-                <div class="space-y-2">
-                    <label for="payment_method" class="block text-gray-700">Metode Pembayaran</label>
-                    <select name="payment_method" id="payment_method" 
-                        class="w-full p-2 border rounded-md @error('payment_method') border-red-500 @enderror" >
-                        <option value="">Pilih metode pembayaran</option>
-                        <option value="cash" {{ old('payment_method') == 'cash' ? 'selected' : '' }}>Cash</option>
-                        <option value="midtrans" {{ old('payment_method') == 'midtrans' ? 'selected' : '' }}>Online Payment (Midtrans)</option>
-                    </select>
-                    @error('payment_method')
-                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                <div class="space-y-2">
-                    <label for="status_pesanan" class="block text-gray-700">Status Pesanan</label>
-                    <select name="status_pesanan" id="status_pesanan" 
-                        class="w-full p-2 border rounded-md @error('status_pesanan') border-red-500 @enderror" >
-                        <option value="proses" {{ old('status_pesanan', 'proses') == 'proses' ? 'selected' : '' }}>Proses</option>
-                        <option value="paid" {{ old('status_pesanan') == 'paid' ? 'selected' : '' }}>Paid</option>
-                        <option value="completed" {{ old('status_pesanan') == 'completed' ? 'selected' : '' }}>Completed</option>
-                    </select>
-                    @error('status_pesanan')
-                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                    @enderror
-                </div>
-                
                 <!-- Row 2 -->
                 <div class="space-y-2">
                     <label for="total_harga" class="block text-gray-700">Total harga</label>
@@ -150,7 +195,6 @@
                         <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                     @enderror
                 </div>
-                
                 <div class="space-y-2">
                     <label for="size_option" class="block text-gray-700">Pilihan Ukuran</label>
                     <select name="size_option" id="size_option" class="w-full p-2 border rounded-md">
@@ -171,6 +215,7 @@
                     </div>
                 </div>
 
+                <!-- Ukuran fields (copy semua dari create.blade.php) -->
                 <div class="space-y-2">
                     <label for="lingkar_badan" class="block text-gray-700">Lingkar Badan (cm)</label>
                     <input type="number" step="0.01" name="lingkar_badan" id="lingkar_badan" 
@@ -276,6 +321,8 @@
                 </div>
                 
             </div>
+
+            <input type="hidden" name="status_pesanan" value="proses">
 
             <div class="mt-6 flex justify-end space-x-2">
                 <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700" id="submit-button">
@@ -502,7 +549,7 @@
 
     document.addEventListener('DOMContentLoaded', function() {
         const requiredFields = [
-            'product_id', 'nama_pemesan', 'payment_method', 'status_pesanan',
+            'product_id', 'nama_pemesan', 'status_pesanan',
             'lingkar_badan', 'lingkar_pinggang', 'lingkar_panggul', 'lebar_pundak',
             'panjang_lengan', 'lingkar_kerung_lengan', 'lingkar_pergelangan_lengan',
             'panjang_punggung', 'lebar_punggung', 'lebar_muka', 'panjang_baju'

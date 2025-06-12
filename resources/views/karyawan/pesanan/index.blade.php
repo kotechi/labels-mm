@@ -10,8 +10,8 @@
 </div>
 
 <div class="bg-white rounded-lg shadow-md p-6 mt-6">
-    <div class="flex justify-between items-center mb-2">
-        <h2 class="text-2xl font-semibold text-gray-700">Pesanan</h2>
+    <div class="card-tittle-section">
+        <h2 class="card-tittle">Pesanan</h2>
         <a href="{{ route('karyawan.pesanans.create') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors">
             <span class="mr-2">+</span> Buat Pesanan Baru
         </a>
@@ -42,7 +42,7 @@
                         <td class="px-6 py-4 whitespace-nowrap">Rp {{ number_format($pesanan->total_harga ?? 0, 0, ',', '.') }}</td>
                         <td class="px-6 py-4 whitespace-nowrap">{{ $pesanan->jumlah_produk }}</td>
                         <td class="px-6 py-4 whitespace-nowrap">{{ $pesanan->no_telp_pemesan }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap">
+                        <td id="actions-td" class="px-6 py-4 whitespace-nowrap">
                             @if($pesanan->status_pesanan == 'proses')
                                 <form action="{{ route('karyawan.pesanans.markAsPaid', $pesanan->id_pesanan) }}" method="POST" class="inline-block">
                                     @csrf
@@ -85,6 +85,7 @@
         </div>
 </div>
 
+@push('scripts')
 <script>
     $(document).ready(function() {
         $('table.datatable tbody tr').on('click', function(e) {
@@ -122,4 +123,5 @@
 
     });
 </script>
+@endpush
 @endsection

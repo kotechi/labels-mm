@@ -12,8 +12,8 @@
 
 
 <div class="mt-6 p-6 shadow-lg bg-white rounded-lg">
-    <div class="flex justify-between items-center mb-6">
-        <h2 class="text-2xl font-semibold text-gray-700"> Daftar User</h2>
+    <div class="card-tittle-section">
+        <h2 class="card-tittle"> Daftar User</h2>
         <a button href="{{ route('users.create') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors mb-4">
             <span class="mr-2">+</span> Create New User
         </a>

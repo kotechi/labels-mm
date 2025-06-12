@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Karyawan | @yield('title')</title>
-    <link rel="icon" type="image/svg+xml" href="{{ asset('storage/images/icon/logo.jpg') }}">
+    <link rel="icon" type="image/svg+xml" href="{{ asset('storage/images/icon/logo_label.png') }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script src="{{ asset('assets/js/chart.min.js') }}"></script>
     <script src="{{ asset('assets/js/lucid.min.js') }}"></script>
@@ -23,6 +23,12 @@
         font-family: 'Poppins', sans-serif;
     }
 
+    {{-- main content style --}}
+    main {
+        transition: padding-left 0.3s ease-in-out;
+    }
+
+    {{-- loading screen styles --}}
     #loading-screen {
         position: fixed;
         top: 0;
@@ -55,6 +61,16 @@
         0% { transform: rotate(0deg); }
         100% { transform: rotate(360deg); }
     }
+
+    {{-- validation form message --}}
+    .text-red-500 {
+        transition: opacity 0.5s ease-out;
+    }
+    .text-red-500.hide {
+        opacity: 0;
+    }
+
+    {{-- DataTables styles --}}
     .dataTables_wrapper .dataTables_filter {
         margin-bottom: 16px;
     }
@@ -102,11 +118,16 @@
     }
 
     .datatable td {
-        max-width: 150px;
+        max-width: 130px;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
         text-align: center !important;
+    }
+
+    #actions-td {
+        max-width: 250px;
+        min-width: 200px;
     }
 
     .datatable thead th {
@@ -196,6 +217,7 @@
     aside.collapsed:hover #sidebar-toggle {
         opacity: 1;
     }
+
 
     aside.collapsed .sidebar-text {
         display: none;
@@ -294,9 +316,8 @@
         transform: rotate(180deg);
     }
     
-    main {
-        transition: padding-left 0.3s ease-in-out;
-    }
+
+
 
     .sidebar-notification {
         position: absolute;
@@ -416,6 +437,98 @@
     aside.collapsed:hover li .tooltip {
         left: 100%;
     }
+
+    .card-tittle {
+        font-size: 1.5rem;
+        line-height: 2rem;
+        font-weight: 600;
+        --tw-text-opacity: 1;
+        color: rgb(55 65 81 / var(--tw-text-opacity, 1)) /* #374151 */;
+    }
+
+    .card-tittle-section {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+    }
+    @media screen and (max-width: 1100px) {
+
+        #sidebar-toggle {
+            display: none;
+        }
+
+        .card-tittle-section {
+            flex-direction: column;
+        }
+        .card-tittle {
+            font-size: 1.5rem;
+            margin-bottom: 1rem
+        }
+
+        .datatable th {
+            font-size: 0.85rem;
+            padding: 0.3rem 0.3rem;
+        }
+        
+        .datatable thead th {
+            font-size: 0.9rem;
+        }
+
+        .datatable td {
+            font-size: 0.75rem;
+            padding: 0.3rem 0.3rem;
+            white-space: normal;
+            word-break: break-word;
+            max-width: none;
+            
+        }
+
+        input, select, textarea {
+            font-size: 16px !important;
+        }
+        
+        .card, .shadow-lg, .bg-white {
+            padding: 1rem !important;
+        }
+        
+        button, .btn, [type="button"], [type="submit"] {
+            padding: 0.5rem 1rem !important;
+            font-size: 0.9rem !important;
+        }
+        
+        .dataTables_paginate .paginate_button {
+            padding: 3px 8px !important;
+            font-size: 0.8rem !important;
+        }
+        
+        .dataTables_filter input {
+            width: 100% !important;
+            max-width: 150px;
+            margin-left: 0 !important;
+            margin-top: 5px;
+        }
+        
+        .dataTables_filter label {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+    }
+
+    @media screen and (max-width: 1100px) {
+        .dataTables_length, .dataTables_filter {
+            width: 100%;
+            text-align: left !important;
+            margin-bottom: 10px;
+        }
+        
+        .dataTables_info, .dataTables_paginate {
+            width: 100%;
+            text-align: center !important;
+            margin-top: 10px;
+        }
+    }
 </style>
 <body class="min-h-screen font-sans bg-gray-100">
     <!-- Loading Screen -->
@@ -425,7 +538,7 @@
             <p>Loading...</p>
         </div>
     </div>
-    <div class="flex min-h-screen">
+    <div class="flex min-h-screen w-full lg:w-auto">
         <!-- Sidebar -->
         <aside class="fixed top-0 left-0 h-screen w-48 lg:w-[220px] p-6 bg-white shadow-lg flex z-50 flex-col">
             <!-- Toggle Button -->
@@ -436,7 +549,7 @@
             </button>
             
             <div class="flex items-center gap-2 mb-4 sidebar-logo">
-                <img src="{{ asset('storage/images/icon/LAblesMM.png') }}" alt="Logo" class="w-[230] h-auto">
+                <img src="{{ asset('storage/images/icon/logo.svg') }}" alt="Logo" class="w-[230] h-auto">
                 <span class="text-lg font-bold text-gray-700 sidebar-text"></span>
             </div>
 
@@ -494,7 +607,7 @@
         </aside>
 
         <!-- Main Content -->
-        <main class="flex-1 h-full pl-48 mt-2 lg:pl-[220px]">
+        <main class="flex-1 h-full w-full lg:w-full pl-48 mt-2 lg:pl-[220px]">
             <!-- Content Area -->
             <div class="px-5 pb-5 h-full">
                 @yield('content')
@@ -511,35 +624,37 @@
             const toggleButton = document.getElementById('sidebar-toggle');
             
             const isSidebarCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
-
+            
             if (isSidebarCollapsed) {
                 sidebar.classList.add('collapsed');
                 mainContent.classList.add('sidebar-collapsed');
-
+                
+                // Update toggle button icon
                 toggleButton.innerHTML = `
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <polyline points="9 18 15 12 9 6"></polyline>
+                            <polyline points="15 18 9 12 15 6"></polyline>
                         </svg>
                 `;
             }
-
+            
             toggleButton.addEventListener('click', function() {
                 sidebar.classList.toggle('collapsed');
                 mainContent.classList.toggle('sidebar-collapsed');
                 
-
+                // Save state to local storage
                 const isNowCollapsed = sidebar.classList.contains('collapsed');
                 localStorage.setItem('sidebarCollapsed', isNowCollapsed);
                 
+                // Update toggle button icon based on state
                 if (isNowCollapsed) {
                     toggleButton.innerHTML = `
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <svg xmlns="http://www.w3.org/2000/svg"  width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <polyline points="9 18 15 12 9 6"></polyline>
                         </svg>
                     `;
                 } else {
                     toggleButton.innerHTML = `
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <svg xmlns="http://www.w3.org/2000/svg"  width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <polyline points="15 18 9 12 15 6"></polyline>
                         </svg>
                     `;
@@ -549,13 +664,14 @@
 
         $(document).ready(function() {
             $('table.datatable').DataTable({
-                responsive: true,
-                ordering: true,
+            responsive: true,
+            rowReorder: {
+                selector: 'td:nth-child(2)'
+            },
                 language: {
                     search: "" 
                 },
                 "createdRow": function(row, data, dataIndex, cells) {
-                 
                     const kategori = $(row).data('kategori');
                     if (kategori === 'pemasukan') {
                         $(row).addClass('bg-green-100-important');
@@ -565,7 +681,37 @@
                 },
                 "initComplete": function() {
                     $('.dataTables_filter input').attr('placeholder', 'Search here...');
-                }
+                },
+                // Add these new options for better mobile responsiveness
+                responsive: {
+                    details: {
+                        type: 'column',
+                        renderer: function(api, rowIdx, columns) {
+                            var data = $.map(columns, function(col, i) {
+                                return col.hidden ?
+                                    '<tr data-dt-row="'+col.rowIndex+'" data-dt-column="'+col.columnIndex+'">' +
+                                        '<td class="font-semibold pr-2">' + col.title + ':</td> ' +
+                                        '<td>' + col.data + '</td>' +
+                                    '</tr>' :
+                                    '';
+                            }).join('');
+                            
+                            return data ?
+                                $('<table class="w-full text-sm"/>').append(data) :
+                                false;
+                        }
+                    }
+                },
+                columnDefs: [
+                    { 
+                        responsivePriority: 1, 
+                        targets: 0 
+                    },
+                    { 
+                        responsivePriority: 2, 
+                        targets: -1 
+                    }
+                ]
             });
         });
 
@@ -585,53 +731,54 @@
                 }
             });
         });
-    </script>
 
-    @if(session('success'))
-    <script>
-        window.onload = function() {
-            Swal.fire({
-                icon: 'success',
-                title: 'Success!',
-                text: "{{ session('success') }}"
-            });
-        }
-    </script>
-    @endif
-
-    @if(session('error'))
-    <script>
-        window.onload = function() {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error!',
-                text: "{{ session('error') }}"
-            });
-        }
-    </script>
-    @endif
-
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const loadingScreen = document.getElementById('loading-screen');
         
-        setTimeout(function() {
-            loadingScreen.style.opacity = '0';
-            setTimeout(function() {
-                loadingScreen.style.display = 'none';
-            }, 500); 
-        }, 300);
-    });
-    
-    document.addEventListener('click', function(e) {
-        const target = e.target.closest('a');
-        if (target && target.href && target.href.startsWith(window.location.origin) && !target.hasAttribute('data-no-loading')) {
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const successMessage = "{{ session('success') }}";
+            const errorMessage = "{{ session('error') }}";
+            
+            if (successMessage) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: successMessage
+                });
+            }
+            
+            if (errorMessage) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: errorMessage
+                });
+            }
+        }); 
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
             const loadingScreen = document.getElementById('loading-screen');
-            loadingScreen.style.display = 'flex';
-            loadingScreen.style.opacity = '1';
-        }
-    });
-</script>
+            
+            setTimeout(function() {
+                loadingScreen.style.opacity = '0';
+                setTimeout(function() {
+                    loadingScreen.style.display = 'none';
+                }, 500); 
+            }, 300);
+        });
+        
+        document.addEventListener('click', function(e) {
+            const target = e.target.closest('a');
+            if (target && target.href && target.href.startsWith(window.location.origin) && !target.hasAttribute('data-no-loading')) {
+                const loadingScreen = document.getElementById('loading-screen');
+                loadingScreen.style.display = 'flex';
+                loadingScreen.style.opacity = '1';
+            }
+        });
+    </script>
 
     @stack('scripts')
 </body>

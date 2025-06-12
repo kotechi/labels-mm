@@ -8,9 +8,9 @@
         <u class="font-extrabold text-3xl">Admin | Pembayaran Pesanan</u>
     </div>
 </div>
-<div class="max-w-6xl bg-white rounded-lg shadow-lg p-6 mx-auto mt-4">
+<div class="bg-white rounded-lg shadow-lg p-6 mx-auto mt-4">
     <!-- Content -->
-    <div>
+    <div class="w-full">
         <div class="grid md:grid-cols-2 gap-8">
             <!-- Order Information -->
             <div class="bg-gray-50 p-6 rounded-lg border-purple shadow-lg">

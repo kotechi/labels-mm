@@ -9,7 +9,16 @@
 
 <div class="p-6 mt-6 rounded-lg shadow-md bg-white ">
     <h3 class="text-2xl font-semibold text-gray-700 mb-4">Overview</h3>
-    <div class="grid grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 lg:grid-cols-2  gap-6">
+        <!-- Penghasilan -->
+        <div class="relative p-4 lg:col-span-2  shadow-md border border-black rounded-lg ">
+            <div class="flex items-center justify-between text-center">
+                <span class="font-semibold text-gray-800 text-xl">Rp {{ number_format($totalPenghasilan ?? 0, 0, ',', '.') }}</span>
+                <i data-lucide="dollar-sign" class="h-6 w-6 text-gray-600"></i>
+            </div>
+            <span class="block mt-2 text-xl">Penghasilan</span>
+        </div>
+
         <!-- Pengeluaran -->
         <div class="relative p-4 shadow-md border border-black rounded-lg ">
             <div class="flex items-center justify-between text-center">
@@ -28,14 +37,7 @@
             <span class="block mt-2 text-xl">Pemasukan</span>
         </div>
 
-        <!-- Penghasilan -->
-        <div class="relative p-4  shadow-md border border-black rounded-lg ">
-            <div class="flex items-center justify-between text-center">
-                <span class="font-semibold text-gray-800 text-xl">Rp {{ number_format($totalPenghasilan ?? 0, 0, ',', '.') }}</span>
-                <i data-lucide="dollar-sign" class="h-6 w-6 text-gray-600"></i>
-            </div>
-            <span class="block mt-2 text-xl">Penghasilan</span>
-        </div>
+
     </div>
     <div class="w-full p-2 text-center bg-labels rounded-md shadow-sm hover:shadow-lg mt-4 relative">
         <button id="downloadReportBtn" class="px-4 w-full py-2 text-white">
@@ -114,9 +116,9 @@
 
 <!-- Earnings Chart -->
 <div class="mt-6 p-6 rounded-lg shadow-lg bg-white">
-    <div class="flex justify-between items-center mb-4">
-        <h3 class="text-2xl font-semibold text-gray-700">Grafik Pendapatan</h3>
-        <div class="flex items-center gap-4">
+    <div class="flex flex-col lg:flex-row lg:justify-between items-center mb-4">
+        <h3 class="lg:text-2xl mb-2 lg:mb-0 text-xl font-semibold text-gray-700">Grafik Pendapatan</h3>
+        <div class="flex flex-col lg:flex-row items-center gap-4">
             <select id="earningsPeriod" class="px-4 py-2 bg-gray-200 rounded">
                 <option value="daily">Daily</option>
                 <option value="monthly" selected>Monthly</option>
@@ -141,7 +143,7 @@
         </div>
     </div>
 
-    <div class="bg-gray-50 p-4 rounded-md" style="height: 400px;">
+    <div class="bg-gray-50 p-2 lg:p-4 rounded-md" style="height: 400px;">
         <canvas id="earningsChart"></canvas>
     </div>
 </div>
@@ -210,7 +212,7 @@
                             @if($pesanan->status_pesanan !== 'batal')
                                 <form action="{{ route('pesanans.batalkan', $pesanan->id_pesanan) }}" method="POST" class="inline-block delete-form">
                                     @csrf
-                                    <button type="button" class="px-3 py-2 bg-red-500 hover:bg-red-600 text-white rounded-md delete-button">Batalkan</button>
+                                    <button type="button" class="mt-3 sm:mt-0 px-3 py-2 bg-red-500 hover:bg-red-600 text-white rounded-md delete-button">Batalkan</button>
                                 </form>
                             @endif
                         </td>
@@ -262,8 +264,8 @@
 
 <!-- Contact Section -->
 <div class="mt-6 p-6 rounded-lg shadow-md bg-white">
-    <div class="flex justify-between items-center mb-4">
-        <h2 class="text-2xl font-semibold text-gray-700">Contact</h2>
+    <div class="card-tittle-section">
+        <h2 class="card-tittle">Contact</h2>
         <a href="{{ route('contacts.create') }}" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
             <span class="mr-2">+</span> Add New Contact
         </a>

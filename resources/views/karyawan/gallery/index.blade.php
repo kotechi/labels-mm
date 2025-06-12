@@ -10,8 +10,8 @@
 </div>
 
 <div class="mt-6 p-6 rounded-lg shadow bg-white">
-    <div class="flex justify-between items-center">
-        <h2 class="text-2xl font-semibold text-gray-700"> Daftar model</h2>
+    <div class="card-tittle-section">
+        <h2 class="card-tittle"> Daftar model</h2>
         <a href="{{ route('karyawan.gallery.create') }}" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-600">
             <span class="mr-2">+</span> Buat model Baru
         </a>

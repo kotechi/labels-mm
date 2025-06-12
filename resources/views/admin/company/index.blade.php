@@ -13,7 +13,7 @@
 
 <!-- Header Section -->
 <div class="mt-6 p-6 rounded-lg shadow-md bg-white">
-    <div class="flex justify-between items-center mb-4">
+    <div class="card-tittle-section">
         <h2 class="text-2xl font-semibold text-gray-700">Headers</h2>
         <a href="{{ route('headers.create') }}" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
             <span class="mr-2">+</span> Add New Header
@@ -65,7 +65,7 @@
 
 <!-- About Section -->
 <div class="mt-6 p-6 rounded-lg shadow-md bg-white">
-    <div class="flex justify-between items-center mb-4">
+    <div class="card-tittle-section">
         <h2 class="text-2xl font-semibold text-gray-700">About</h2>
         <a href="{{ route('abouts.create') }}" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
             <span class="mr-2">+</span> Add New About

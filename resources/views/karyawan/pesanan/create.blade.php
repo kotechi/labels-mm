@@ -30,7 +30,7 @@
                 </div>
                 <div class="space-y-2">
                     <label for="product_id" class="block text-gray-700">Model</label>
-                        <select name="product_id" id="product_id" 
+                    <select name="product_id" id="product_id" 
                         class="w-full p-2 border rounded-md @error('product_id') border-red-500 @enderror">
                         @foreach($products as $product)
                             @if($loop->first)
@@ -59,32 +59,6 @@
                     @enderror
                 </div>
 
-                <div class="space-y-2">
-                    <label for="payment_method" class="block text-gray-700">Metode Pembayaran</label>
-                    <select name="payment_method" id="payment_method" 
-                        class="w-full p-2 border rounded-md @error('payment_method') border-red-500 @enderror" >
-                        <option value="">Pilih metode pembayaran</option>
-                        <option value="cash" {{ old('payment_method') == 'cash' ? 'selected' : '' }}>Cash</option>
-                        <option value="midtrans" {{ old('payment_method') == 'midtrans' ? 'selected' : '' }}>Online Payment (Midtrans)</option>
-                    </select>
-                    @error('payment_method')
-                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                <div class="space-y-2">
-                    <label for="status_pesanan" class="block text-gray-700">Status Pesanan</label>
-                    <select name="status_pesanan" id="status_pesanan" 
-                        class="w-full p-2 border rounded-md @error('status_pesanan') border-red-500 @enderror" >
-                        <option value="proses" {{ old('status_pesanan', 'proses') == 'proses' ? 'selected' : '' }}>Proses</option>
-                        <option value="paid" {{ old('status_pesanan') == 'paid' ? 'selected' : '' }}>Paid</option>
-                        <option value="completed" {{ old('status_pesanan') == 'completed' ? 'selected' : '' }}>Completed</option>
-                    </select>
-                    @error('status_pesanan')
-                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                    @enderror
-                </div>
-                
                 <!-- Row 2 -->
                 <div class="space-y-2">
                     <label for="total_harga" class="block text-gray-700">Total harga</label>
@@ -120,7 +94,6 @@
                         <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                     @enderror
                 </div>
-                
                 <div class="space-y-2">
                     <label for="size_option" class="block text-gray-700">Pilihan Ukuran</label>
                     <select name="size_option" id="size_option" class="w-full p-2 border rounded-md">
@@ -141,6 +114,7 @@
                     </div>
                 </div>
 
+                <!-- Ukuran fields (sama dengan admin) -->
                 <div class="space-y-2">
                     <label for="lingkar_badan" class="block text-gray-700">Lingkar Badan (cm)</label>
                     <input type="number" step="0.01" name="lingkar_badan" id="lingkar_badan" 
@@ -246,6 +220,8 @@
                 </div>
                 
             </div>
+
+            <input type="hidden" name="status_pesanan" value="proses">
 
             <div class="mt-6 flex justify-end space-x-2">
                 <a href="{{ route('karyawan.pesanans.index')}}" class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-700 cursor-pointer">Kembali</a>
@@ -475,7 +451,7 @@
 
     document.addEventListener('DOMContentLoaded', function() {
         const requiredFields = [
-            'product_id', 'nama_pemesan', 'payment_method', 'status_pesanan',
+            'product_id', 'nama_pemesan', 'status_pesanan',
             'lingkar_badan', 'lingkar_pinggang', 'lingkar_panggul', 'lebar_pundak',
             'panjang_lengan', 'lingkar_kerung_lengan', 'lingkar_pergelangan_lengan',
             'panjang_punggung', 'lebar_punggung', 'lebar_muka', 'panjang_baju'

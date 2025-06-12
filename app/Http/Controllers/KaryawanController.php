@@ -19,8 +19,9 @@ class KaryawanController extends Controller
         $pendingCount = Pesanan::where('status_pesanan', 'proses')->count();
         $paidCount = Pesanan::where('status_pesanan', 'paid')->count();
         $completedCount = Pesanan::where('status_pesanan', 'completed')->count();
+        $dp = Pesanan::where('status_pesanan', 'DP')->count();
 
-        return view('karyawan.index', compact('pendingCount', 'paidCount', 'completedCount', 'pesanans', 'products'));
+        return view('karyawan.index', compact('pendingCount', 'paidCount', 'completedCount', 'pesanans', 'products', 'dp'));
     }
 
     public function profile()

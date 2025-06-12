@@ -11,24 +11,37 @@
     </div>
 
     <div class="bg-white rounded-lg shadow-md p-6 mt-6">
-        <div class="grid grid-cols-3 gap-6 mb-6">
-            <!-- Dalama Proses -->
+        <div class="card-tittle mb-3">Overview status pesanan</div>
+        <div class="grid grid-cols-2  gap-6 mb-6">
+
+            <!-- belum lunas -->
             <div class="relative p-4 shadow-lg border border-black rounded-lg ">
                 <div class="flex items-center justify-between text-center">
                     <span class="font-semibold text-gray-800 text-xl">{{$pendingCount}}</span>
                     <i data-lucide="arrow-left" class="h-6 w-6 text-gray-600"></i>
                 </div>
-                <span class=" block mt-2 text-xl">Dalam Proses</span>
+                <span class=" block mt-2 text-xl">Belum Lunas</span>
             </div>
     
-            <!-- Selesai -->
+            <!-- Sudah lunas -->
             <div class="relative p-4 shadow-lg border border-black rounded-lg ">
                 <div class="flex items-center justify-between text-center">
                     <span class="font-semibold text-gray-800 text-xl">{{$paidCount+$completedCount}}</span>
                     <i data-lucide="wallet" class="h-6 w-6 text-gray-600"></i>
                 </div>
-                <span class="block mt-2 text-xl">Sudah bayar</span>
+                <span class="block mt-2 text-xl">Sudah Lunas</span>
             </div>
+
+            <!-- Dalama Proses -->
+            <div class="relative p-4 shadow-lg border border-black rounded-lg ">
+                <div class="flex items-center justify-between text-center">
+                    <span class="font-semibold text-gray-800 text-xl">{{$dp}}</span>
+                    <i data-lucide="arrow-left" class="h-6 w-6 text-gray-600"></i>
+                </div>
+                <span class=" block mt-2 text-xl">Dalam Proses</span>
+            </div>
+
+
     
             <!-- Dibatalkan -->
             <div class="relative p-4 shadow-lg border border-black rounded-lg ">
@@ -39,14 +52,18 @@
                 <span class="block mt-2 text-xl">Selesai</span>
             </div>
         </div>
-        <div class="flex justify-between items-center mb-2">
-            <h2 class="text-2xl font-semibold text-gray-700">Pesanan</h2>
+
+    </div>
+
+<div class="bg-white rounded-lg shadow-md p-6 mt-6">
+            <div class="card-tittle-section">
+            <h2 class="card-tittle">Pesanan</h2>
             <a href="{{ route('pesanans.create') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors">
                 <span class="mr-2">+</span> Buat Pesanan Baru
             </a>
         </div>
-        <div class="overflow-x-auto">
-            <table class="datatable min-w-full divide-y divide-gray-200">
+        <div class="overflow-x-auto table-responsive">
+            <table class="datatable table table-stripped min-w-full divide-y divide-gray-200">
                 <thead class="bg-thead">
                     <tr>
                         <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider border-r border-gray-200">#</th>
@@ -103,7 +120,7 @@
                             @if($pesanan->status_pesanan !== 'batal')
                                 <form action="{{ route('pesanans.batalkan', $pesanan->id_pesanan) }}" method="POST" class="inline-block delete-form">
                                     @csrf
-                                    <button type="button" class="px-3 py-2 bg-red-500 hover:bg-red-600 text-white rounded-md delete-button">Batalkan</button>
+                                    <button type="button" class="mt-3 sm:mt-0 px-3 py-2 bg-red-500 hover:bg-red-600 text-white rounded-md delete-button">Batalkan</button>
                                 </form>
                             @endif
                         </td>
@@ -112,17 +129,17 @@
                 </tbody>
             </table>
         </div>
-    </div>
+</div>
 
     <div class="bg-white rounded-lg shadow-md p-6 mt-6">
-        <div class="flex justify-between items-center mb-6">
-            <h2 class="text-2xl font-semibold text-gray-700">Pemasukan</h2>
+        <div class="card-tittle-section">
+            <h2 class="card-tittle">Pemasukan</h2>
             <a href="{{ route('pemasukan.create') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors">
                 <span class="mr-2">+</span> Buat Pemasukan Baru
             </a>
-        </div>
-        <div class="overflow-x-auto">
-            <table class="datatable min-w-full divide-y divide-gray-200">
+        </div>  
+        <div class="overflow-x-auto table-responsive">
+            <table class="datatable table table-stripped min-w-full divide-y divide-gray-200">
                 <thead class="bg-thead">
                     <tr>
                         <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider border-r border-gray-200">#</th>
@@ -154,8 +171,6 @@
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-
-        
         $('table.datatable tbody tr').on('click', function(e) {
             // Don't trigger if clicking on buttons, links, or forms
             if (!$(e.target).closest('button, a, form').length) {

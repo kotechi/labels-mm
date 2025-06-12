@@ -174,8 +174,8 @@ class KaryawanPesananController extends Controller
         $pesanan = Pesanan::findOrFail($id);
         $users = User::all();
         $product = Product::find($pesanan->product_id); 
-        
-        return view('karyawan.pesanan.detail', compact('pesanan', 'users', 'product'));
+        $resis = Resi::where('pesanan_id', $id)->orderBy('tanggal', 'desc')->get();
+        return view('karyawan.pesanan.detail', compact('pesanan', 'users', 'product', 'resis'));
     }
 
     public function resi($id) {
@@ -374,8 +374,8 @@ class KaryawanPesananController extends Controller
     {
         $pesanan = Pesanan::findOrFail($id);
         $product = Product::findOrFail($pesanan->product_id);
-        $resi = Resi::where('pesanan_id', $id)->first();
-        return view('karyawan.pesanan.payment', compact('pesanan', 'product', 'resi'));
+        $resis = Resi::where('pesanan_id', $id)->orderBy('tanggal', 'desc')->get();
+        return view('karyawan.pesanan.payment', compact('pesanan', 'product', 'resis'));
     }
 
     public function paymentProses($id, Request $request)
@@ -449,17 +449,17 @@ class KaryawanPesananController extends Controller
             $pemasukan->created_at = now();
             $pemasukan->save();
 
-            $resi = Resi::where('pesanan_id', $pesanan->id_pesanan)->first();
-            if (!$resi) {
-                $resi = new Resi();
-                $resi->pesanan_id = $pesanan->id_pesanan;
-                $resi->nomor_resi = 'RESI-' . date('Ymd') . '-' . $pesanan->id_pesanan;
-                $resi->tanggal = now();
-                $resi->created_by = $currentUserId;
-            }
+            $countResi = Resi::where('pesanan_id', $pesanan->id_pesanan)->count();
+            $nomorResiFinal = 'RESI-' . date('Ymd') . '-' . $pesanan->id_pesanan . '-' . ($countResi + 1);
+
+            $resi = new Resi();
+            $resi->pesanan_id = $pesanan->id_pesanan;
+            $resi->nomor_resi = $nomorResiFinal;
+            $resi->tanggal = now();
             $resi->total_pembayaran = $totalHarga;
             $resi->jumlah_pembayaran = $jumlahPembayaranBaru;
             $resi->kembalian = $kembalian;
+            $resi->created_by = $currentUserId;
             $resi->save();
 
             DB::commit();
@@ -507,20 +507,19 @@ class KaryawanPesananController extends Controller
 
     protected function createResi($pesanan)
     {
-        $resi = Resi::where('pesanan_id', $pesanan->id_pesanan)->first();
-        
-        if (!$resi) {
-            $resi = new Resi();
-            $resi->pesanan_id = $pesanan->id_pesanan;
-            $resi->nomor_resi = 'RESI-' . date('Ymd') . '-' . $pesanan->id_pesanan;
-            $resi->tanggal = now();
-            $resi->total_pembayaran = $pesanan->is_DP ? $pesanan->DP_amount : $pesanan->total_harga;
-            $resi->jumlah_pembayaran = $pesanan->jumlah_pembayaran ?? $resi->total_pembayaran;
-            $resi->kembalian = ($pesanan->jumlah_pembayaran ?? $resi->total_pembayaran) - $resi->total_pembayaran;
-            $resi->created_by = auth()->user()->id_users;
-            $resi->save();
-        }
-        
+        $countResi = Resi::where('pesanan_id', $pesanan->id_pesanan)->count();
+        $nomorResiFinal = 'RESI-' . date('Ymd') . '-' . $pesanan->id_pesanan . '-' . ($countResi + 1);
+
+        $resi = new Resi();
+        $resi->pesanan_id = $pesanan->id_pesanan;
+        $resi->nomor_resi = $nomorResiFinal;
+        $resi->tanggal = now();
+        $resi->total_pembayaran = $pesanan->is_DP ? $pesanan->DP_amount : $pesanan->total_harga;
+        $resi->jumlah_pembayaran = $pesanan->jumlah_pembayaran ?? $resi->total_pembayaran;
+        $resi->kembalian = ($pesanan->jumlah_pembayaran ?? $resi->total_pembayaran) - $resi->total_pembayaran;
+        $resi->created_by = auth()->user()->id_users;
+        $resi->save();
+
         return $resi;
     }
 
@@ -648,12 +647,12 @@ class KaryawanPesananController extends Controller
 
             DB::commit();
 
-            return redirect()->route('pemasukan.index')
+            return redirect()->route('karyawan.pesanans.index')
                 ->with('success', 'Pesanan berhasil dibatalkan');
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->route('pemasukan.index')
+            return redirect()->route('karyawan.pesanans.index')
                 ->with('error', 'Gagal membatalkan pesanan: ' . $e->getMessage());
         }
     }

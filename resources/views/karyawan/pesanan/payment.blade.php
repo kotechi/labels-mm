@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+@extends('layouts.karyawan')
 
 @section('title', 'Pembayaran Pesanan')
 
@@ -197,9 +197,6 @@
         
         <!-- Bottom buttons -->
         <div class="mt-9 w-full items-center justify-center d-flex flex">
-            <button id="printResiBtn" class="rounded-md bg-[#AF0893] text-white p-2 mx-5 flex">
-                cetak resi <i class="w-5 h-5" data-lucide="notepad-text"></i>
-            </button>
             
             <a href="{{ route('karyawan.pesanans.index') }}" class="rounded-md bg-gray-500 text-white px-4 py-2 flex items-center shadow-lg">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
@@ -239,7 +236,7 @@
                         
                         <div class="flex justify-between mb-2">
                             <span class="font-medium">Nomor Resi</span>
-                            <span id="nomor-resi">{{ $resi->nomor_resi ?? '-' }}</span>
+                            <span id="nomor-resi"></span>
                         </div>
                         
                         <div class="flex justify-between mb-2">
@@ -277,15 +274,15 @@
                         
                         <!-- TAMBAHAN: Informasi pembayaran yang sudah dilakukan -->
                         @if($dibayar > 0)
-                        <div class="flex justify-between mb-2 text-green-600">
+                        <div class="flex justify-between mb-2 ">
                             <span class="font-medium">Sudah Dibayar</span>
                             <span id="sudah-dibayar">Rp {{ number_format($dibayar, 0, ',', '.') }}</span>
                         </div>
                         @endif
                         
                         <div id="DP-info" class="flex justify-between mb-2 hidden">
-                            <span class="font-medium text-blue-600">DP (%)</span>
-                            <span class="text-blue-600">Rp 0</span>
+                            <span class="font-medium ">DP (%)</span>
+                            <span >Rp 0</span>
                         </div>
                         
                         <div class="flex justify-between mb-2">
@@ -294,7 +291,7 @@
                         </div>
                         
                         <!-- TAMBAHAN: Sisa tagihan setelah pembayaran ini -->
-                        <div class="flex justify-between mb-2 text-orange-600">
+                        <div class="flex justify-between mb-2 ">
                             <span class="font-medium">Sisa Tagihan</span>
                             <span id="sisa-tagihan">Rp 0</span>
                         </div>
@@ -307,10 +304,10 @@
                             <span id="cash-amount">Rp 0</span>
                         </div>
                         
-                        <div class="flex justify-between mb-2" id="kembalian-row">
-                            <span class="font-medium">Kembali</span>
-                            <span id="kembalian-amount" class="font-bold text-green-600">Rp 0</span>
-                        </div>
+    <div class="flex justify-between mb-2" id="kembalian-row" style="display:none;">
+        <span class="font-medium">Kembalian</span>
+        <span id="kembalian-amount" class="font-bold">Rp 0</span>
+    </div>
                         
                         <div class="flex justify-between mt-4 pt-2 border-t border-gray-300">
                             <span class="font-medium">Metode Pembayaran</span>
@@ -318,18 +315,6 @@
                         </div>
                     </div>
                     
-                    <!-- Status Pembayaran -->
-                    <div class="p-4 bg-gray-50">
-                        <div class="text-center">
-                            <div class="inline-flex px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800">
-                                @if($pesanan->status_pesanan === 'paid')
-                                    Sudah Lunas
-                                @else
-                                    Pembayaran {{ $pesanan->jumlah_pembayaran ? 'Sebagian' : 'Baru' }}
-                                @endif
-                            </div>
-                        </div>
-                    </div>
                 </div>
                 
                 <!-- Tombol Konfirmasi Pembayaran - Fixed at bottom -->
@@ -573,14 +558,12 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // ========== FIX UNTUK PAYMENT METHOD SELECTION ==========
     let selectedPayment = 'cash'; 
     
     const paymentOptions = document.querySelectorAll('.payment-option');
     const cashPaymentForm = document.getElementById('cashPaymentForm');
     const paymentMethodInput = document.getElementById('payment_method');
     
-    console.log('Payment options found:', paymentOptions.length); // Debug log
     
     function selectPaymentMethod(element, paymentType) {
         // Remove selection from all options
@@ -601,9 +584,6 @@ document.addEventListener('DOMContentLoaded', function() {
             paymentMethodInput.value = selectedPayment;
         }
         
-        console.log('Selected payment method:', selectedPayment); // Debug log
-        
-        // Show/hide cash payment form
         if (cashPaymentForm) {
             if (selectedPayment === 'cash') {
                 cashPaymentForm.classList.remove('hidden');
@@ -622,8 +602,7 @@ document.addEventListener('DOMContentLoaded', function() {
             e.stopPropagation();
             
             const paymentType = this.getAttribute('data-payment') || this.dataset.payment;
-            console.log('Payment option clicked:', paymentType); // Debug log
-            
+
             selectPaymentMethod(this, paymentType);
         });
         
@@ -647,8 +626,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const totalHarga = {{ $totalHarga ?? 0 }};
     const jumlahDibayar = {{ $dibayar ?? 0 }};
     const sisaTagihan = {{ $sisaTagihan ?? 0 }};
-    
-    console.log('Calculation values:', { totalHarga, jumlahDibayar, sisaTagihan }); // Debug log
     
     // Handle DP option selection
     const DPOptions = document.querySelectorAll('input[name="DP_option"]');
@@ -759,6 +736,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
             
+            // Hitung kembalian berdasarkan nominal yang dipilih
             let kembalian = 0;
             if (bayar >= nominalYangHarusDibayar) {
                 kembalian = bayar - nominalYangHarusDibayar;
@@ -788,6 +766,7 @@ document.addEventListener('DOMContentLoaded', function() {
         return nominal;
     }
 
+    // Function to fetch Midtrans token
     function fetchMidtransToken(nominal) {
         const url = "{{ route('karyawan.pesanans.midTransToken', $pesanan->id_pesanan ?? '') }}";
         return fetch(url, {
@@ -818,6 +797,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // Update Midtrans token when payment method or DP option changes
     function updateMidtransToken() {
         if (selectedPayment === 'midtrans') {
             let nominal = getSelectedNominal();
@@ -830,30 +810,37 @@ document.addEventListener('DOMContentLoaded', function() {
             let dp = this.value === 'full' ? 0 : parseInt(this.value);
             let nominal = dp === 0 ? sisaTagihan : Math.floor(sisaTagihan * dp / 100);
             
+            // Update DP percentage hidden input
             if (DPPercentageInput) {
                 DPPercentageInput.value = dp;
             }
             
+            // Update payment amount field
             if (jumlahPembayaranField) {
                 jumlahPembayaranField.value = formatRupiah(String(nominal));
                 
+                // Update hidden numeric value
                 if (hiddenJumlahPembayaran) {
                     hiddenJumlahPembayaran.value = nominal;
                 }
                 
+                // Hapus error message yang mungkin ada
                 const errorMessage = document.getElementById('payment-error');
                 if (errorMessage) {
                     errorMessage.remove();
                 }
                 
+                // Reset styling error
                 jumlahPembayaranField.classList.remove('border-red-500', 'focus:border-red-500', 'focus:ring-red-500');
                 
+                // Enable tombol bayar jika tidak disabled secara permanen
                 const payButton = document.getElementById('payButton');
                 if (payButton && !payButton.hasAttribute('data-original-disabled')) {
                     payButton.disabled = false;
                     payButton.classList.remove('opacity-50', 'cursor-not-allowed');
                 }
                 
+                // Trigger input event untuk menghitung kembalian
                 jumlahPembayaranField.dispatchEvent(new Event('input'));
             }
             
@@ -866,35 +853,48 @@ document.addEventListener('DOMContentLoaded', function() {
         paymentForm.addEventListener('submit', function(e) {
             e.preventDefault();
             
+            // Validasi form
             if (!validatePaymentForm()) {
                 return;
             }
             
             console.log('Form submitted with payment method:', selectedPayment);
             
+            // Tampilkan resi modal terlebih dahulu
             showResiPreview();
         });
     }
 
     function showResiPreview() {
+
         updateResiData();
-        
+
+        const pesananId = {{ $pesanan->id_pesanan }};
+        const now = new Date();
+        const pad = n => n.toString().padStart(2, '0');
+        const resiSementara = `RESI-${now.getFullYear()}${pad(now.getMonth()+1)}${pad(now.getDate())}-${pesananId}`;
+
+        document.getElementById('nomor-resi').textContent = resiSementara;
+
+        showConfirmationButtons();
         const modal = document.getElementById('resiModal');
-        if (modal) {
-            modal.classList.remove('hidden');
-        }
+        if (modal) modal.classList.remove('hidden');
     }
 
     function updateResiData() {
+        // Ambil nilai DP yang dipilih
         const selectedDP = document.querySelector('input[name="DP_option"]:checked');
         const dpValue = selectedDP ? selectedDP.value : 'full';
         const dpPercentage = dpValue === 'full' ? 0 : parseInt(dpValue);
+        const kembalianRow = document.getElementById('kembalian-row');
         
+        // Hitung nominal yang akan dibayar
         let nominalBayar = sisaTagihan;
         if (dpPercentage > 0) {
             nominalBayar = Math.floor(sisaTagihan * dpPercentage / 100);
         }
         
+        // Update DP info di resi
         const dpInfo = document.getElementById('DP-info');
         const dpInfoText = dpInfo.querySelector('span:first-child');
         const dpInfoAmount = dpInfo.querySelector('span:last-child');
@@ -907,31 +907,33 @@ document.addEventListener('DOMContentLoaded', function() {
             dpInfo.classList.add('hidden');
         }
         
+        // Update total bayar saat ini
         const totalBayarElement = document.getElementById('total-bayar');
         if (totalBayarElement) {
             totalBayarElement.textContent = `Rp ${formatRupiah(String(nominalBayar))}`;
         }
         
+        // TAMBAHAN: Update informasi total yang sudah dibayar sebelumnya
         const sudahDibayarElement = document.getElementById('sudah-dibayar');
         if (sudahDibayarElement) {
             sudahDibayarElement.textContent = `Rp ${formatRupiah(String(jumlahDibayar))}`;
         }
         
+        // TAMBAHAN: Update sisa tagihan
         const sisaTagihanElement = document.getElementById('sisa-tagihan');
         if (sisaTagihanElement) {
             const sisaSetelahBayar = Math.max(0, sisaTagihan - nominalBayar);
             sisaTagihanElement.textContent = `Rp ${formatRupiah(String(sisaSetelahBayar))}`;
         }
         
+        // Update informasi cash dan kembalian untuk cash payment
         const cashAmountElement = document.getElementById('cash-amount');
         const kembalianAmountElement = document.getElementById('kembalian-amount');
         
         if (selectedPayment === 'cash') {
             const jumlahCash = document.getElementById('jumlah_pembayaran').value.replace(/[^,\d]/g, '');
             const cashValue = parseInt(jumlahCash) || nominalBayar;
-            
-            const kembalianValue = Math.max(0, cashValue - nominalBayar);
-            
+            const kembalianValue = Math.max(0, cashValue - nominalBayar);            
             if (cashAmountElement) {
                 cashAmountElement.textContent = `Rp ${formatRupiah(String(cashValue))}`;
             }
@@ -939,13 +941,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 kembalianAmountElement.textContent = `Rp ${formatRupiah(String(kembalianValue))}`;
             }
             
+            // Show cash and kembalian rows
             if (cashAmountElement) cashAmountElement.parentElement.style.display = 'flex';
             if (kembalianAmountElement) kembalianAmountElement.parentElement.style.display = 'flex';
         } else {
+            // Hide cash and kembalian rows for non-cash payment
             if (cashAmountElement) cashAmountElement.parentElement.style.display = 'none';
             if (kembalianAmountElement) kembalianAmountElement.parentElement.style.display = 'none';
         }
         
+        // Update payment method text
         const paymentMethodText = document.getElementById('payment-method-text');
         if (paymentMethodText) {
             paymentMethodText.textContent = selectedPayment === 'cash' ? 'Cash' : 'Midtrans';
@@ -962,6 +967,7 @@ document.addEventListener('DOMContentLoaded', function() {
             confirmationSection.style.display = 'none';
         }
         
+        // Tampilkan tombol print/download dengan tombol lanjutkan pembayaran
         const printDownloadButtons = document.getElementById('printDownloadButtons');
         if (printDownloadButtons) {
             printDownloadButtons.innerHTML = `
@@ -991,10 +997,12 @@ document.addEventListener('DOMContentLoaded', function() {
             printDownloadButtons.style.display = 'flex';
         }
         
+        // Tambahkan event listeners untuk tombol-tombol baru
         setupPrintFirstButtons();
     }
 
     function setupPrintFirstButtons() {
+        // Tombol kembali ke konfirmasi
         const backToConfirmationBtn = document.getElementById('backToConfirmation');
         if (backToConfirmationBtn) {
             backToConfirmationBtn.addEventListener('click', function() {
@@ -1002,6 +1010,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
         
+        // Tombol print resi
         const printReceiptFirstBtn = document.getElementById('printReceiptFirst');
         if (printReceiptFirstBtn) {
             printReceiptFirstBtn.addEventListener('click', function() {
@@ -1009,14 +1018,17 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
         
+        // Tombol lanjutkan pembayaran setelah print
         const continuePaymentBtn = document.getElementById('continuePaymentAfterPrint');
         if (continuePaymentBtn) {
             continuePaymentBtn.addEventListener('click', function() {
+                // Tutup modal dan lanjutkan proses pembayaran
                 const modal = document.getElementById('resiModal');
                 if (modal) {
                     modal.classList.add('hidden');
                 }
                 
+                // Proses pembayaran
                 processActualPayment();
             });
         }
@@ -1025,6 +1037,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function printReceipt() {
         const printButtons = document.querySelectorAll('#backToConfirmation, #printReceiptFirst, #continuePaymentAfterPrint');
         
+        // Sembunyikan tombol saat print
         printButtons.forEach(button => {
             button.style.display = 'none';
         });
@@ -1034,6 +1047,7 @@ document.addEventListener('DOMContentLoaded', function() {
         window.print();
         document.title = originalTitle;
         
+        // Tampilkan kembali tombol setelah print
         setTimeout(function() {
             printButtons.forEach(button => {
                 button.style.display = 'flex';
@@ -1043,6 +1057,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function processActualPayment() {
         if (selectedPayment === 'midtrans') {
+            // Handle Midtrans payment
             let nominal = getSelectedNominal();
             fetchMidtransToken(nominal).then(function(token) {
                 if (token && typeof snap !== 'undefined') {
@@ -1099,6 +1114,7 @@ document.addEventListener('DOMContentLoaded', function() {
         return true;
     }
 
+    // Initialize default values
     const defaultDPOption = document.querySelector('input[name="DP_option"]:checked');
     if (defaultDPOption && DPPercentageInput) {
         const DPPercentage = defaultDPOption.value === 'full' ? 0 : parseInt(defaultDPOption.value);
@@ -1120,14 +1136,16 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // Update modal handling untuk tombol print resi (bukan dari form)
     if (openModalBtn && modal) {
         openModalBtn.addEventListener('click', function() {
             showPrintDownloadButtons();
-            updateResiData(); // Update data resi
+            updateResiData(); 
             modal.classList.remove('hidden');
         });
     }
 
+    // Function untuk menampilkan tombol print/download dan menyembunyikan tombol konfirmasi
     function showPrintDownloadButtons() {
         const confirmationSection = document.querySelector('#resiModal .bg-gray-50.border-t');
         const printDownloadButtons = document.getElementById('printDownloadButtons');
@@ -1142,6 +1160,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    // Function untuk menampilkan tombol konfirmasi dan menyembunyikan tombol print/download  
     function showConfirmationButtons() {
         const confirmationSection = document.querySelector('#resiModal .p-4.bg-gray-50.border-t.flex-shrink-0');
         const printDownloadButtons = document.getElementById('printDownloadButtons');
@@ -1154,6 +1173,7 @@ document.addEventListener('DOMContentLoaded', function() {
             printDownloadButtons.classList.add('hidden');
             printDownloadButtons.style.display = 'none';
             
+            // Reset content tombol print/download ke kondisi awal
             printDownloadButtons.innerHTML = `
                 <button id="closeModal" class="px-4 py-2 bg-gray-500 text-white rounded-md flex items-center shadow-lg">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
@@ -1177,11 +1197,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 </button>
             `;
             
+            // Re-setup event listeners untuk tombol-tombol default
             setupDefaultPrintButtons();
         }
     }
 
     function setupDefaultPrintButtons() {
+        // Setup close modal button
         const closeModalBtn = document.getElementById('closeModal');
         if (closeModalBtn) {
             closeModalBtn.addEventListener('click', function() {
@@ -1215,6 +1237,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
         
+        // Setup download button
         const downloadBtn = document.getElementById('downloadResiBtn');
         if (downloadBtn) {
             downloadBtn.addEventListener('click', function() {
@@ -1239,18 +1262,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    function showResiPreview() {
-        updateResiData();
-        
-        showConfirmationButtons();
-        
-        const modal = document.getElementById('resiModal');
-        if (modal) {
-            modal.classList.remove('hidden');
-        }
-    }
 
-    console.log('Payment method selection initialized'); 
 });
 
 setInterval(function() {
@@ -1261,6 +1273,6 @@ setInterval(function() {
                 location.reload();
             }
         });
-}, 5000); 
+}, 5000); // cek setiap 5 detik
 </script>
 @endpush
