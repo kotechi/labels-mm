@@ -14,23 +14,14 @@ class CompanyProfileSeeder extends Seeder
     {
         DB::table('headers')->insert([
             'tittle' => 'Butik Konveksi Berkualitas  dan Terpercaya.',
-            'image' => 'https://example.com/image.jpg',
-            'description' => 'Melayani  pembuatan  pakaian    custom, 
-seragam, hingga busana fashion dengan 
-sentuhan   profesional  dan hasil terbaik.',
+            'image' => 'images/headers/1750046338_5RyeeLUd3J.png',
+            'description' => 'Melayani pembuatan pakaian custom, 
+seragam, hingga busana fashion dengan sentuhan profesional dan hasil terbaik.',
         ]);
         DB::table('abouts')->insert([
             'tittle' => 'LablesMM',
-            'image' => 'https://example.com/image.jpg',
-            'deskripsi' => 'Labels – MM adalah butik  konveksi lokal yang  berdedikasi 
-menghadirkan    pakaian     berkualitas       tinggi     dengan   
-sentuhan personal. Kami percaya bahwa    setiap  helai kain
-memiliki cerita, dan tugas kami adalah mewujudkan cerita 
-itu menjadi kenyataan dalam bentuk busana yang  anggun, 
-rapi, dan nyaman dikenakan.
-Dengan tim profesional dan pengalaman bertahun-tahun,
-kami melayani  beragam  kebutuhan     mulai dari  pakaian 
-formal, seragam, hingga desain custom sesuai permintaan.',
+            'image' => 'images/abouts/1750045021_vB1ZysVpsQ.jpg',
+            'deskripsi' => 'Labels MM adalah aplikasi manajemen bisnis yang dirancang untuk menyederhanakan segala hal dari pencatatan transaksi, pengelolaan barang, hingga pelacakan stok dan laporan penjualan. Kami hadir untuk membantu UMKM, toko retail, dan pelaku usaha lainnya dalam menjalankan operasional harian secara lebih rapi, cepat, dan efisien.',
         ]);
     }
 }
