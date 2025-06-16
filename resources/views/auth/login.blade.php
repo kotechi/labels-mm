@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login Page</title>
-    <link rel="icon" type="image/svg+xml" href="{{ asset('storage/images/icon/logo_label.png') }}">
+    <link rel="icon" type="image/svg+xml" href="{{ asset('images/icon/logo_label.png') }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         body { font-family: 'Poppins', serif; }
@@ -21,7 +21,7 @@
 </head>
 
 <body class="flex items-center justify-center min-h-screen bg-gradient-to-b from-[#6A1E55] via-[#6b0d55] to-[#ebc0e1]">
-    <img src="{{ asset('storage/images/group_7.png') }}" class="hiasan w-5 h-5" alt="">
+    <img src="{{ asset('images/group_7.png') }}" class="hiasan w-5 h-5" alt="">
     
     <div class="container flex flex-col items-center justify-center min-h-screen -mt-5">
         <h2 class="text-4xl font-extrabold text-white mb-8 mt-5 drop-shadow-[1px_9px_2px_rgba(0,0,0,0.3)]">
@@ -29,7 +29,7 @@
         </h2>
         <div class="flex w-full max-w-4xl bg-white rounded-lg shadow-lg">
             <div class="w-1/2 flex items-center justify-center bg-white shadow-lg mt-1 p-16">
-                <img src="{{ asset('storage/images/icon/LAblesMM.png') }}" alt="Logo" class="p-3 max-w-full rounded-xl border-2 border-pink-200 shadow-[0_6px_15px_rgba(0,0,0,0.6)]">
+                <img src="{{ asset('images/icon/LAblesMM.png') }}" alt="Logo" class="p-3 max-w-full rounded-xl border-2 border-pink-200 shadow-[0_6px_15px_rgba(0,0,0,0.6)]">
             </div>
             <div class="w-1/2 p-8 bg-white rounded-md">
                 <h2 class="text-3xl font-bold text-center text-[#00000] mb-8"><u>Agent Login</u></h2>

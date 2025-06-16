@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Labels-MM</title>
-    <link rel="icon" type="image/svg+xml" href="{{ asset('storage/images/icon/logo_label.png') }}" alt="Logo">
+    <link rel="icon" type="image/svg+xml" href="{{ asset('images/icon/logo_label.png') }}" alt="Logo">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 </head>

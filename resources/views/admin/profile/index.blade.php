@@ -12,7 +12,7 @@
 <div class="flex mt-6  bg-white shadow-xl border-purple">
     <!-- Left Side with Logo -->
     <div class="w-1/3 bg-gray-200 hidden lg:flex items-center justify-center">
-        <img src="{{ asset('storage/images/icon/LAblesMM.png') }}" alt="Labels Fashion Logo" class="w-86">
+        <img src="{{ asset('images/icon/LAblesMM.png') }}" alt="Labels Fashion Logo" class="w-86">
     </div>
 
     <!-- Right Side with Form -->

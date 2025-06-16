@@ -1,6 +1,6 @@
 <div class="fixed top-0 left-0 h-screen w-64 p-6 bg-white shadow-lg flex flex-col">
   <div class="flex items-center gap-2 mb-6">
-      <img src="{{ asset('storage/images/icon/LAblesMM.png') }}" alt="Logo" class="w-auto h-auto">
+      <img src="{{ asset('images/icon/LAblesMM.png') }}" alt="Logo" class="w-auto h-auto">
       <span class="text-lg font-bold text-gray-700"></span>
   </div>
 

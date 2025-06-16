@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Karyawan | @yield('title')</title>
-    <link rel="icon" type="image/svg+xml" href="{{ asset('storage/images/icon/logo_label.png') }}">
+    <link rel="icon" type="image/svg+xml" href="{{ asset('images/icon/logo_label.png') }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script src="{{ asset('assets/js/chart.min.js') }}"></script>
     <script src="{{ asset('assets/js/lucid.min.js') }}"></script>
@@ -559,7 +559,7 @@
             </button>
             
             <div class="flex items-center gap-2 mb-4 sidebar-logo">
-                <img src="{{ asset('storage/images/icon/logo.svg') }}" alt="Logo" class="w-[230] h-auto">
+                <img src="{{ asset('images/icon/logo.svg') }}" alt="Logo" class="w-[230] h-auto">
                 <span class="text-lg font-bold text-gray-700 sidebar-text"></span>
             </div>
 
