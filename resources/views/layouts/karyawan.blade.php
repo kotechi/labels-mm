@@ -259,6 +259,16 @@
 
     aside.collapsed:hover .sidebar-text {
         display: inline;
+        animation: sidebar-teks 1.5s linear;
+    }
+
+    @keyframes sidebar-teks {
+        0% {
+            opacity: 0;
+        }
+        100% {
+            opacity: 1;
+        }
     }
 
     aside.collapsed:hover .sidebar-logo img {
@@ -609,7 +619,7 @@
         <!-- Main Content -->
         <main class="flex-1 h-full w-full lg:w-full pl-48 mt-2 lg:pl-[220px]">
             <!-- Content Area -->
-            <div class="px-5 pb-5 h-full">
+            <div class="px-3 lg:px-5 pb-5 h-full">
                 @yield('content')
             </div>
         </main>

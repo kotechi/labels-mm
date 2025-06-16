@@ -260,6 +260,16 @@
 
     aside.collapsed:hover .sidebar-text {
         display: inline;
+        animation: sidebar-teks 1.5s linear;
+    }
+
+    @keyframes sidebar-teks {
+        0% {
+            opacity: 0;
+        }
+        100% {
+            opacity: 1;
+        }
     }
 
     aside.collapsed:hover .sidebar-logo img {
@@ -317,9 +327,6 @@
         transform: rotate(180deg);
     }
     
-
-
-
     .sidebar-notification {
         position: absolute;
         right: 4px;
@@ -533,12 +540,12 @@
 </style>
 <body class="min-h-screen font-sans bg-gray-100">
     <!-- Loading Screen -->
-<div id="loading-screen">
-    <div class="loading-spinner">
-        <div class="spinner"></div>
-        <p>Loading...</p>
+    <div id="loading-screen">
+        <div class="loading-spinner">
+            <div class="spinner"></div>
+            <p>Loading...</p>
+        </div>
     </div>
-</div>
     <div class="flex min-h-screen w-full lg:w-auto">
         <!-- Sidebar -->
         <aside class="fixed top-0 left-0 h-screen w-48 lg:w-[220px] p-6 bg-white shadow-lg flex z-50 flex-col">
@@ -625,7 +632,7 @@
         </aside>
 
         <main class="flex-1 h-full w-full lg:w-full pl-48 mt-2 lg:pl-[220px]">
-            <div class="px-5 pb-5 h-full">
+            <div class="px-3 lg:px-5 pb-5 h-full">
                 @yield('content')
             </div>
         </main>

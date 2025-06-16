@@ -74,17 +74,17 @@
     <div id="about" class="py-16 px-24 bg-gradient-to-br from-purple-50 to-fuchsia-400 relative">
 
         <div class="container mx-auto px-4">
-            <h2 data-aos="zoom-in-down"  class="text-center text-color-labels font-bold text-2xl mb-10">About Us</h2>
+            <h2 data-aos="zoom-in-down"  class="text-center text-color-labels font-bold text-2xl mb-20">About Us</h2>
             
             <div class="flex flex-col md:flex-row items-center md:items-start">
-                <div class="md:w-1/3 flex justify-center mb-8 md:mb-0 md:order-1">
-                    <img src="{{ asset('storage/' . $abouts->image) }}" alt="Model" class="rounded-full shadow-lg w-64 h-64 object-cover">
+                <div class="md:w-1/3 flex justify-center mb-8 md:mb-0 md:order-1" data-aos="zoom-in-down">
+                    <img src="{{ asset('storage/' . $abouts->image) }}" alt="Model" class="rounded-tl-[75px] rounded-br-[75px] shadow-lg w-[17rem] h-[20rem] object-cover">
                 </div>
                 <div data-aos="zoom-in-down" data-aos-delay="500"  class="md:w-2/3 pr-0 md:pr-8 md:order-0">
                     <h3 class="text-color-labels font-semibold text-xl mb-4">{{$abouts->tittle}}</h3>
                     
-                    <div class="mb-4">
-                        <div class="flex items-start mb-2">
+                    <div class="mb-16">
+                        <div class="flex items-start mb-2 pr-24 ">
                             <div>
                                 <p class="text-gray-600 text-md">{{$abouts->deskripsi}}</p>
                             </div>
@@ -135,7 +135,7 @@
             
             <div class="flex flex-col md:flex-row gap-6">
                 <div class="md:w-1/2">
-                    <div class="bg-white rounded-lg shadow-md p-6" data-aos="zoom-in-down" data-aos-delay="450">
+                    <div class="bg-white rounded-lg shadow-md p-10" data-aos="zoom-in-down" data-aos-delay="450">
                         <h3 class="font-semibold mb-4 text-center">Form Contact</h3>
                         
                         <form id="contactForm" action="{{ route('contact.lp.store')}}" method="POST">
